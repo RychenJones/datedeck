@@ -1,1 +1,62 @@
-[]
+[
+  {
+    "id": "sample-1",
+    "title": "Picnic at Porter Park",
+    "description": "Bring a blanket and some snacks and spend a slow evening in the park.",
+    "place_name": "Porter Park",
+    "address": "Rexburg, ID 83440",
+    "location": "Downtown Rexburg",
+    "price": 0,
+    "duration": 90,
+    "category": "Outdoors",
+    "photo": ""
+  },
+  {
+    "id": "sample-2",
+    "title": "Sunset at the sand dunes",
+    "description": "Drive out to the dunes, climb to the top and watch the sun go down.",
+    "place_name": "St. Anthony Sand Dunes",
+    "address": "St. Anthony, ID 83445",
+    "location": "Outside Rexburg",
+    "price": 0,
+    "duration": 180,
+    "category": "Outdoors",
+    "photo": ""
+  },
+  {
+    "id": "sample-3",
+    "title": "Hike the Menan Buttes",
+    "description": "A short, steep hike up a volcanic butte with views of the whole valley.",
+    "place_name": "Menan Buttes",
+    "address": "Menan, ID 83434",
+    "location": "Outside Rexburg",
+    "price": 0,
+    "duration": 150,
+    "category": "Active",
+    "photo": ""
+  },
+  {
+    "id": "sample-4",
+    "title": "Campus concert night",
+    "description": "Catch a student concert or performance on campus.",
+    "place_name": "BYU-Idaho Center",
+    "address": "Rexburg, ID 83460",
+    "location": "BYU-Idaho Campus",
+    "price": 8,
+    "duration": 120,
+    "category": "Show",
+    "photo": ""
+  },
+  {
+    "id": "sample-5",
+    "title": "Drive-through Yellowstone Bear World",
+    "description": "Drive through the park to see bears, elk and bison up close.",
+    "place_name": "Yellowstone Bear World",
+    "address": "Rexburg, ID 83440",
+    "location": "Outside Rexburg",
+    "price": 30,
+    "duration": 120,
+    "category": "Animals",
+    "photo": ""
+  }
+]
