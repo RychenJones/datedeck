@@ -1,4 +1,4 @@
-import IdeaCard from '../components/Idea_Card.jsx';
+import IdeaCard from '../components/IdeaCard/IdeaCard.jsx';
 import sampleIdeas from '../data/sample-ideas.json';
 
 import '../styles/home.css';

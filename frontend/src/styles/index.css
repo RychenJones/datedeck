@@ -159,7 +159,3 @@ select { width: 100%; appearance: none; border: 0; border-radius: 20px; backgrou
   .header-actions .button .icon { width: 18px; } .people { grid-template-columns: 1fr 1fr; } .idea-grid { grid-template-columns: 1fr; }
   .idea-card h2 { font-size: 24px; } .results-toolbar { font-size: 17px; } .sort { gap: 7px; font-size: 14px; } .sort select { min-width: 145px; font-size: 15px; }
 }
-
-* {
-  box-sizing: border-box;
-}
