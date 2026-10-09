@@ -1,1 +1,29 @@
-[]
+[
+  {
+    "id": "idea-1",
+    "title": "Sunset picnic",
+    "place": "City Park",
+    "locationArea": "Central Denver",
+    "pricePerPerson": 0,
+    "duration": "2 hours",
+    "photo": ""
+  },
+  {
+    "id": "idea-2",
+    "title": "Coffee and a bookstore browse",
+    "place": "Tattered Cover",
+    "locationArea": "McGregor Square",
+    "pricePerPerson": 12,
+    "duration": "1.5 hours",
+    "photo": ""
+  },
+  {
+    "id": "idea-3",
+    "title": "Beginner pottery class",
+    "place": "The Craftsman & Apprentice",
+    "locationArea": "RiNo",
+    "pricePerPerson": 45,
+    "duration": "2.5 hours",
+    "photo": ""
+  }
+]

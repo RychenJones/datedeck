@@ -1,0 +1,80 @@
+.idea-card {
+  overflow: hidden;
+  border: 1px solid #d9e0e7;
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: 0 2px 8px rgb(31 41 51 / 8%);
+}
+
+.idea-card__photo-wrap {
+  aspect-ratio: 16 / 9;
+  background: #e7edf2;
+}
+
+.idea-card__photo,
+.idea-card__placeholder {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.idea-card__photo {
+  object-fit: cover;
+}
+
+.idea-card__placeholder {
+  display: grid;
+  place-items: center;
+  color: #52606d;
+  font-size: 0.9rem;
+}
+
+.idea-card__content {
+  padding: 1rem;
+}
+
+.idea-card__title,
+.idea-card__place,
+.idea-card__area {
+  margin: 0;
+}
+
+.idea-card__title {
+  font-size: 1.15rem;
+  line-height: 1.3;
+}
+
+.idea-card__place {
+  margin-top: 0.5rem;
+  font-weight: 600;
+}
+
+.idea-card__area {
+  margin-top: 0.15rem;
+  color: #52606d;
+  font-size: 0.9rem;
+}
+
+.idea-card__details {
+  display: flex;
+  gap: 1rem;
+  margin: 1rem 0 0;
+  padding-top: 0.8rem;
+  border-top: 1px solid #e7edf2;
+}
+
+.idea-card__details div {
+  min-width: 0;
+}
+
+.idea-card__details dt {
+  color: #52606d;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.idea-card__details dd {
+  margin: 0.2rem 0 0;
+  font-weight: 600;
+}

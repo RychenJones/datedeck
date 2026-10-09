@@ -1,0 +1,40 @@
+.home {
+  width: min(100% - 2rem, 72rem);
+  margin: 0 auto;
+  padding: 2rem 0 3rem;
+}
+
+.home__header {
+  margin-bottom: 1.5rem;
+}
+
+.home__eyebrow {
+  margin: 0 0 0.35rem;
+  color: #52606d;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.home__header h1 {
+  margin: 0;
+  font-size: clamp(1.75rem, 5vw, 2.5rem);
+}
+
+.home__header > p:last-child {
+  margin: 0.5rem 0 0;
+  color: #52606d;
+}
+
+.idea-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr));
+  gap: 1rem;
+}
+
+@media (min-width: 640px) {
+  .home {
+    padding-top: 3rem;
+  }
+}

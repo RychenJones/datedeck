@@ -1,8 +1,14 @@
 /* Design tokens and global styles (DD-07). */
 :root {
   font-family: system-ui, sans-serif;
+  color: #1f2933;
+  background: #f5f7fa;
 }
 
 body {
   margin: 0;
+}
+
+* {
+  box-sizing: border-box;
 }
