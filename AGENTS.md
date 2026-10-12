@@ -135,7 +135,7 @@ function Deck({ maxPrice }) {
 
 ## Workflow
 
-1. Before a story, read its acceptance criteria in `docs/PLAN.md` and ask about anything that isn't clear. Work on the story's branch from the plan (for example `gabriel/dd-06`), created from an up-to-date `main`.
+1. Before a story, read its acceptance criteria in `docs/PLAN.md` and ask about anything that isn't clear.
 2. Build with `npm run dev` and PocketBase running, and repeat `npm run lint` and `npm test` until every acceptance criterion passes.
 3. Explain what changed in simple words, with a small example and what to click to try it.
 4. At the end, go through the story's acceptance criteria one by one and say which pass and how you checked.
