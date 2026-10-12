@@ -63,11 +63,13 @@ datedeck/
 ## PocketBase and secrets
 
 - The app finds PocketBase through `VITE_POCKETBASE_URL` in `frontend/.env` (for example `http://127.0.0.1:8090`). Copy `frontend/.env.example` to `frontend/.env` to start.
-- The ideas live in the **dates** collection: `title`, `description`, `location`, `price` (per person, `0` = free), `category`, `image`, `created_by`. Story DD-01 also asks for place, address, location area and duration. Check the dashboard or `backend/pb_migrations/` for the current fields before writing a query.
+- The ideas live in the **dates** collection: `title`, `description`, `place_name`, `address`, `location` (the location area), `price` (per person, `0` = free), `duration` (minutes), `category`, `photo`, `created_by`. Fields change as stories land, so check `backend/pb_migrations/` before writing a query.
+- Until DD-04 and DD-09 wire the deck to PocketBase, the Home page shows `src/data/sample-ideas.json`. An idea added with the form appears in the PocketBase dashboard, not on the page yet.
 - Until sign-in arrives in sprint 3, saved and hidden ideas live in `localStorage` under `datedeck.swipes`. In sprint 3 they move to a collection tied to the user (there is already a **favorites** collection with `user` and `date`).
 - Build filters with `pb.filter()` and named parameters, never by gluing strings together: `pb.filter('location = {:area} && price <= {:max}', { area, max })`.
 - The SDK cancels a request when an identical one starts. React's StrictMode runs effects twice in development, so a duplicate list call can fail with an "autocancelled" error. Pass `requestKey: null` or ignore errors where `err.isAbort` is true.
 - Changing a collection or its API rules in the dashboard writes a file to `backend/pb_migrations/`. Commit that file with the story, so teammates get the change.
+- If `./pocketbase serve` stops with `failed to apply migration ... Duplicated or invalid field name`, the local database already has a field a teammate's migration adds. Ask first, then move `backend/pb_data` aside (for example to `pb_data_backup`) so PocketBase rebuilds it from the migrations; this drops local records and the admin account.
 - **Any variable starting with `VITE_` is visible to everyone in the browser.** Only the PocketBase URL goes there. The admin password and the AI API key stay on the server, in PocketBase's settings or `pb_hooks`, never in `frontend/src/` or a `VITE_` variable.
 
 ## Code style
@@ -78,49 +80,50 @@ datedeck/
 - Colors, fonts and spacing come from the design token variables, not hard-coded values.
 - Whenever creating or editing a CSS file, first read [`docs/STYLE_GUIDE.md`](docs/STYLE_GUIDE.md) and follow its rules throughout the change.
 - Real buttons and labels (`<button>`, `<label>`), never a clickable `<div>`.
+- Prettier decides formatting (2-space indent, single quotes, 100 columns). Run `npm run format` before committing.
 
 ```jsx
 // Good: data access in a hook, safe filter, loading and error states, cleans up
 export function useIdeas({ area, maxPrice }) {
-	const [ideas, setIdeas] = useState([]);
-	const [status, setStatus] = useState('loading');
+  const [ideas, setIdeas] = useState([]);
+  const [status, setStatus] = useState('loading');
 
-	useEffect(() => {
-		let cancelled = false;
-		setStatus('loading');
-		pb.collection('dates')
-			.getFullList({
-				filter: pb.filter('location = {:area} && price <= {:maxPrice}', {
-					area,
-					maxPrice,
-				}),
-				sort: '-created',
-				requestKey: null,
-			})
-			.then((items) => {
-				if (!cancelled) {
-					setIdeas(items);
-					setStatus('ready');
-				}
-			})
-			.catch(() => {
-				if (!cancelled) setStatus('error');
-			});
-		return () => {
-			cancelled = true;
-		};
-	}, [area, maxPrice]);
+  useEffect(() => {
+    let cancelled = false;
+    setStatus('loading');
+    pb.collection('dates')
+      .getFullList({
+        filter: pb.filter('location = {:area} && price <= {:maxPrice}', {
+          area,
+          maxPrice,
+        }),
+        sort: '-created',
+        requestKey: null,
+      })
+      .then((items) => {
+        if (!cancelled) {
+          setIdeas(items);
+          setStatus('ready');
+        }
+      })
+      .catch(() => {
+        if (!cancelled) setStatus('error');
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [area, maxPrice]);
 
-	return { ideas, status };
+  return { ideas, status };
 }
 
 // Bad: fetches on every render, builds the filter from a string, no error state
 function Deck({ maxPrice }) {
-	const [ideas, setIdeas] = useState([]);
-	pb.collection('dates')
-		.getFullList({ filter: `price <= ${maxPrice}` })
-		.then(setIdeas);
-	return ideas.map((i) => <div onClick={() => save(i)}>{i.title}</div>);
+  const [ideas, setIdeas] = useState([]);
+  pb.collection('dates')
+    .getFullList({ filter: `price <= ${maxPrice}` })
+    .then(setIdeas);
+  return ideas.map((i) => <div onClick={() => save(i)}>{i.title}</div>);
 }
 ```
 
@@ -142,8 +145,8 @@ function Deck({ maxPrice }) {
 
 - Commit only when asked. Suggest the commit message and wait for an OK.
 - Message: a short summary line (`DD-06: add an idea with a form`), then a few `- ` bullets of what changed.
-- Open a pull request to `main` after `npm run lint`, `npm test` and `npm run build` all pass. A teammate reviews it before it's merged.
-- Keep `backend/pb_data/`, `.env`, `node_modules/`, `dist/` and the `pocketbase` binary out of commits (already in `.gitignore`).
+- Open a pull request to `main` after `npm run lint`, `npm test`, `npm run build` and `npm run format` all pass. A teammate reviews it before it's merged.
+- Keep `backend/pb_data/`, `.env`, `node_modules/`, `dist/` and the `pocketbase` binary out of commits (already in `.gitignore`). Database copies such as `backend/pb_data_backup/` are not ignored, so stage files by name instead of `git add .`.
 
 ## Boundaries
 
