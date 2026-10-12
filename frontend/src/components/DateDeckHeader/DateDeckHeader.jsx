@@ -22,7 +22,7 @@ export default function DateDeckHeader({
         <span className="brand-mark">
           <DateDeckIcon name="heart" />
         </span>
-        datedeck
+        <span className="brand-name">datedeck</span>
       </a>
       <nav className="view-tabs" aria-label="Date idea views">
         {views.map(({ value, label, icon }) => (
@@ -35,7 +35,7 @@ export default function DateDeckHeader({
             onClick={() => onViewChange?.(value)}
           >
             <DateDeckIcon name={icon} />
-            {label}
+            <span className="tab-label">{label}</span>
           </button>
         ))}
       </nav>
@@ -45,6 +45,7 @@ export default function DateDeckHeader({
           type="button"
           aria-label={theme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme'}
           aria-pressed={theme === 'light'}
+          title={theme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme'}
           onClick={onThemeToggle}
         >
           <DateDeckIcon name="sun" />
@@ -57,7 +58,7 @@ export default function DateDeckHeader({
           onClick={onAddIdea}
         >
           <DateDeckIcon name="plus" />
-          Add idea
+          <span className="header-action-label">Add idea</span>
         </button>
       </div>
     </header>

@@ -76,6 +76,7 @@ datedeck/
 - Hooks start with `use` and live in `frontend/src/hooks/`. Components never call PocketBase directly; they use a hook.
 - Every screen that loads data shows loading, error and empty states.
 - Colors, fonts and spacing come from the design token variables, not hard-coded values.
+- Whenever creating or editing a CSS file, first read [`docs/STYLE_GUIDE.md`](docs/STYLE_GUIDE.md) and follow its rules throughout the change.
 - Real buttons and labels (`<button>`, `<label>`), never a clickable `<div>`.
 
 ```jsx
