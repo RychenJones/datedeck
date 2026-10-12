@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#151d21" />
+    <meta
+      name="description"
+      content="DateDeck React preview with Deck, All ideas, and Liked views."
+    />
+    <title>DateDeck · Deck, All ideas &amp; Liked</title>
+  </head>
+  <body>
+    <!-- Same React entry as index.html: Home.jsx owns the header and layout. -->
+    <div id="root"></div>
+    <noscript>DateDeck needs JavaScript to display the React views and your liked ideas.</noscript>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>

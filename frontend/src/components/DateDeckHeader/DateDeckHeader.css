@@ -1,0 +1,15 @@
+/* Inherit the template's brand, pills, actions and breakpoints from index.css. */
+.datedeck-header .tab {
+  min-width: 0;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-2);
+  font-size: var(--text-sm);
+}
+
+@media (min-width: 800px) {
+  .datedeck-header .tab {
+    gap: var(--space-3);
+    padding: var(--space-4) var(--space-6);
+    font-size: var(--text-lg);
+  }
+}

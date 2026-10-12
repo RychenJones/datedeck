@@ -2,12 +2,12 @@
 
 Generated from the Trello export (`datedeck-trello.json`). The Trello board is the live copy; update this file when stories change.
 
-| Track | Owner |
-|---|---|
-| PocketBase and data | Rychen |
-| Deck and swiping | Riley |
+| Track                          | Owner   |
+| ------------------------------ | ------- |
+| PocketBase and data            | Rychen  |
+| Deck and swiping               | Riley   |
 | Forms, filters and React setup | Gabriel |
-| Design, lists and quality | Talmage |
+| Design, lists and quality      | Talmage |
 
 ## Sprint 1: First deck (2026-10-05 to 2026-10-16)
 
@@ -65,7 +65,7 @@ Generated from the Trello export (`datedeck-trello.json`). The Trello board is t
 **Acceptance criteria**
 
 - [ ] Design tokens as CSS variables: colors, fonts, spacing, corners
-- [ ] App shell with header and Deck and Browse tabs
+- [ ] App shell with a React-owned header and Deck, Browse (All ideas), and Liked tabs
 - [ ] Mobile-first layout that also works on a laptop
 - [ ] A one-page style guide in the docs
 
@@ -172,7 +172,7 @@ Generated from the Trello export (`datedeck-trello.json`). The Trello board is t
 - [ ] Open in Maps link for the address
 - [ ] Save or Hide from the details view
 
-### DD-15 Show my Saved and Hidden lists
+### DD-15 Show my Liked (Saved) and Hidden lists
 
 - **Owner:** Talmage · **Week:** 3 · **Due:** 2026-10-23 · **Points:** 3 · **Labels:** Frontend, Design
 - **Branch:** `talmage/dd-15` · **Depends on:** DD-04
@@ -182,9 +182,17 @@ Generated from the Trello export (`datedeck-trello.json`). The Trello board is t
 **Acceptance criteria**
 
 - [ ] Saved list with photo, title, location and price
+- [ ] A third Liked tab beside Deck and All ideas shows only ideas the user has liked, using the existing rounded card grid and shared design tokens
+- [ ] Heart buttons in Deck and All ideas toggle a like with an accessible pressed state; the Liked grid and Saved for later sidebar update together
+- [ ] Unlike from the Liked grid or Saved sidebar removes the idea from both lists without deleting the idea
+- [ ] Likes persist across reloads in `datedeck.swipes` as a `saved` array of idea IDs; retain `hidden` and other existing fields, and show a clear message if storage is unavailable or unreadable
+- [ ] The empty Liked view explains heart buttons and provides an All ideas action; counts reflect the available examples and actual liked ideas
+- [ ] All three navigation buttons and heart controls work by keyboard, have visible focus, and fit at 320px and 375px widths
 - [ ] Remove an idea from Saved
 - [ ] Hidden list with Bring back, which returns it to the deck
 - [ ] Clear empty states that explain swiping
+
+**Requested UI extension:** Liked is the navigation name for saved ideas, not a second favorites collection. For the current preview, liking and unliking work with the existing layout examples in `Home.jsx`; the static sample file is still empty. This extends the style guide's original disabled-fixture scope only for heart buttons and the Saved sidebar. Filters, Hide/Undo/Shuffle, details, form submission, and database integration remain separate stories. Keep the header in `Home.jsx` and the testing HTML on the shared React entry. Do not claim the complete DD-15 story is done until its Hidden list criteria also pass.
 
 ### DD-10 Put DateDeck online
 
