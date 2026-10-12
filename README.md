@@ -3,6 +3,8 @@ DateDeck is a full-stack application designed to improve the dating scene in Rex
 
 The DateDeck database is continuously expanding, allowing users to submit their own date ideas and contribute new recommendations to the community.
 
+https://datedeck.netlify.app
+
 # Team Members
 * Rychen Jones
 * Riley Cluff
