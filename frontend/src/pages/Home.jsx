@@ -1,3 +1,4 @@
+import AddIdeaForm from '../components/AddIdeaForm/AddIdeaForm.jsx';
 import IdeaCard from '../components/IdeaCard/IdeaCard.jsx';
 import sampleIdeas from '../data/sample-ideas.json';
 
@@ -18,6 +19,8 @@ export default function Home() {
           <IdeaCard key={idea.id} idea={idea} />
         ))}
       </section>
+
+      <AddIdeaForm />
     </main>
   );
 }
