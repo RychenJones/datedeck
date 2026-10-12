@@ -1,0 +1,84 @@
+/* Colors come from the design tokens in index.css; the fallbacks match the dark theme. */
+.add-idea {
+  display: grid;
+  gap: 1rem;
+  max-width: 40rem;
+  margin-top: 2rem;
+  padding: 1.5rem;
+  border-radius: 1.5rem;
+  background: var(--panel, #222c32);
+  color: var(--ink, #edf3f1);
+}
+
+.add-idea h2 {
+  font-size: 1.5rem;
+}
+
+.add-idea__row {
+  display: grid;
+  gap: 1rem;
+}
+
+@media (min-width: 480px) {
+  .add-idea__row {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.add-idea__field {
+  display: grid;
+  gap: 0.4rem;
+  min-width: 0;
+}
+
+.add-idea__field label {
+  font-weight: 700;
+}
+
+.add-idea__field input,
+.add-idea__field select,
+.add-idea__field textarea {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 2px solid transparent;
+  border-radius: 0.75rem;
+  background: var(--field, #2b363d);
+  color: var(--ink, #edf3f1);
+}
+
+.add-idea__field textarea {
+  resize: vertical;
+}
+
+.add-idea__field [aria-invalid='true'] {
+  border-color: var(--accent, #ff7866);
+}
+
+.add-idea__error {
+  color: var(--accent, #ff7866);
+  font-size: 0.9rem;
+}
+
+.add-idea__submit {
+  justify-self: start;
+  padding: 0.85rem 1.75rem;
+  border-radius: 2.5rem;
+  background: var(--accent, #ff7866);
+  color: var(--page, #151d21);
+  font-weight: 800;
+}
+
+.add-idea__submit:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+
+.add-idea__message {
+  padding: 0.75rem 1rem;
+  border-radius: 0.75rem;
+  background: var(--field, #2b363d);
+}
+
+.add-idea__message--error {
+  color: var(--accent, #ff7866);
+}
