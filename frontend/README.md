@@ -28,3 +28,42 @@ Start PocketBase first (see `../setup-pocketbase.md`) so the app can reach it at
 - `npm run build` – build for production
 - `npm run lint` – check code with ESLint
 - `npm run format` – format code with Prettier
+
+## Using `useIdeas`
+
+Use the shared hook to load ideas and add a new one from a React component:
+
+```jsx
+import { useIdeas } from './hooks/useIdeas.js';
+
+function IdeasList() {
+  const { ideas, status, error, addIdea } = useIdeas();
+
+  if (status === 'loading') return <p>Loading ideas...</p>;
+  if (status === 'error') return <p>Could not load ideas: {error.message}</p>;
+
+  async function handleAddIdea() {
+    await addIdea({
+      title: 'Bowling',
+      description: 'A casual bowling date.',
+      place_name: 'Rexburg Bowling Center',
+      address: 'Rexburg, ID',
+      location: 'Rexburg',
+      price: 12,
+      duration: 90,
+      category: 'Activity',
+    });
+  }
+
+  return (
+    <>
+      <button type="button" onClick={handleAddIdea}>
+        Add example idea
+      </button>
+      {ideas.map((idea) => (
+        <p key={idea.id}>{idea.title}</p>
+      ))}
+    </>
+  );
+}
+```
