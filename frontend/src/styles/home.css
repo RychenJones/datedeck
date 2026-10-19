@@ -44,9 +44,10 @@
   isolation: isolate;
   margin: 0 auto var(--space-8);
 }
+/* Stop the back cards above the controls row (save button height + its top margin). */
 .deck__behind {
   position: absolute;
-  inset: 0;
+  inset: 0 0 calc(var(--control-action) + var(--space-6));
   z-index: -1;
   overflow: hidden;
   border-radius: var(--radius-card);
