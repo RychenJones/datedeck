@@ -33,6 +33,15 @@ You need [Node.js](https://nodejs.org/) and the PocketBase binary (see [`setup-p
 
 Other commands (from `frontend/`): `npm run lint`, `npm test`, `npm run build`, `npm run format`.
 
+# Branches and Pull Requests
+
+- `main` is protected: nobody pushes to it directly, and every change goes in through a pull request.
+- Make one branch per story from the latest `main`, named `yourname/dd-XX` (for example `gabriel/dd-06`).
+- Before opening a pull request, run `npm run lint`, `npm test`, `npm run build` and `npm run format` in `frontend/`; all of them must pass.
+- Commit messages start with the story: `DD-06: add an idea with a form`, followed by a few `- ` bullets of what changed.
+- A teammate reviews and approves every pull request before it is merged. Never force-push to `main`.
+- Stage files by name instead of `git add .`, and keep `.env`, `backend/pb_data/` and other database copies out of commits.
+
 # Architecture
 
 | Layer             | Choice                                                                                                                                       |
