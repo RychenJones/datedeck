@@ -130,19 +130,22 @@ Generated from the Trello export (`datedeck-trello.json`). The Trello board is t
 
 **Goal:** Swipe to save or hide, filter by location and price, see your saved and hidden ideas, open an idea’s details, work well on phones, and put DateDeck online. The core app is done.
 
-### DD-09 Filter ideas in PocketBase by location and price
+**How this sprint is split:** week 3 cards need only Sprint 1 work, so all four start on Oct 19. Week 4 cards need only DD-09 (Gabriel, week 3) or their owner's own week 3 card. No card waits on another card from the same week, and each week 4 card works in its own files.
 
-- **Owner:** Rychen · **Week:** 3 · **Due:** 2026-10-23 · **Points:** 2 · **Labels:** Backend
-- **Branch:** `rychen/dd-09` · **Depends on:** DD-02, DD-04
+### DD-14 Open an idea’s details
 
-> As a user, I want only ideas that match my location and budget, so that the deck shows what works for me.
+- **Owner:** Rychen · **Week:** 3 · **Due:** 2026-10-23 · **Points:** 2 · **Labels:** Frontend
+- **Branch:** `rychen/dd-14` · **Depends on:** DD-02, DD-03
+
+> As a user, I want to open an idea and see everything about it, so that I can plan the date.
 
 **Acceptance criteria**
 
-- [ ] The deck loads the real ideas through useIdeas instead of the sample file
-- [ ] useIdeas accepts location areas, a price range, category and search text
-- [ ] Filtering is done with PocketBase filter queries, not in the browser
-- [ ] Results are sorted and paged so the deck stays fast
+- [ ] Tap an idea in the All ideas grid to open its details; close with a Close button or Esc
+- [ ] Details view: photo from PocketBase file storage (or a placeholder), full description, address, price, duration and category
+- [ ] Open in Maps link for the address
+- [ ] Works with both the sample ideas and real PocketBase ideas, so it doesn’t wait on DD-09
+- [ ] Built as its own IdeaDetails component, so the Liked list and sprint 3's Pick one for us can reuse it; fits a 375px screen
 
 ### DD-11 Swipe the card by dragging
 
@@ -157,74 +160,43 @@ Generated from the Trello export (`datedeck-trello.json`). The Trello board is t
 - [ ] SAVE and HIDE stamps fade in while dragging
 - [ ] Works with mouse, touch and pen
 - [ ] Left and right arrow keys do the same
+- [ ] Built as its own SwipeCard component that wraps the top card and calls the deck's save and hide
 
-### DD-14 Browse all ideas and open the details
+### DD-09 Load real ideas with PocketBase filters and share saved and hidden ideas
 
-- **Owner:** Gabriel · **Week:** 3 · **Due:** 2026-10-23 · **Points:** 2 · **Labels:** Frontend
-- **Branch:** `gabriel/dd-14` · **Depends on:** DD-02, DD-03
+- **Owner:** Gabriel · **Week:** 3 · **Due:** 2026-10-23 · **Points:** 3 · **Labels:** Backend, Frontend
+- **Branch:** `gabriel/dd-09` · **Depends on:** DD-02, DD-04
 
-> As a user, I want to browse every idea and open one to see everything, so that I can plan the date.
-
-**Acceptance criteria**
-
-- [ ] Browse tab shows every idea in a grid, loaded with useIdeas
-- [ ] Details view: photo, full description, address, price, duration and category
-- [ ] Open in Maps link for the address
-- [ ] Save or Hide from the details view
-
-### DD-15 Show my Liked (Saved) and Hidden lists
-
-- **Owner:** Talmage · **Week:** 3 · **Due:** 2026-10-23 · **Points:** 3 · **Labels:** Frontend, Design
-- **Branch:** `talmage/dd-15` · **Depends on:** DD-04
-
-> As a user, I want to see the ideas I saved and the ones I hid, so that I can plan from my favorites and undo a hide.
+> As a user, I want the deck to show real Rexburg ideas that fit my location and budget, so that what I see works for me. This is the groundwork card: every week 4 card builds on it.
 
 **Acceptance criteria**
 
-- [ ] Saved list with photo, title, location and price
-- [ ] A third Liked tab beside Deck and All ideas shows only ideas the user has liked, using the existing rounded card grid and shared design tokens
-- [ ] Heart buttons in Deck and All ideas toggle a like with an accessible pressed state; the Liked grid and Saved for later sidebar update together
-- [ ] Unlike from the Liked grid or Saved sidebar removes the idea from both lists without deleting the idea
-- [ ] Likes persist across reloads in `datedeck.swipes` as a `saved` array of idea IDs; retain `hidden` and other existing fields, and show a clear message if storage is unavailable or unreadable
-- [ ] The empty Liked view explains heart buttons and provides an All ideas action; counts reflect the available examples and actual liked ideas
-- [ ] All three navigation buttons and heart controls work by keyboard, have visible focus, and fit at 320px and 375px widths
-- [ ] Remove an idea from Saved
-- [ ] Hidden list with Bring back, which returns it to the deck
-- [ ] Clear empty states that explain swiping
+- [ ] First, by Tue Oct 20: give each tab its own page file (pages/Deck.jsx, pages/Browse.jsx, pages/Liked.jsx); Home.jsx keeps the header and switches tabs; nothing looks different and class names stay the same. Merge it so everyone builds in their own file
+- [ ] The deck and the All ideas grid load real ideas through useIdeas instead of the sample file, with loading, error and empty states
+- [ ] useIdeas accepts location areas, a price range, category and search text, filtered with pb.filter() queries in PocketBase, not in the browser
+- [ ] Results are sorted and paged so the deck stays fast
+- [ ] One shared useSwipes hook (provider in App.jsx) gives every tab saved, hidden, save, hide, unsave and unhide, still stored in datedeck.swipes
+- [ ] Filter state lives in Home.jsx and is passed to the deck and All ideas, ready for the filter bar in DD-13
 
-**Requested UI extension:** Liked is the navigation name for saved ideas, not a second favorites collection. For the current preview, liking and unliking work with the existing layout examples in `Home.jsx`; the static sample file is still empty. This extends the style guide's original disabled-fixture scope only for heart buttons and the Saved sidebar. Filters, Hide/Undo/Shuffle, details, form submission, and database integration remain separate stories. Keep the header in `Home.jsx` and the testing HTML on the shared React entry. Do not claim the complete DD-15 story is done until its Hidden list criteria also pass.
+### DD-16 Make it great on phones
 
-### DD-10 Put DateDeck online
+- **Owner:** Talmage · **Week:** 3 · **Due:** 2026-10-23 · **Points:** 3 · **Labels:** Design, QA
+- **Branch:** `talmage/dd-16` · **Depends on:** DD-04, DD-07
 
-- **Owner:** Rychen · **Week:** 4 · **Due:** 2026-10-30 · **Points:** 3 · **Labels:** Backend
-- **Branch:** `rychen/dd-10` · **Depends on:** DD-09
-
-> As the team, we want DateDeck live on the internet, so that the class can use it on their phones.
+> As a user on my phone, I want DateDeck to fit my screen and thumbs, so that we can pick a date anywhere.
 
 **Acceptance criteria**
 
-- [ ] PocketBase hosted with a persistent disk, serving the Vite build from pb_public
-- [ ] Public rules: anyone can view and add ideas, nobody can edit or delete from the app
-- [ ] Admin password is strong and backups are on
-- [ ] Deploy steps in the README, and a smoke test on the live link: load, swipe, add
-
-### DD-12 Undo the last swipe and shuffle the deck
-
-- **Owner:** Riley · **Week:** 4 · **Due:** 2026-10-30 · **Points:** 2 · **Labels:** Frontend
-- **Branch:** `riley/dd-12` · **Depends on:** DD-11
-
-> As a user, I want to take back a swipe or mix up the order, so that a mistake or a boring order is easy to fix.
-
-**Acceptance criteria**
-
-- [ ] Back button undoes the last save or hide
-- [ ] Shuffle reorders the ideas that are left
-- [ ] Hidden ideas never come back into the stack after a reload
+- [ ] Full-screen deck with the Save, Hide, Undo and Shuffle buttons in thumb reach
+- [ ] Header, tabs, the All ideas grid and the add idea form fit phone screens
+- [ ] Phone layout rules added to docs/STYLE_GUIDE.md (breakpoints, safe areas, grid and list patterns), so the week 4 screens follow them
+- [ ] No sideways scrolling at 375px; tested on an iPhone and an Android phone
+- [ ] Basic accessibility check: labels, focus and contrast
 
 ### DD-13 Build the location and price filters
 
-- **Owner:** Gabriel · **Week:** 4 · **Due:** 2026-10-30 · **Points:** 3 · **Labels:** Frontend
-- **Branch:** `gabriel/dd-13` · **Depends on:** DD-09, DD-14
+- **Owner:** Rychen · **Week:** 4 · **Due:** 2026-10-30 · **Points:** 3 · **Labels:** Frontend
+- **Branch:** `rychen/dd-13` · **Depends on:** DD-09, DD-14
 
 > As a user, I want to filter by where and how much, so that I only see dates that fit tonight.
 
@@ -232,22 +204,60 @@ Generated from the Trello export (`datedeck-trello.json`). The Trello board is t
 
 - [ ] Location area chips and price ranges: Free, under $10, $10 to $25, $25 and up
 - [ ] Category chips and a search box
-- [ ] The deck and the Browse grid update together, and Clear all resets them
+- [ ] The deck and the All ideas grid update together, and Clear all resets them
 - [ ] Each option shows how many ideas match
+- [ ] Built as its own FilterBar component; fits a 375px screen with no sideways scrolling
+- [ ] Also add Save and Hide buttons to your IdeaDetails view from DD-14, using useSwipes from DD-09
 
-### DD-16 Make it great on phones
+### DD-12 Undo the last swipe and shuffle the deck
 
-- **Owner:** Talmage · **Week:** 4 · **Due:** 2026-10-30 · **Points:** 3 · **Labels:** Design, QA
-- **Branch:** `talmage/dd-16` · **Depends on:** DD-07, DD-15
+- **Owner:** Riley · **Week:** 4 · **Due:** 2026-10-30 · **Points:** 2 · **Labels:** Frontend
+- **Branch:** `riley/dd-12` · **Depends on:** DD-09, DD-11
 
-> As a user on my phone, I want DateDeck to fit my screen and thumbs, so that we can pick a date anywhere.
+> As a user, I want to take back a swipe or mix up the order, so that a mistake or a boring order is easy to fix.
 
 **Acceptance criteria**
 
-- [ ] Full-screen deck with buttons in thumb reach
-- [ ] Browse grid and the Saved and Hidden lists fit phone screens
-- [ ] No sideways scrolling at 375px; tested on iPhone and Android
-- [ ] Basic accessibility check: labels, focus and contrast
+- [ ] Back button undoes the last save or hide, whether it was a swipe or a button (add undo to useSwipes)
+- [ ] Shuffle reorders the ideas that are left
+- [ ] Hidden ideas never come back into the stack after a reload
+
+### DD-10 Put DateDeck online
+
+- **Owner:** Gabriel · **Week:** 4 · **Due:** 2026-10-30 · **Points:** 3 · **Labels:** Backend
+- **Branch:** `gabriel/dd-10` · **Depends on:** DD-01, DD-02
+
+> As the team, we want DateDeck live on the internet, so that the class can use it on their phones.
+
+**Acceptance criteria**
+
+- [ ] PocketBase hosted on AWS with a persistent disk and HTTPS, and the React app on Netlify pointing at it
+- [ ] Netlify rebuilds the live app on every merge to main, so everything merged goes live on its own with no final deploy step
+- [ ] Public rules: anyone can view and add ideas, nobody can edit or delete from the app
+- [ ] Admin password is strong and backups are on
+- [ ] README deploy steps: how to apply new migrations and how to load the DD-08 ideas into the live database, so they go live as soon as DD-08 is merged
+- [ ] Smoke test on the live link from a phone: load, save or hide, add
+
+### DD-15 Show my Liked (Saved) and Hidden lists
+
+- **Owner:** Talmage · **Week:** 4 · **Due:** 2026-10-30 · **Points:** 3 · **Labels:** Frontend, Design
+- **Branch:** `talmage/dd-15` · **Depends on:** DD-09, DD-16
+
+> As a user, I want to see the ideas I saved and the ones I hid, so that I can plan from my favorites and undo a hide.
+
+**Acceptance criteria**
+
+- [ ] A Liked tab beside Deck and All ideas shows the ideas you saved (photo, title, location and price), using the rounded card grid and design tokens
+- [ ] Heart buttons in Deck and All ideas toggle a like with an accessible pressed state; the Liked grid and the Saved for later sidebar update together
+- [ ] Unlike from the Liked grid or the sidebar removes the idea from both lists, without deleting the idea
+- [ ] Likes use useSwipes from DD-09 (the saved array in datedeck.swipes), keep hidden and other fields, and show a clear message if storage can't be read
+- [ ] Hidden list with Bring back, which returns the idea to the deck
+- [ ] Clear empty states that explain swiping and hearts, with an All ideas button
+- [ ] Works by keyboard with visible focus, and fits 320px and 375px screens using the phone rules from DD-16
+
+**Requested UI extension:** Liked is the navigation name for saved ideas, not a second favorites collection. For the current preview, liking and unliking work with the existing layout examples in `Home.jsx`; the static sample file is still empty. This extends the style guide's original disabled-fixture scope only for heart buttons and the Saved sidebar. Filters, Hide/Undo/Shuffle, details, form submission, and database integration remain separate stories. Keep the header in `Home.jsx` and the testing HTML on the shared React entry. Do not claim the complete DD-15 story is done until its Hidden list criteria also pass.
+
+**Sprint 2 update:** DD-15 moved to week 4, so it builds on DD-09 (real ideas, the shared `useSwipes` hook and `pages/Liked.jsx`) instead of the examples in `Home.jsx`. Add the heart button as its own component so the Deck and All ideas pages each need only a one-line change.
 
 ## Sprint 3: Accounts and AI (2026-11-02 to 2026-11-13)
 

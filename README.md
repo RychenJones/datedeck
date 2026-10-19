@@ -75,14 +75,14 @@ The full stories with acceptance criteria are in [`docs/PLAN.md`](docs/PLAN.md).
 
 **Sprint 2: Swipe, filter and ship (Oct 19 – Oct 30)**
 
-- [ ] DD-09 Filter ideas in PocketBase by location and price
+- [ ] DD-14 Open an idea's details (with Open in Maps)
 - [ ] DD-11 Swipe the card by dragging (mouse, touch, keyboard)
-- [ ] DD-14 Browse all ideas and open an idea's details (with Open in Maps)
-- [ ] DD-15 Liked (Saved) and Hidden lists
-- [ ] DD-10 Put DateDeck online
-- [ ] DD-12 Undo the last swipe and shuffle the deck
+- [ ] DD-09 Real ideas from PocketBase with filters, and shared saved and hidden ideas
+- [ ] DD-16 Mobile-friendly layout and phone layout rules
 - [ ] DD-13 Location, price and category filters with search
-- [ ] DD-16 Mobile-friendly layout
+- [ ] DD-12 Undo the last swipe and shuffle the deck
+- [ ] DD-10 Put DateDeck online (Netlify rebuilds on every merge)
+- [ ] DD-15 Liked (Saved) and Hidden lists
 
 ### Stretch goals
 
