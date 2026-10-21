@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import AddIdeaForm from '../components/AddIdeaForm/AddIdeaForm.jsx';
 import DateDeckHeader from '../components/DateDeckHeader/DateDeckHeader.jsx';
 import IdeaCard from '../components/IdeaCard/IdeaCard.jsx';
+import IdeaDetails from '../components/IdeaDetails/IdeaDetails.jsx';
 import sampleIdeas from '../data/sample-ideas.json';
 
 import '../styles/home.css';
@@ -28,6 +29,7 @@ function writeSwipes(swipes) {
 export default function Home() {
   const [view, setView] = useState('deck');
   const [theme, setTheme] = useState('dark');
+  const [selectedIdea, setSelectedIdea] = useState(null);
   const addIdeaPanel = useRef(null);
   const [swipes, setSwipes] = useState(readSwipes);
   const remainingIdeas = useMemo(
@@ -146,7 +148,7 @@ export default function Home() {
           ) : (
             <section className="idea-grid" id="date-ideas" aria-label="Date ideas">
               {sampleIdeas.map((idea) => (
-                <IdeaCard key={idea.id} idea={idea} />
+                <IdeaCard key={idea.id} idea={idea} onOpenDetails={setSelectedIdea} />
               ))}
             </section>
           )}
@@ -155,6 +157,7 @@ export default function Home() {
             <AddIdeaForm />
           </section>
         </main>
+        {selectedIdea && <IdeaDetails idea={selectedIdea} onClose={() => setSelectedIdea(null)} />}
       </div>
     </div>
   );
