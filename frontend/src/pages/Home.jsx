@@ -1,59 +1,20 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import AddIdeaForm from '../components/AddIdeaForm/AddIdeaForm.jsx';
 import DateDeckHeader from '../components/DateDeckHeader/DateDeckHeader.jsx';
 import IdeaCard from '../components/IdeaCard/IdeaCard.jsx';
-import IdeaDetails from '../components/IdeaDetails/IdeaDetails.jsx';
 import sampleIdeas from '../data/sample-ideas.json';
 
 import '../styles/home.css';
 
-const SWIPES_KEY = 'datedeck.swipes';
+const PAGES = { deck: Deck, browse: Browse, liked: Liked };
 
-function readSwipes() {
-  try {
-    const saved = JSON.parse(window.localStorage.getItem(SWIPES_KEY));
-    return {
-      saved: Array.isArray(saved?.saved) ? saved.saved : [],
-      hidden: Array.isArray(saved?.hidden) ? saved.hidden : [],
-    };
-  } catch {
-    return { saved: [], hidden: [] };
-  }
-}
-
-function writeSwipes(swipes) {
-  window.localStorage.setItem(SWIPES_KEY, JSON.stringify(swipes));
-}
-
-// Main screen: the deck of ideas and the form to add one.
+// Main screen: the header, the tab you picked and the form to add an idea.
 export default function Home() {
   const [view, setView] = useState('deck');
   const [theme, setTheme] = useState('dark');
   const [selectedIdea, setSelectedIdea] = useState(null);
   const addIdeaPanel = useRef(null);
-  const [swipes, setSwipes] = useState(readSwipes);
-  const remainingIdeas = useMemo(
-    () =>
-      sampleIdeas.filter(
-        (idea) => !swipes.saved.includes(idea.id) && !swipes.hidden.includes(idea.id),
-      ),
-    [swipes],
-  );
-  const currentIdea = remainingIdeas[0];
-
-  useEffect(() => {
-    writeSwipes(swipes);
-  }, [swipes]);
-
-  function decide(decision) {
-    if (!currentIdea) return;
-    const nextSwipes = {
-      ...swipes,
-      [decision]: [...swipes[decision], currentIdea.id],
-    };
-    setSwipes(nextSwipes);
-    writeSwipes(nextSwipes);
-  }
+  const Page = PAGES[view];
 
   function showAddIdeaForm() {
     addIdeaPanel.current?.scrollIntoView({ behavior: 'auto', block: 'start' });
@@ -148,7 +109,7 @@ export default function Home() {
           ) : (
             <section className="idea-grid" id="date-ideas" aria-label="Date ideas">
               {sampleIdeas.map((idea) => (
-                <IdeaCard key={idea.id} idea={idea} onOpenDetails={setSelectedIdea} />
+                <IdeaCard key={idea.id} idea={idea} />
               ))}
             </section>
           )}
