@@ -73,6 +73,17 @@ describe('Home deck', () => {
     });
   });
 
+  it('shows every idea in a grid when you open the All ideas tab', async () => {
+    const user = userEvent.setup();
+    render(<Home />);
+
+    await user.click(screen.getByRole('button', { name: 'All ideas' }));
+
+    const grid = screen.getByRole('region', { name: 'Date ideas' });
+    expect(within(grid).getAllByRole('heading', { level: 2 })).toHaveLength(5);
+    expect(screen.queryByRole('region', { name: 'Date idea deck' })).not.toBeInTheDocument();
+  });
+
   it('shows an empty state when you reach the end of the deck', async () => {
     const user = userEvent.setup();
     render(<Home />);
