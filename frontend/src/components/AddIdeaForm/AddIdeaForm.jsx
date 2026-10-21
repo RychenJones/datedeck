@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useIdeas } from '../../hooks/useIdeas.js';
+import { useAddIdea } from '../../hooks/useAddIdea.js';
 
 import './AddIdeaForm.css';
 
@@ -49,7 +49,7 @@ function validate(values) {
 
 /** A form that adds a new date idea to the PocketBase dates collection (DD-06). */
 export default function AddIdeaForm() {
-  const { addIdea } = useIdeas();
+  const { addIdea } = useAddIdea();
   const [values, setValues] = useState(EMPTY_FORM);
   const [errors, setErrors] = useState({});
   const [saving, setSaving] = useState(false);

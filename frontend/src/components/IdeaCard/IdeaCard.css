@@ -92,6 +92,16 @@
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+.idea-card__details-button {
+  min-height: var(--control-small);
+  margin-top: var(--space-4);
+  padding: var(--space-2) var(--space-4);
+  border: var(--border-width) solid var(--line);
+  border-radius: var(--radius-pill);
+  color: var(--ink);
+  background: transparent;
+  font-weight: var(--weight-bold);
+}
 .idea-card__actions {
   display: flex;
   justify-content: center;

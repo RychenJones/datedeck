@@ -138,6 +138,12 @@
   gap: var(--space-6);
 }
 
+.idea-grid__more {
+  margin-top: var(--space-6);
+  color: var(--muted);
+  text-align: center;
+}
+
 @media (min-width: 640px) {
   .home {
     padding-top: var(--space-10);
