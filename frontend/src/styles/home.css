@@ -1,4 +1,5 @@
 .home {
+  min-width: 0;
   width: 100%;
   max-width: var(--page-width);
   margin: 0 auto;
@@ -96,7 +97,7 @@
   width: var(--control-action);
   height: var(--control-action);
   border: 0;
-  color: var(--on-accent);
+  color: var(--on-action);
   background: var(--accent);
   box-shadow: var(--shadow-save);
 }
@@ -136,6 +137,103 @@
   display: grid;
   grid-template-columns: minmax(0, 1fr);
   gap: var(--space-6);
+}
+
+.home :where(h1, h2, p) {
+  overflow-wrap: anywhere;
+}
+
+#add-idea-panel {
+  min-width: 0;
+  scroll-margin-block: var(--space-6);
+}
+
+/* Phone layout stays in React's styles; keep existing desktop tokens intact. */
+@media (max-width: 639px), (max-width: 799px) and (max-height: 499px) {
+  .app {
+    min-height: 100vh;
+    min-height: 100dvh;
+    padding-top: calc(var(--space-5) + env(safe-area-inset-top, 0px));
+    padding-right: calc(var(--space-4) + env(safe-area-inset-right, 0px));
+    padding-bottom: calc(var(--space-9) + env(safe-area-inset-bottom, 0px));
+    padding-left: calc(var(--space-4) + env(safe-area-inset-left, 0px));
+  }
+
+  .home {
+    padding-top: 0;
+  }
+
+  .deck {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    min-height: 100dvh;
+    /* Clip only the decorative rotations, without creating a scroll container. */
+    overflow-x: clip;
+    overflow-y: visible;
+  }
+
+  .deck__stack {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    width: 100%;
+    min-width: 0;
+    margin-bottom: 0;
+    padding: var(--space-4) var(--space-3) 0;
+  }
+
+  .deck__behind {
+    inset-inline: var(--space-5);
+  }
+
+  .deck__top {
+    min-width: 0;
+    margin-bottom: var(--space-6);
+  }
+
+  .deck__controls {
+    position: sticky;
+    bottom: 0;
+    z-index: 1;
+    flex-shrink: 0;
+    margin-top: auto;
+    margin-inline: calc(-1 * var(--space-3));
+    padding: var(--space-4) var(--space-2) calc(var(--space-4) + env(safe-area-inset-bottom, 0px));
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+    background: var(--page);
+  }
+
+  .deck__control {
+    flex-shrink: 0;
+  }
+
+  .home--deck:has(#add-idea-panel:focus-within) .deck__controls {
+    visibility: hidden;
+  }
+
+  .home .saved-item {
+    min-width: 0;
+  }
+
+  .home .saved-item .icon-button {
+    flex-shrink: 0;
+  }
+
+  .home .saved-copy p {
+    overflow-wrap: anywhere;
+  }
+}
+
+@media (max-width: 479px) {
+  .app .datedeck-header .brand {
+    gap: var(--space-2);
+  }
+
+  .app .datedeck-header .header-actions .button {
+    gap: var(--space-1);
+    padding-inline: var(--space-3);
+  }
 }
 
 @media (min-width: 640px) {
