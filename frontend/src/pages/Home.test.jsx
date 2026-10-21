@@ -95,4 +95,49 @@ describe('Home deck', () => {
     expect(screen.getByRole('heading', { name: 'You are all caught up' })).toBeInTheDocument();
     expect(screen.getByText('0 ideas left')).toBeInTheDocument();
   });
+
+  it('opens the selected idea details from the All ideas grid', async () => {
+    const user = userEvent.setup();
+    render(<Home />);
+
+    await user.click(screen.getByRole('button', { name: 'All ideas' }));
+    await user.click(
+      screen.getByRole('button', { name: 'View details for Picnic at Porter Park' }),
+    );
+
+    expect(screen.getByRole('dialog', { name: 'Picnic at Porter Park' })).toBeInTheDocument();
+    expect(
+      screen.getByText('Bring a blanket and some snacks and spend a slow evening in the park.'),
+    ).toBeInTheDocument();
+  });
+
+  it('closes idea details with the Close button', async () => {
+    const user = userEvent.setup();
+    render(<Home />);
+
+    await user.click(screen.getByRole('button', { name: 'All ideas' }));
+    await user.click(
+      screen.getByRole('button', { name: 'View details for Picnic at Porter Park' }),
+    );
+    await user.click(screen.getByRole('button', { name: 'Close' }));
+
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'All ideas' })).toHaveAttribute(
+      'aria-pressed',
+      'true',
+    );
+  });
+
+  it('closes idea details with Escape', async () => {
+    const user = userEvent.setup();
+    render(<Home />);
+
+    await user.click(screen.getByRole('button', { name: 'All ideas' }));
+    await user.click(
+      screen.getByRole('button', { name: 'View details for Picnic at Porter Park' }),
+    );
+    await user.keyboard('{Escape}');
+
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+  });
 });
