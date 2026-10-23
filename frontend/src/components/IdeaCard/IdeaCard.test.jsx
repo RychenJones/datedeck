@@ -44,6 +44,13 @@ describe('IdeaCard', () => {
     expect(screen.queryByRole('img')).not.toBeInTheDocument();
   });
 
+  it('shows a drawing for the category when the idea has no photo', () => {
+    const { container } = render(<IdeaCard idea={{ ...idea, category: 'Food' }} />);
+
+    expect(container.querySelector('svg[data-scene="food"]')).toBeInTheDocument();
+    expect(screen.getByText('No photo')).toBeInTheDocument();
+  });
+
   it('shows the photo when the idea has one', () => {
     render(<IdeaCard idea={{ ...idea, photo: 'https://example.com/dunes.jpg' }} />);
 

@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react';
+import IdeaArt from '../IdeaArt/IdeaArt.jsx';
 import './IdeaDetails.css';
 
 function formatPrice(price) {
@@ -12,6 +13,10 @@ function formatDuration(minutes) {
   if (hours === 0) return `${rest} min`;
   if (rest === 0) return `${hours} hr`;
   return `${hours} hr ${rest} min`;
+}
+
+function mapsUrl(address) {
+  return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`;
 }
 
 export default function IdeaDetails({ idea, onClose }) {
@@ -52,7 +57,7 @@ export default function IdeaDetails({ idea, onClose }) {
             <img className="idea-details__photo" src={photo} alt={title} />
           ) : (
             <div className="idea-details__placeholder" aria-label="Photo placeholder">
-              <span aria-hidden="true">Photo coming soon</span>
+              <IdeaArt category={category} />
               <span className="sr-only">No photo</span>
             </div>
           )}
@@ -78,6 +83,18 @@ export default function IdeaDetails({ idea, onClose }) {
               <dd>{formatDuration(duration)}</dd>
             </div>
           </dl>
+
+          {address && (
+            <a
+              className="idea-details__maps"
+              href={mapsUrl(address)}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Open in Maps
+              <span className="sr-only"> (opens in a new tab)</span>
+            </a>
+          )}
         </div>
       </section>
     </div>

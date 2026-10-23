@@ -1,50 +1,133 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { pb } from '../lib/pocketbase.js';
 
-// Lists and adds ideas through the shared PocketBase client (DD-02).
-export function useIdeas() {
-  const [ideas, setIdeas] = useState([]);
-  const [status, setStatus] = useState('loading');
-  const [error, setError] = useState(null);
+export const PAGE_SIZE = 20;
+
+// Newest first; id breaks ties so pages never repeat or skip an idea.
+const SORT = '-created,id';
+
+export const NO_FILTERS = {
+  areas: [],
+  minPrice: null,
+  maxPrice: null,
+  categories: [],
+  search: '',
+};
+
+// Joins "field = value" checks with || so any of the chosen values matches.
+function anyOf(field, values, name, parts, params) {
+  if (!values?.length) return;
+  const checks = values.map((value, index) => {
+    params[`${name}${index}`] = value;
+    return `${field} = {:${name}${index}}`;
+  });
+  parts.push(`(${checks.join(' || ')})`);
+}
+
+/**
+ * Turns the filter choices into a PocketBase filter string. Values always go
+ * through pb.filter() parameters, never straight into the string.
+ */
+export function buildIdeasFilter(filters = NO_FILTERS) {
+  const { areas, minPrice, maxPrice, categories, search } = { ...NO_FILTERS, ...filters };
+  const parts = [];
+  const params = {};
+
+  anyOf('location', areas, 'area', parts, params);
+  anyOf('category', categories, 'category', parts, params);
+  if (minPrice != null) {
+    parts.push('price >= {:minPrice}');
+    params.minPrice = minPrice;
+  }
+  if (maxPrice != null) {
+    parts.push('price <= {:maxPrice}');
+    params.maxPrice = maxPrice;
+  }
+  if (search.trim()) {
+    parts.push('(title ~ {:search} || description ~ {:search} || place_name ~ {:search})');
+    params.search = search.trim();
+  }
+
+  return parts.length ? pb.filter(parts.join(' && '), params) : '';
+}
+
+// PocketBase stores only the photo's file name; IdeaCard needs a full link.
+function withPhotoUrl(idea) {
+  return idea.photo ? { ...idea, photo: pb.files.getURL(idea, idea.photo) } : idea;
+}
+
+/**
+ * Loads ideas from the PocketBase dates collection that match the filters,
+ * PAGE_SIZE at a time. Call loadMore() to add the next page.
+ *
+ * @param {{areas?: string[], minPrice?: number|null, maxPrice?: number|null, categories?: string[], search?: string}} filters
+ */
+export function useIdeas(filters = NO_FILTERS) {
+  const filter = buildIdeasFilter(filters);
+  const [request, setRequest] = useState({ filter, page: 1 });
+  const [result, setResult] = useState({
+    request: null,
+    ideas: [],
+    totalItems: 0,
+    hasMore: false,
+    error: null,
+  });
+
+  // New filters start again from the first page.
+  if (request.filter !== filter) setRequest({ filter, page: 1 });
 
   useEffect(() => {
     let cancelled = false;
 
     pb.collection('dates')
-      .getFullList({
-        sort: '-created',
+      .getList(request.page, PAGE_SIZE, {
+        filter: request.filter,
+        sort: SORT,
         requestKey: null,
       })
-      .then((items) => {
-        if (!cancelled) {
-          setIdeas(items);
-          setStatus('ready');
-        }
+      .then((list) => {
+        if (cancelled) return;
+        setResult((current) => {
+          const items = list.items.map(withPhotoUrl);
+          const known = request.page === 1 ? [] : current.ideas;
+          const knownIds = new Set(known.map((idea) => idea.id));
+          return {
+            request,
+            ideas: [...known, ...items.filter((idea) => !knownIds.has(idea.id))],
+            totalItems: list.totalItems,
+            hasMore: list.page < list.totalPages,
+            error: null,
+          };
+        });
       })
       .catch((requestError) => {
-        if (!cancelled && !requestError.isAbort) {
-          setError(requestError);
-          setStatus('error');
-        }
+        if (cancelled || requestError.isAbort) return;
+        setResult((current) => ({ ...current, request, error: requestError }));
       });
 
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [request]);
 
-  async function addIdea(data) {
-    setError(null);
+  const isDone = result.request === request;
+  const canLoadMore = isDone && result.hasMore && !result.error;
 
-    try {
-      const idea = await pb.collection('dates').create(data, { requestKey: null });
-      setIdeas((currentIdeas) => [idea, ...currentIdeas]);
-      return idea;
-    } catch (requestError) {
-      if (!requestError.isAbort) setError(requestError);
-      throw requestError;
-    }
-  }
+  const loadMore = useCallback(() => {
+    if (!canLoadMore) return;
+    setRequest((current) => ({ ...current, page: current.page + 1 }));
+  }, [canLoadMore]);
 
-  return { ideas, status, error, addIdea };
+  let status = 'ready';
+  if (isDone && result.error) status = 'error';
+  else if (!isDone) status = request.page === 1 ? 'loading' : 'loading-more';
+
+  return {
+    ideas: status === 'loading' ? [] : result.ideas,
+    status,
+    error: isDone ? result.error : null,
+    totalItems: result.totalItems,
+    hasMore: result.hasMore,
+    loadMore,
+  };
 }

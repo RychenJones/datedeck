@@ -33,6 +33,30 @@ describe('IdeaDetails', () => {
     expect(onClose).toHaveBeenCalledOnce();
   });
 
+  it('links to the address in Maps', () => {
+    render(<IdeaDetails idea={idea} onClose={vi.fn()} />);
+
+    expect(screen.getByRole('link', { name: /Open in Maps/ })).toHaveAttribute(
+      'href',
+      'https://www.google.com/maps/search/?api=1&query=St.%20Anthony%2C%20ID%2083445',
+    );
+  });
+
+  it('leaves out the Maps link when the idea has no address', () => {
+    render(<IdeaDetails idea={{ ...idea, address: '' }} onClose={vi.fn()} />);
+
+    expect(screen.getByText('Address coming soon')).toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: /Open in Maps/ })).not.toBeInTheDocument();
+  });
+
+  it('shows a drawing for the category when the idea has no photo', () => {
+    render(<IdeaDetails idea={idea} onClose={vi.fn()} />);
+
+    const dialog = screen.getByRole('dialog');
+    expect(dialog.querySelector('svg[data-scene="outdoors"]')).toBeInTheDocument();
+    expect(screen.getByText('No photo')).toBeInTheDocument();
+  });
+
   it('calls onClose when Escape is pressed', async () => {
     const user = userEvent.setup();
     const onClose = vi.fn();
