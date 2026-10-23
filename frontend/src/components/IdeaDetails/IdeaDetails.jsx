@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import IdeaArt from '../IdeaArt/IdeaArt.jsx';
 import './IdeaDetails.css';
 
@@ -21,6 +21,11 @@ function mapsUrl(address) {
 
 export default function IdeaDetails({ idea, onClose }) {
   const closeButtonRef = useRef(null);
+  const [photoFailed, setPhotoFailed] = useState(false);
+
+  useEffect(() => {
+    setPhotoFailed(false);
+  }, [idea]);
 
   useEffect(() => {
     closeButtonRef.current?.focus();
@@ -34,6 +39,7 @@ export default function IdeaDetails({ idea, onClose }) {
   }, [onClose]);
 
   const { title, description, place_name, address, price, duration, category, photo } = idea;
+  const photoSource = photo && !photoFailed ? photo : null;
 
   return (
     <div className="idea-details__backdrop">
@@ -53,8 +59,13 @@ export default function IdeaDetails({ idea, onClose }) {
         </button>
 
         <div className="idea-details__photo-wrap">
-          {photo ? (
-            <img className="idea-details__photo" src={photo} alt={title} />
+          {photoSource ? (
+            <img
+              className="idea-details__photo"
+              src={photoSource}
+              alt={title}
+              onError={() => setPhotoFailed(true)}
+            />
           ) : (
             <div className="idea-details__placeholder" aria-label="Photo placeholder">
               <IdeaArt category={category} />

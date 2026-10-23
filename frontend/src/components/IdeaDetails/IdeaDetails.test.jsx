@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 import IdeaDetails from './IdeaDetails.jsx';
@@ -31,6 +31,27 @@ describe('IdeaDetails', () => {
     await user.click(screen.getByRole('button', { name: 'Close' }));
 
     expect(onClose).toHaveBeenCalledOnce();
+  });
+
+  it('shows the full description and required details', () => {
+    render(<IdeaDetails idea={idea} onClose={vi.fn()} />);
+
+    expect(screen.getByText(idea.description)).toBeInTheDocument();
+    expect(screen.getByText(idea.category)).toBeInTheDocument();
+    expect(screen.getByText(idea.address)).toBeInTheDocument();
+    expect(screen.getByText('$12 per person')).toBeInTheDocument();
+    expect(screen.getByText('1 hr 30 min')).toBeInTheDocument();
+  });
+
+  it('shows the placeholder when the photo cannot be loaded', () => {
+    render(
+      <IdeaDetails idea={{ ...idea, photo: 'https://example.com/dunes.jpg' }} onClose={vi.fn()} />,
+    );
+
+    fireEvent.error(screen.getByRole('img', { name: idea.title }));
+
+    expect(screen.getByText('No photo')).toBeInTheDocument();
+    expect(screen.queryByRole('img', { name: idea.title })).not.toBeInTheDocument();
   });
 
   it('links to the address in Maps', () => {
