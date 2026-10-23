@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react';
+import IdeaArt from '../IdeaArt/IdeaArt.jsx';
 import './IdeaDetails.css';
 
 function formatPrice(price) {
@@ -56,7 +57,7 @@ export default function IdeaDetails({ idea, onClose }) {
             <img className="idea-details__photo" src={photo} alt={title} />
           ) : (
             <div className="idea-details__placeholder" aria-label="Photo placeholder">
-              <span aria-hidden="true">Photo coming soon</span>
+              <IdeaArt category={category} />
               <span className="sr-only">No photo</span>
             </div>
           )}

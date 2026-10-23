@@ -49,6 +49,14 @@ describe('IdeaDetails', () => {
     expect(screen.queryByRole('link', { name: /Open in Maps/ })).not.toBeInTheDocument();
   });
 
+  it('shows a drawing for the category when the idea has no photo', () => {
+    render(<IdeaDetails idea={idea} onClose={vi.fn()} />);
+
+    const dialog = screen.getByRole('dialog');
+    expect(dialog.querySelector('svg[data-scene="outdoors"]')).toBeInTheDocument();
+    expect(screen.getByText('No photo')).toBeInTheDocument();
+  });
+
   it('calls onClose when Escape is pressed', async () => {
     const user = userEvent.setup();
     const onClose = vi.fn();

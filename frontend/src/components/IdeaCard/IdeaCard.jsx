@@ -1,3 +1,4 @@
+import IdeaArt from '../IdeaArt/IdeaArt.jsx';
 import './IdeaCard.css';
 
 function formatPrice(price) {
@@ -32,7 +33,7 @@ export default function IdeaCard({ idea, onOpenDetails, onSave, onHide, isStacke
           <img className="idea-card__photo" src={photo} alt={title} />
         ) : (
           <div className="idea-card__placeholder" aria-label="Photo placeholder">
-            <span aria-hidden="true">Photo coming soon</span>
+            <IdeaArt category={category} />
             <span className="sr-only">No photo</span>
           </div>
         )}

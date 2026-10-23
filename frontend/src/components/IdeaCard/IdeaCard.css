@@ -19,11 +19,6 @@
 .idea-card__photo {
   object-fit: cover;
 }
-.idea-card__placeholder {
-  color: var(--art-wood);
-  font-size: var(--text-xs);
-  font-weight: var(--weight-bold);
-}
 .idea-card__content {
   padding: var(--space-5) var(--space-6) var(--space-6);
 }

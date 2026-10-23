@@ -50,7 +50,8 @@
 }
 
 .idea-details__placeholder {
-  color: var(--muted);
+  width: 100%;
+  aspect-ratio: 600 / 285;
 }
 
 .idea-details__content {
@@ -102,7 +103,7 @@
 }
 
 .idea-details__facts dd {
-  margin-top: var(--space-1);
+  margin: var(--space-1) 0 0;
   font-weight: var(--weight-bold);
 }
 
