@@ -33,6 +33,42 @@ You need [Node.js](https://nodejs.org/) and the PocketBase binary (see [`setup-p
 
 Other commands (from `frontend/`): `npm run lint`, `npm test`, `npm run build`, `npm run format`.
 
+# Deploy
+
+The React app is on Netlify and PocketBase will be on AWS (DD-10b, sprint 3).
+
+### Netlify (the React app)
+
+Netlify reads [`netlify.toml`](netlify.toml): it builds `frontend/` with `npm run build` and publishes `frontend/dist`. Every merge to `main` rebuilds the live app, so there is no separate deploy step.
+
+One-time setup, done in the Netlify dashboard:
+
+1. **Add new site → Import an existing project → GitHub**, then pick this repo. Netlify fills in the build settings from `netlify.toml`.
+2. **Site configuration → Environment variables:** add `VITE_POCKETBASE_URL` with the live PocketBase URL (an `https://` address). Only this URL goes here, never a password or API key.
+3. Deploy. After changing the variable, use **Deploys → Trigger deploy** so the app is rebuilt with it.
+
+### Applying new migrations to the live PocketBase
+
+PocketBase applies any new file in `pb_migrations/` when it starts. On the server:
+
+1. Get the latest `backend/pb_migrations/` from `main` (for example `git pull`, or copy the folder over).
+2. Restart PocketBase (for example `sudo systemctl restart pocketbase`).
+3. Open the live dashboard (`https://<live-url>/_/`) and check the change is there.
+
+### Loading the DD-08 ideas into the live database
+
+The ideas are in `backend/seed/dates.json`. From `frontend/`, run the import against the live URL:
+
+```bash
+VITE_POCKETBASE_URL=https://<live-url> npm run import:ideas
+```
+
+It prints how many ideas it added and skipped. It skips ideas that are already there, so it is safe to run again.
+
+### Public rules
+
+The `dates` collection rules come from the migrations: anyone can list, view and add ideas, and only an admin can edit or delete them in the dashboard. Check this in the live dashboard under **Collections → dates → API Rules** after the first deploy.
+
 # Branches and Pull Requests
 
 - `main` is protected: nobody pushes to it directly, and every change goes in through a pull request.
@@ -90,13 +126,14 @@ The full stories with acceptance criteria are in [`docs/PLAN.md`](docs/PLAN.md).
 - [ ] DD-16 Mobile-friendly layout and phone layout rules
 - [ ] DD-13 Location, price and category filters with search
 - [ ] DD-12 Undo the last swipe and shuffle the deck
-- [ ] DD-10 Put DateDeck online (Netlify rebuilds on every merge)
+- [ ] DD-10a Get DateDeck ready to go online (Netlify rebuilds on every merge, deploy steps)
 - [ ] DD-15 Liked (Saved) and Hidden lists
 
 ### Stretch goals
 
 **Sprint 3: Accounts and AI (Nov 2 – Nov 13)**
 
+- [ ] DD-10b Put PocketBase on AWS and go live
 - [ ] DD-17 Sign up and sign in
 - [ ] DD-18 Keep saved and hidden ideas in your account
 - [ ] DD-19 Ask the AI for a date idea

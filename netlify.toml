@@ -1,0 +1,9 @@
+# Netlify builds the React app from frontend/ on every push to main (DD-10a).
+# VITE_POCKETBASE_URL is set in Netlify's site settings, not here.
+[build]
+  base = "frontend"
+  command = "npm run build"
+  publish = "dist"
+
+[build.environment]
+  NODE_VERSION = "22"
