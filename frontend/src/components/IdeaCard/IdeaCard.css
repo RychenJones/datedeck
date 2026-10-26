@@ -1,4 +1,6 @@
 .idea-card {
+  min-width: 0;
+  overflow-wrap: anywhere;
   overflow: hidden;
   border-radius: var(--radius-card);
   background: var(--panel);
@@ -6,6 +8,7 @@
   box-shadow: var(--shadow-card);
 }
 .idea-card__photo-wrap {
+  overflow: hidden;
   aspect-ratio: 600 / 285;
   background: var(--art-food-bg);
 }
@@ -18,6 +21,11 @@
 }
 .idea-card__photo {
   object-fit: cover;
+}
+.idea-card__placeholder {
+  color: var(--on-action);
+  font-size: var(--text-xs);
+  font-weight: var(--weight-bold);
 }
 .idea-card__content {
   padding: var(--space-5) var(--space-6) var(--space-6);
@@ -41,28 +49,26 @@
 .idea-card__place {
   display: flex;
   gap: var(--space-2);
-  align-items: center;
+  align-items: baseline;
   margin: var(--space-2) 0 0;
   color: var(--muted);
   font-size: var(--text-md);
 }
 .idea-card__place span {
+  flex-shrink: 0;
   color: var(--ink);
   font-size: var(--text-lg);
 }
 .idea-card__description {
-  display: -webkit-box;
-  overflow: hidden;
+  display: block;
   margin: var(--space-3) 0 0;
   color: var(--muted);
   font-size: var(--text-sm);
   line-height: var(--leading-body);
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
 }
 .idea-card__details {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: minmax(0, 1fr);
   gap: var(--space-2);
   margin: var(--space-4) 0 0;
 }
@@ -78,24 +84,11 @@
   line-height: var(--leading-heading);
 }
 .idea-card__details dd {
-  overflow: hidden;
   margin: var(--space-1) 0 0;
   color: var(--ink);
   font-size: var(--text-md);
   font-weight: var(--weight-heavy);
   line-height: var(--leading-heading);
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-.idea-card__details-button {
-  min-height: var(--control-small);
-  margin-top: var(--space-4);
-  padding: var(--space-2) var(--space-4);
-  border: var(--border-width) solid var(--line);
-  border-radius: var(--radius-pill);
-  color: var(--ink);
-  background: transparent;
-  font-weight: var(--weight-bold);
 }
 .idea-card__actions {
   display: flex;
@@ -118,7 +111,7 @@
 }
 .idea-card__action--save {
   border: 0;
-  color: var(--on-accent);
+  color: var(--on-action);
   background: var(--accent);
   box-shadow: var(--shadow-save);
 }
@@ -132,6 +125,29 @@
 .idea-card--stacked .idea-card__actions {
   display: none;
 }
+@media (min-width: 480px) {
+  .idea-card__details {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 479px) {
+  .idea-card__content {
+    padding: var(--space-4);
+  }
+
+  .idea-card__details > div {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
+    align-items: baseline;
+    gap: var(--space-2);
+  }
+
+  .idea-card__details dd {
+    margin: 0;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .idea-card__action:hover {
     transform: none;

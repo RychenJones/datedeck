@@ -1,71 +1,85 @@
-/* Colors come from the design tokens in index.css; the fallbacks match the dark theme. */
+/* Shared tokens preserve readable fields and actions in both themes. */
 .add-idea {
   display: grid;
-  gap: 1rem;
-  max-width: 40rem;
-  margin-top: 2rem;
-  padding: 1.5rem;
-  border-radius: 1.5rem;
-  background: var(--panel, #222c32);
-  color: var(--ink, #edf3f1);
+  gap: var(--space-4);
+  width: 100%;
+  min-width: 0;
+  max-width: var(--deck-width);
+  margin-top: var(--space-8);
+  padding: var(--space-4);
+  border-radius: var(--radius-lg);
+  background: var(--panel);
+  color: var(--ink);
+  overflow-wrap: anywhere;
 }
 
 .add-idea h2 {
-  font-size: 1.5rem;
+  font-size: var(--text-xl);
 }
 
 .add-idea__row {
   display: grid;
-  gap: 1rem;
-}
-
-@media (min-width: 480px) {
-  .add-idea__row {
-    grid-template-columns: 1fr 1fr;
-  }
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-4);
+  min-width: 0;
 }
 
 .add-idea__field {
   display: grid;
-  gap: 0.4rem;
+  gap: var(--space-2);
   min-width: 0;
 }
 
 .add-idea__field label {
-  font-weight: 700;
+  font-weight: var(--weight-bold);
 }
 
 .add-idea__field input,
 .add-idea__field select,
 .add-idea__field textarea {
   width: 100%;
-  padding: 0.75rem 1rem;
-  border: 2px solid transparent;
-  border-radius: 0.75rem;
-  background: var(--field, #2b363d);
-  color: var(--ink, #edf3f1);
+  min-width: 0;
+  min-height: var(--control-small);
+  padding: var(--space-3) var(--space-4);
+  border: var(--border-strong) solid var(--line);
+  border-radius: var(--radius-sm);
+  background: var(--field);
+  color: var(--ink);
+  font-size: var(--text-sm);
+  line-height: var(--leading-body);
+  scroll-margin-block: var(--space-6);
 }
 
 .add-idea__field textarea {
   resize: vertical;
 }
 
+.add-idea :focus-visible {
+  outline: var(--focus-width) solid var(--focus);
+  outline-offset: var(--space-1);
+}
+
 .add-idea__field [aria-invalid='true'] {
-  border-color: var(--accent, #ff7866);
+  border-color: var(--focus);
 }
 
 .add-idea__error {
-  color: var(--accent, #ff7866);
-  font-size: 0.9rem;
+  color: var(--focus);
+  font-size: var(--text-sm);
 }
 
 .add-idea__submit {
-  justify-self: start;
-  padding: 0.85rem 1.75rem;
-  border-radius: 2.5rem;
-  background: var(--accent, #ff7866);
-  color: var(--page, #151d21);
-  font-weight: 800;
+  width: 100%;
+  min-height: var(--control-small);
+  padding: var(--space-4) var(--space-7);
+  border-radius: var(--radius-pill);
+  background: var(--action);
+  color: var(--on-action);
+  font-weight: var(--weight-heavy);
+}
+
+.add-idea__submit:not(:disabled):hover {
+  background: var(--action-hover);
 }
 
 .add-idea__submit:disabled {
@@ -74,11 +88,26 @@
 }
 
 .add-idea__message {
-  padding: 0.75rem 1rem;
-  border-radius: 0.75rem;
-  background: var(--field, #2b363d);
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-sm);
+  background: var(--field);
 }
 
 .add-idea__message--error {
-  color: var(--accent, #ff7866);
+  color: var(--focus);
+}
+
+@media (min-width: 480px) {
+  .add-idea {
+    padding: var(--space-6);
+  }
+
+  .add-idea__row {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .add-idea__submit {
+    width: auto;
+    justify-self: start;
+  }
 }

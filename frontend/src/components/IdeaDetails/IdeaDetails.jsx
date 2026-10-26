@@ -21,11 +21,7 @@ function mapsUrl(address) {
 
 export default function IdeaDetails({ idea, onClose }) {
   const closeButtonRef = useRef(null);
-  const [photoFailed, setPhotoFailed] = useState(false);
-
-  useEffect(() => {
-    setPhotoFailed(false);
-  }, [idea]);
+  const [failedPhoto, setFailedPhoto] = useState(null);
 
   useEffect(() => {
     closeButtonRef.current?.focus();
@@ -39,7 +35,7 @@ export default function IdeaDetails({ idea, onClose }) {
   }, [onClose]);
 
   const { title, description, place_name, address, price, duration, category, photo } = idea;
-  const photoSource = photo && !photoFailed ? photo : null;
+  const photoSource = photo && photo !== failedPhoto ? photo : null;
 
   return (
     <div className="idea-details__backdrop">
@@ -64,7 +60,7 @@ export default function IdeaDetails({ idea, onClose }) {
               className="idea-details__photo"
               src={photoSource}
               alt={title}
-              onError={() => setPhotoFailed(true)}
+              onError={() => setFailedPhoto(photo)}
             />
           ) : (
             <div className="idea-details__placeholder" aria-label="Photo placeholder">
