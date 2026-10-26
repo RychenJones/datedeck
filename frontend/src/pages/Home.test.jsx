@@ -147,6 +147,33 @@ describe('Home deck', () => {
     expect(screen.queryByRole('region', { name: 'Date idea deck' })).not.toBeInTheDocument();
   });
 
+  it('shows sample and PocketBase ideas together in the All ideas grid', async () => {
+    serve([{ ...sampleIdeas[0], id: 'database-1', title: 'Database date' }]);
+    const user = userEvent.setup();
+    render(<App />);
+
+    await user.click(screen.getByRole('button', { name: 'All ideas' }));
+
+    const grid = await screen.findByRole('region', { name: 'Date ideas' });
+    expect(within(grid).getByRole('heading', { name: 'Database date' })).toBeInTheDocument();
+    expect(
+      within(grid).getByRole('heading', { name: 'Picnic at Porter Park' }),
+    ).toBeInTheDocument();
+  });
+
+  it('shows sample ideas in the All ideas grid when PocketBase is unavailable', async () => {
+    collection.getList.mockRejectedValue(new Error('PocketBase is unavailable'));
+    const user = userEvent.setup();
+    render(<App />);
+
+    await user.click(screen.getByRole('button', { name: 'All ideas' }));
+
+    const grid = await screen.findByRole('region', { name: 'Date ideas' });
+    expect(
+      within(grid).getByRole('heading', { name: 'Picnic at Porter Park' }),
+    ).toBeInTheDocument();
+  });
+
   it('opens the selected idea details from the All ideas grid', async () => {
     const user = userEvent.setup();
     render(<App />);
@@ -224,7 +251,7 @@ describe('Home deck', () => {
     await user.click(screen.getByRole('button', { name: 'All ideas' }));
 
     const grid = await screen.findByRole('region', { name: 'Date ideas' });
-    expect(within(grid).getAllByRole('heading', { level: 2 })).toHaveLength(PAGE_SIZE);
+    expect(within(grid).getAllByRole('heading', { level: 2 })).toHaveLength(PAGE_SIZE + 5);
 
     await user.click(screen.getByRole('button', { name: 'Show more ideas' }));
 
@@ -254,7 +281,9 @@ describe('Home deck', () => {
     expect(await screen.findByRole('heading', { name: 'No ideas found' })).toBeInTheDocument();
 
     await user.click(screen.getByRole('button', { name: 'All ideas' }));
-    expect(await screen.findByRole('heading', { name: 'No ideas found' })).toBeInTheDocument();
+    expect(
+      await screen.findByRole('heading', { name: 'Picnic at Porter Park' }),
+    ).toBeInTheDocument();
   });
 
   it('shows an error message when the ideas cannot load', async () => {
@@ -268,7 +297,7 @@ describe('Home deck', () => {
 
     await user.click(screen.getByRole('button', { name: 'All ideas' }));
     expect(
-      await screen.findByRole('heading', { name: 'Could not load ideas' }),
+      await screen.findByRole('heading', { name: 'Picnic at Porter Park' }),
     ).toBeInTheDocument();
   });
 });
