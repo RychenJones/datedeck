@@ -1,6 +1,7 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
+import sampleIdeas from '../../data/sample-ideas.json';
 import IdeaDetails from './IdeaDetails.jsx';
 
 const idea = {
@@ -41,6 +42,17 @@ describe('IdeaDetails', () => {
     expect(screen.getByText(idea.address)).toBeInTheDocument();
     expect(screen.getByText('$12 per person')).toBeInTheDocument();
     expect(screen.getByText('1 hr 30 min')).toBeInTheDocument();
+  });
+
+  it('shows details for a sample idea', () => {
+    render(<IdeaDetails idea={sampleIdeas[0]} onClose={vi.fn()} />);
+
+    expect(screen.getByText(sampleIdeas[0].title)).toBeInTheDocument();
+    expect(screen.getByText(sampleIdeas[0].description)).toBeInTheDocument();
+    expect(screen.getByText(sampleIdeas[0].address)).toBeInTheDocument();
+    expect(screen.getByText('Free')).toBeInTheDocument();
+    expect(screen.getByText('1 hr 30 min')).toBeInTheDocument();
+    expect(screen.getByText(sampleIdeas[0].category)).toBeInTheDocument();
   });
 
   it('shows the placeholder when the photo cannot be loaded', () => {
