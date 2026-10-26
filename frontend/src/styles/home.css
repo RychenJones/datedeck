@@ -139,6 +139,12 @@
   gap: var(--space-6);
 }
 
+.idea-grid__more {
+  margin-top: var(--space-6);
+  color: var(--muted);
+  text-align: center;
+}
+
 .home :where(h1, h2, p) {
   overflow-wrap: anywhere;
 }

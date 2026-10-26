@@ -1,3 +1,4 @@
+import IdeaArt from '../IdeaArt/IdeaArt.jsx';
 import './IdeaCard.css';
 
 function formatPrice(price) {
@@ -20,7 +21,7 @@ function formatDuration(minutes) {
  *
  * @param {{title: string, place_name: string, location: string, price: number, duration: number, photo?: string}} idea
  */
-export default function IdeaCard({ idea, onSave, onHide, isStacked = false }) {
+export default function IdeaCard({ idea, onOpenDetails, onSave, onHide, isStacked = false }) {
   const { title, description, place_name, location, price, duration, category, photo } = idea;
   const priceLabel = formatPrice(price);
   const durationLabel = formatDuration(duration);
@@ -32,7 +33,7 @@ export default function IdeaCard({ idea, onSave, onHide, isStacked = false }) {
           <img className="idea-card__photo" src={photo} alt={title} />
         ) : (
           <div className="idea-card__placeholder" aria-label="Photo placeholder">
-            <span aria-hidden="true">Photo coming soon</span>
+            <IdeaArt category={category} />
             <span className="sr-only">No photo</span>
           </div>
         )}
@@ -60,6 +61,16 @@ export default function IdeaCard({ idea, onSave, onHide, isStacked = false }) {
             <dd>{location}</dd>
           </div>
         </dl>
+
+        {onOpenDetails && (
+          <button
+            type="button"
+            className="idea-card__details-button"
+            onClick={() => onOpenDetails(idea)}
+          >
+            View details for {title}
+          </button>
+        )}
 
         {(onSave || onHide) && (
           <div className="idea-card__actions" aria-label="Choose what to do with this idea">

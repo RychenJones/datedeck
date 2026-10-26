@@ -1,6 +1,7 @@
 import { useRef, useState } from 'react';
 import AddIdeaForm from '../components/AddIdeaForm/AddIdeaForm.jsx';
 import DateDeckHeader from '../components/DateDeckHeader/DateDeckHeader.jsx';
+import { NO_FILTERS } from '../hooks/useIdeas.js';
 import Browse from './Browse.jsx';
 import Deck from './Deck.jsx';
 import Liked from './Liked.jsx';
@@ -13,6 +14,8 @@ const PAGES = { deck: Deck, browse: Browse, liked: Liked };
 export default function Home() {
   const [view, setView] = useState('deck');
   const [theme, setTheme] = useState('dark');
+  // Shared by the deck and All ideas; DD-13 adds setFilters for its filter bar.
+  const [filters] = useState(NO_FILTERS);
   const addIdeaPanel = useRef(null);
   const Page = PAGES[view];
 
@@ -33,7 +36,7 @@ export default function Home() {
           isAddIdeaOpen
         />
         <main className={view === 'deck' ? 'home home--deck' : 'home'}>
-          <Page />
+          <Page filters={filters} />
 
           <section id="add-idea-panel" ref={addIdeaPanel} aria-label="Add a date idea">
             <AddIdeaForm />

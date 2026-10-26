@@ -128,7 +128,7 @@ Generated from the Trello export (`datedeck-trello.json`). The Trello board is t
 
 ## Sprint 2: Swipe, filter and ship (2026-10-19 to 2026-10-30)
 
-**Goal:** Swipe to save or hide, filter by location and price, see your saved and hidden ideas, open an idea’s details, work well on phones, and put DateDeck online. The core app is done.
+**Goal:** Swipe to save or hide, filter by location and price, see your saved and hidden ideas, open an idea’s details, work well on phones, and get DateDeck ready to go online. The core app is done.
 
 **How this sprint is split:** week 3 cards need only Sprint 1 work, so all four start on Oct 19. Week 4 cards need only DD-09 (Gabriel, week 3) or their owner's own week 3 card. No card waits on another card from the same week, and each week 4 card works in its own files.
 
@@ -222,21 +222,20 @@ Generated from the Trello export (`datedeck-trello.json`). The Trello board is t
 - [ ] Shuffle reorders the ideas that are left
 - [ ] Hidden ideas never come back into the stack after a reload
 
-### DD-10 Put DateDeck online
+### DD-10a Get DateDeck ready to go online
 
-- **Owner:** Gabriel · **Week:** 4 · **Due:** 2026-10-30 · **Points:** 3 · **Labels:** Backend
+- **Owner:** Gabriel · **Week:** 4 · **Due:** 2026-10-30 · **Points:** 1 · **Labels:** Backend
 - **Branch:** `gabriel/dd-10` · **Depends on:** DD-01, DD-02
 
-> As the team, we want DateDeck live on the internet, so that the class can use it on their phones.
+> As the team, we want the app set up for hosting, so that putting PocketBase online next sprint is the only step left.
 
 **Acceptance criteria**
 
-- [ ] PocketBase hosted on AWS with a persistent disk and HTTPS, and the React app on Netlify pointing at it
-- [ ] Netlify rebuilds the live app on every merge to main, so everything merged goes live on its own with no final deploy step
+- [ ] Netlify rebuilds the app on every merge to main, so everything merged goes live on its own with no final deploy step (`netlify.toml` in the repo)
 - [ ] Public rules: anyone can view and add ideas, nobody can edit or delete from the app
-- [ ] Admin password is strong and backups are on
-- [ ] README deploy steps: how to apply new migrations and how to load the DD-08 ideas into the live database, so they go live as soon as DD-08 is merged
-- [ ] Smoke test on the live link from a phone: load, save or hide, add
+- [ ] README deploy steps: how to apply new migrations and how to load the DD-08 ideas into the live database
+
+**Sprint 2 update:** DD-10 was split. Hosting PocketBase on AWS moved to DD-10b in sprint 3, so until then the Netlify site has no live database.
 
 ### DD-15 Show my Liked (Saved) and Hidden lists
 
@@ -261,12 +260,28 @@ Generated from the Trello export (`datedeck-trello.json`). The Trello board is t
 
 ## Sprint 3: Accounts and AI (2026-11-02 to 2026-11-13)
 
-**Goal:** Add sign-in so saved and hidden ideas follow each person, let people edit their own ideas, and add AI that suggests dates and helps write new ideas. Planned now so you can adjust it after sprint 2.
+**Goal:** Put DateDeck online, add sign-in so saved and hidden ideas follow each person, let people edit their own ideas, and add AI that suggests dates and helps write new ideas. Planned now so you can adjust it after sprint 2.
+
+### DD-10b Put PocketBase on AWS and go live
+
+- **Owner:** Gabriel · **Week:** 5 · **Due:** 2026-11-06 · **Points:** 2 · **Labels:** Backend
+- **Branch:** `gabriel/dd-10b` · **Depends on:** DD-10a
+
+> As the team, we want DateDeck live on the internet, so that the class can use it on their phones.
+
+**Acceptance criteria**
+
+- [ ] PocketBase hosted on AWS (student free tier) with a persistent disk and HTTPS, and the Netlify app pointing at it through `VITE_POCKETBASE_URL`
+- [ ] Admin password is strong and backups are on
+- [ ] Migrations applied and the DD-08 ideas loaded into the live database with the README deploy steps
+- [ ] Smoke test on the live link from a phone: load, save or hide, add
+
+DD-17 and DD-19 can be built against local PocketBase before this lands; they go live with it.
 
 ### DD-17 Sign up and sign in
 
 - **Owner:** Rychen · **Week:** 5 · **Due:** 2026-11-06 · **Points:** 3 · **Labels:** Backend, Frontend
-- **Branch:** `rychen/dd-17` · **Depends on:** DD-10
+- **Branch:** `rychen/dd-17` · **Depends on:** DD-10a
 
 > As a user, I want my own DateDeck account, so that my choices follow me to any device.
 
@@ -280,7 +295,7 @@ Generated from the Trello export (`datedeck-trello.json`). The Trello board is t
 ### DD-19 Ask the AI for a date idea
 
 - **Owner:** Riley · **Week:** 5 · **Due:** 2026-11-06 · **Points:** 3 · **Labels:** Backend, Frontend
-- **Branch:** `riley/dd-19` · **Depends on:** DD-09, DD-10
+- **Branch:** `riley/dd-19` · **Depends on:** DD-09, DD-10a
 
 > As a user, I want to describe what I am in the mood for and get matching ideas, so that choosing is even faster.
 

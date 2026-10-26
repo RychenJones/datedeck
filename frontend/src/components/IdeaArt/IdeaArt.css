@@ -1,0 +1,112 @@
+.idea-art {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.idea-art__fallback {
+  color: var(--art-wood);
+  font-size: var(--text-xs);
+  font-weight: var(--weight-bold);
+}
+
+.idea-art__night {
+  fill: var(--art-night);
+}
+
+.idea-art__moon {
+  fill: var(--art-moon);
+}
+
+.idea-art__white {
+  fill: var(--art-white);
+}
+
+.idea-art__grass {
+  fill: var(--art-grass);
+}
+
+.idea-art__grass-dark {
+  fill: var(--art-grass-dark);
+}
+
+.idea-art__coral {
+  fill: var(--art-coral);
+}
+
+.idea-art__food-bg {
+  fill: var(--art-food-bg);
+}
+
+.idea-art__food-light {
+  fill: var(--art-food-light);
+}
+
+.idea-art__food-ground {
+  fill: var(--art-food-ground);
+}
+
+.idea-art__food-shadow {
+  fill: var(--art-food-shadow);
+}
+
+.idea-art__sky {
+  fill: var(--art-sky);
+}
+
+.idea-art__sun {
+  fill: var(--art-sun);
+}
+
+.idea-art__flame {
+  fill: var(--art-flame);
+}
+
+.idea-art__mountain {
+  fill: var(--art-mountain);
+}
+
+.idea-art__mountain-light {
+  fill: var(--art-mountain-light);
+}
+
+.idea-art__disco-bg {
+  fill: var(--art-disco-bg);
+}
+
+.idea-art__beam {
+  fill: var(--art-beam);
+}
+
+.idea-art__disco {
+  fill: var(--art-disco);
+}
+
+.idea-art__disco-line {
+  fill: var(--art-disco-line);
+}
+
+.idea-art__line {
+  fill: none;
+  stroke-linecap: round;
+}
+
+.idea-art__line--white {
+  stroke: var(--art-white);
+}
+
+.idea-art__line--wood {
+  stroke: var(--art-wood);
+}
+
+.idea-art__line--coral {
+  stroke: var(--art-coral);
+}
+
+.idea-art__line--disco {
+  stroke: var(--art-disco);
+}
+
+.idea-art__line--disco-dark {
+  stroke: var(--art-disco-line);
+}
