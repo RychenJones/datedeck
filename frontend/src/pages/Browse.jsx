@@ -14,7 +14,7 @@ function BrowseMessage({ title, children }) {
 
 // All ideas tab: every idea in a grid, one page at a time.
 export default function Browse({ filters }) {
-  const { ideas, status, hasMore, loadMore } = useIdeas(filters);
+  const { ideas, status, hasMore, loadMore } = useIdeas(filters, { includeSamples: true });
   const [selectedIdea, setSelectedIdea] = useState(null);
 
   if (status === 'loading') {

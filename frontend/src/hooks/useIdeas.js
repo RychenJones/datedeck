@@ -1,4 +1,5 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import sampleIdeas from '../data/sample-ideas.json';
 import { pb } from '../lib/pocketbase.js';
 
 export const PAGE_SIZE = 20;
@@ -56,14 +57,41 @@ function withPhotoUrl(idea) {
   return idea.photo ? { ...idea, photo: pb.files.getURL(idea, idea.photo) } : idea;
 }
 
+function matchesSampleFilters(idea, filters) {
+  const { areas, minPrice, maxPrice, categories, search } = { ...NO_FILTERS, ...filters };
+  const searchText = search.trim().toLowerCase();
+  const searchableText = `${idea.title} ${idea.description} ${idea.place_name}`.toLowerCase();
+
+  return (
+    (!areas.length || areas.includes(idea.location)) &&
+    (minPrice == null || idea.price >= minPrice) &&
+    (maxPrice == null || idea.price <= maxPrice) &&
+    (!categories.length || categories.includes(idea.category)) &&
+    (!searchText || searchableText.includes(searchText))
+  );
+}
+
+function mergeIdeas(primaryIdeas, additionalIdeas) {
+  const seenIds = new Set(primaryIdeas.map((idea) => idea.id));
+  return [...primaryIdeas, ...additionalIdeas.filter((idea) => !seenIds.has(idea.id))];
+}
+
 /**
  * Loads ideas from the PocketBase dates collection that match the filters,
  * PAGE_SIZE at a time. Call loadMore() to add the next page.
  *
  * @param {{areas?: string[], minPrice?: number|null, maxPrice?: number|null, categories?: string[], search?: string}} filters
  */
-export function useIdeas(filters = NO_FILTERS) {
+export function useIdeas(filters = NO_FILTERS, { includeSamples = false } = {}) {
   const filter = buildIdeasFilter(filters);
+  const sampleFilterSource = includeSamples ? filters : NO_FILTERS;
+  const samples = useMemo(
+    () =>
+      includeSamples
+        ? sampleIdeas.filter((idea) => matchesSampleFilters(idea, sampleFilterSource))
+        : [],
+    [includeSamples, sampleFilterSource],
+  );
   const [request, setRequest] = useState({ filter, page: 1 });
   const [result, setResult] = useState({
     request: null,
@@ -91,10 +119,11 @@ export function useIdeas(filters = NO_FILTERS) {
           const items = list.items.map(withPhotoUrl);
           const known = request.page === 1 ? [] : current.ideas;
           const knownIds = new Set(known.map((idea) => idea.id));
+          const pageItems = request.page === 1 ? mergeIdeas(items, samples) : items;
           return {
             request,
-            ideas: [...known, ...items.filter((idea) => !knownIds.has(idea.id))],
-            totalItems: list.totalItems,
+            ideas: [...known, ...pageItems.filter((idea) => !knownIds.has(idea.id))],
+            totalItems: list.totalItems + samples.length,
             hasMore: list.page < list.totalPages,
             error: null,
           };
@@ -102,13 +131,23 @@ export function useIdeas(filters = NO_FILTERS) {
       })
       .catch((requestError) => {
         if (cancelled || requestError.isAbort) return;
+        if (includeSamples) {
+          setResult({
+            request,
+            ideas: samples,
+            totalItems: samples.length,
+            hasMore: false,
+            error: null,
+          });
+          return;
+        }
         setResult((current) => ({ ...current, request, error: requestError }));
       });
 
     return () => {
       cancelled = true;
     };
-  }, [request]);
+  }, [includeSamples, request, samples]);
 
   const isDone = result.request === request;
   const canLoadMore = isDone && result.hasMore && !result.error;
