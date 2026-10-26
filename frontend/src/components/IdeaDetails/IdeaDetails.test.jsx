@@ -66,6 +66,39 @@ describe('IdeaDetails', () => {
     expect(screen.queryByRole('img', { name: idea.title })).not.toBeInTheDocument();
   });
 
+  it('keeps the placeholder when the same failed photo receives refreshed idea data', () => {
+    const photoIdea = { ...idea, photo: 'https://example.com/dunes.jpg' };
+    const onClose = vi.fn();
+    const { rerender } = render(<IdeaDetails idea={photoIdea} onClose={onClose} />);
+
+    fireEvent.error(screen.getByRole('img', { name: idea.title }));
+    rerender(<IdeaDetails idea={{ ...photoIdea }} onClose={onClose} />);
+
+    expect(screen.getByText('No photo')).toBeInTheDocument();
+    expect(screen.queryByRole('img', { name: idea.title })).not.toBeInTheDocument();
+  });
+
+  it('shows a new photo after the previous photo failed', () => {
+    const onClose = vi.fn();
+    const { rerender } = render(
+      <IdeaDetails idea={{ ...idea, photo: 'https://example.com/dunes.jpg' }} onClose={onClose} />,
+    );
+
+    fireEvent.error(screen.getByRole('img', { name: idea.title }));
+    rerender(
+      <IdeaDetails
+        idea={{ ...idea, photo: 'https://example.com/new-dunes.jpg' }}
+        onClose={onClose}
+      />,
+    );
+
+    expect(screen.getByRole('img', { name: idea.title })).toHaveAttribute(
+      'src',
+      'https://example.com/new-dunes.jpg',
+    );
+    expect(screen.queryByText('No photo')).not.toBeInTheDocument();
+  });
+
   it('links to the address in Maps', () => {
     render(<IdeaDetails idea={idea} onClose={vi.fn()} />);
 
