@@ -1,0 +1,150 @@
+.filter-bar {
+  display: grid;
+  gap: var(--space-6);
+  width: 100%;
+  margin-bottom: var(--space-7);
+  padding: var(--space-5);
+  border-radius: var(--radius-card);
+  background: var(--panel);
+}
+
+.filter-bar h2 {
+  font-size: var(--text-xl);
+  line-height: var(--leading-heading);
+}
+
+.filter-bar__heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.filter-bar__clear {
+  min-height: var(--control-small);
+  padding: var(--space-2) var(--space-3);
+  border: var(--border-width) solid var(--line);
+  border-radius: var(--radius-pill);
+  color: var(--ink);
+  background: transparent;
+  font-size: var(--text-sm);
+  font-weight: var(--weight-bold);
+}
+
+.filter-bar__clear:hover {
+  background: var(--field);
+}
+
+.filter-bar__search {
+  display: grid;
+  gap: var(--space-2);
+  color: var(--muted);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-bold);
+}
+
+.filter-bar__search input {
+  width: 100%;
+  min-width: 0;
+  min-height: var(--control-small);
+  padding: var(--space-2) var(--space-4);
+  border: var(--border-width) solid transparent;
+  border-radius: var(--radius-pill);
+  color: var(--ink);
+  background: var(--field);
+  font-size: var(--text-md);
+}
+
+.filter-bar__search input:focus {
+  border-color: var(--focus);
+}
+
+.filter-bar__group {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.filter-bar__group legend {
+  margin-bottom: var(--space-3);
+  color: var(--muted);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-bold);
+}
+
+.filter-bar__options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.filter-bar__option {
+  min-width: var(--control-small);
+  min-height: var(--control-small);
+  padding: var(--space-2) var(--space-3);
+  border: var(--border-width) solid var(--line);
+  border-radius: var(--radius-pill);
+  color: var(--ink);
+  background: var(--field);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  text-align: left;
+}
+
+.filter-bar__option:hover {
+  background: var(--action-hover);
+  color: var(--on-action);
+}
+
+.filter-bar__option--selected {
+  border-color: var(--accent);
+  color: var(--on-accent);
+  background: var(--accent);
+}
+
+.filter-bar__category {
+  border-color: transparent;
+  color: var(--on-mood);
+}
+
+.filter-bar__category--outdoorsy {
+  background: var(--outdoorsy);
+}
+
+.filter-bar__category--active {
+  background: var(--active);
+}
+
+.filter-bar__category--cultured {
+  background: var(--cultured);
+}
+
+.filter-bar__category--cozy {
+  background: var(--cozy);
+}
+
+.filter-bar__category--creative {
+  background: var(--creative);
+}
+
+.filter-bar__category--foodie {
+  background: var(--foodie);
+}
+
+@media (min-width: 800px) {
+  .filter-bar {
+    grid-template-columns: minmax(0, 0.7fr) minmax(0, 1fr);
+    align-items: start;
+  }
+
+  .filter-bar__heading {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (min-width: 1280px) {
+  .filter-bar {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
