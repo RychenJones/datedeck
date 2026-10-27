@@ -321,4 +321,18 @@ describe('Home deck', () => {
     await user.click(screen.getByRole('button', { name: 'Sign in to add an idea' }));
     expect(account).toBeVisible();
   });
+
+  it('asks signed-out people to sign in on the Liked tab', async () => {
+    const user = userEvent.setup();
+    Element.prototype.scrollIntoView = vi.fn();
+    const { container } = render(<App />);
+
+    await user.click(screen.getByRole('button', { name: 'Liked' }));
+
+    expect(screen.getByRole('heading', { name: '0 liked ideas' })).toBeInTheDocument();
+    await user.click(
+      within(container.querySelector('#date-ideas')).getByRole('button', { name: 'Sign in' }),
+    );
+    expect(container.querySelector('#account-panel')).toBeVisible();
+  });
 });

@@ -31,6 +31,10 @@ export default function Home() {
     accountPanel.current?.querySelector('input, button')?.focus({ preventScroll: true });
   }, [isAccountOpen]);
 
+  function openAccount() {
+    setIsAccountOpen(true);
+  }
+
   function showAddIdeaForm() {
     addIdeaPanel.current?.scrollIntoView({ behavior: 'auto', block: 'start' });
     addIdeaPanel.current?.querySelector('input, button')?.focus({ preventScroll: true });
@@ -60,10 +64,10 @@ export default function Home() {
             <AuthPanel onClose={() => setIsAccountOpen(false)} />
           </section>
 
-          <Page filters={filters} />
+          <Page filters={filters} signedIn={Boolean(user)} onSignIn={openAccount} />
 
           <section id="add-idea-panel" ref={addIdeaPanel} aria-label="Add a date idea">
-            <AddIdeaForm signedIn={Boolean(user)} onSignIn={() => setIsAccountOpen(true)} />
+            <AddIdeaForm signedIn={Boolean(user)} onSignIn={openAccount} />
           </section>
         </main>
       </div>
