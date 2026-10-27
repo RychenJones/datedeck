@@ -6,6 +6,7 @@ import AddIdeaForm from './AddIdeaForm.jsx';
 
 vi.mock('../../lib/pocketbase.js', () => ({
   pb: {
+    authStore: { record: { id: 'user-1' } },
     collection: vi.fn(),
   },
 }));
@@ -34,8 +35,20 @@ describe('AddIdeaForm', () => {
     collection.create.mockResolvedValue({ id: 'new-idea', title: 'Picnic at Porter Park' });
   });
 
+  it('asks you to sign in before you can add an idea', async () => {
+    const user = userEvent.setup();
+    const onSignIn = vi.fn();
+    render(<AddIdeaForm onSignIn={onSignIn} />);
+
+    expect(screen.queryByLabelText('Title')).not.toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: 'Sign in to add an idea' }));
+
+    expect(onSignIn).toHaveBeenCalledOnce();
+    expect(collection.create).not.toHaveBeenCalled();
+  });
+
   it('shows a field for every part of an idea', () => {
-    render(<AddIdeaForm />);
+    render(<AddIdeaForm signedIn />);
 
     for (const label of [
       'Title',
@@ -54,7 +67,7 @@ describe('AddIdeaForm', () => {
 
   it('tells you which fields are missing and does not save', async () => {
     const user = userEvent.setup();
-    render(<AddIdeaForm />);
+    render(<AddIdeaForm signedIn />);
 
     await user.click(screen.getByRole('button', { name: 'Add idea' }));
 
@@ -72,7 +85,7 @@ describe('AddIdeaForm', () => {
 
   it('tells you when the price or duration is not a valid number', async () => {
     const user = userEvent.setup();
-    render(<AddIdeaForm />);
+    render(<AddIdeaForm signedIn />);
 
     await fillInForm(user);
     await user.clear(screen.getByLabelText('Price per person ($)'));
@@ -88,7 +101,7 @@ describe('AddIdeaForm', () => {
 
   it('saves the idea to PocketBase, clears the form and confirms it was added', async () => {
     const user = userEvent.setup();
-    render(<AddIdeaForm />);
+    render(<AddIdeaForm signedIn />);
 
     await fillInForm(user);
     await user.click(screen.getByRole('button', { name: 'Add idea' }));
@@ -103,6 +116,7 @@ describe('AddIdeaForm', () => {
         duration: 90,
         category: 'Outdoors',
         description: 'Bring a blanket and some snacks.',
+        created_by: 'user-1',
       },
       { requestKey: null },
     );
@@ -117,7 +131,7 @@ describe('AddIdeaForm', () => {
   it('keeps what you typed and shows an error when saving fails', async () => {
     collection.create.mockRejectedValue(new Error('PocketBase is unavailable'));
     const user = userEvent.setup();
-    render(<AddIdeaForm />);
+    render(<AddIdeaForm signedIn />);
 
     await fillInForm(user);
     await user.click(screen.getByRole('button', { name: 'Add idea' }));

@@ -108,6 +108,47 @@
   background: var(--field);
 }
 
+/* Icon-only on phones so the actions fit at 320px; the name shows from 480px. */
+.datedeck-header .account-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: var(--control-small);
+  min-height: var(--control-small);
+  gap: var(--space-2);
+  padding: var(--space-1);
+  border-radius: var(--radius-pill);
+  background: var(--panel);
+  color: var(--ink);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-bold);
+}
+
+.datedeck-header .account-button:hover {
+  background: var(--field);
+}
+
+.datedeck-header .account-initial {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: var(--icon-large);
+  height: var(--icon-large);
+  border-radius: var(--radius-pill);
+  background: var(--accent);
+  color: var(--on-accent);
+  font-size: var(--text-xs);
+  line-height: 1;
+}
+
+.datedeck-header .account-label {
+  display: none;
+  overflow: hidden;
+  max-width: 10em;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .datedeck-header .header-actions .button {
   display: inline-flex;
   align-items: center;
@@ -141,6 +182,14 @@
     gap: var(--space-3);
   }
 
+  .datedeck-header .account-button {
+    padding: var(--space-1) var(--space-4) var(--space-1) var(--space-2);
+  }
+
+  .datedeck-header .account-label {
+    display: inline;
+  }
+
   .datedeck-header .tab {
     flex-direction: row;
     gap: var(--space-2);
@@ -169,6 +218,12 @@
     min-height: var(--control-large);
     gap: var(--space-3);
     padding: var(--space-3) var(--space-6);
+    font-size: var(--text-lg);
+  }
+
+  .datedeck-header .account-button {
+    min-width: var(--control-large);
+    min-height: var(--control-large);
     font-size: var(--text-lg);
   }
 

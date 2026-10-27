@@ -48,7 +48,7 @@ function validate(values) {
 }
 
 /** A form that adds a new date idea to the PocketBase dates collection (DD-06). */
-export default function AddIdeaForm() {
+export default function AddIdeaForm({ signedIn = false, onSignIn }) {
   const { addIdea } = useAddIdea();
   const [values, setValues] = useState(EMPTY_FORM);
   const [errors, setErrors] = useState({});
@@ -112,6 +112,19 @@ export default function AddIdeaForm() {
       <p className="add-idea__error" id={`add-idea-${name}-error`}>
         {errors[name]}
       </p>
+    );
+  }
+
+  // Only signed-in people can add ideas, so each idea records who added it (DD-10).
+  if (!signedIn) {
+    return (
+      <div className="add-idea">
+        <h2>Add a date idea</h2>
+        <p>Sign in to add an idea. Each idea keeps track of who added it.</p>
+        <button className="add-idea__submit" type="button" onClick={onSignIn}>
+          Sign in to add an idea
+        </button>
+      </div>
     );
   }
 

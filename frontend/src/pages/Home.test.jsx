@@ -8,6 +8,7 @@ import { pb } from '../lib/pocketbase.js';
 
 vi.mock('../lib/pocketbase.js', () => ({
   pb: {
+    authStore: { isValid: false, record: null, onChange: () => () => {}, clear: () => {} },
     collection: vi.fn(),
     filter: vi.fn(),
     files: { getURL: vi.fn() },
@@ -321,5 +322,39 @@ describe('Home deck', () => {
     expect(
       await screen.findByRole('heading', { name: 'Picnic at Porter Park' }),
     ).toBeInTheDocument();
+  });
+
+  it('opens the account panel from the header and from the add idea form', async () => {
+    const user = userEvent.setup();
+    // jsdom has no layout, so it does not implement scrolling.
+    Element.prototype.scrollIntoView = vi.fn();
+    const { container } = render(<App />);
+
+    const account = container.querySelector('#account-panel');
+    expect(account).not.toBeVisible();
+
+    await user.click(screen.getByRole('button', { name: 'Sign in' }));
+    expect(screen.getByRole('region', { name: 'Your DateDeck account' })).toBe(account);
+    expect(within(account).getByLabelText('Email')).toHaveFocus();
+
+    await user.click(within(account).getByRole('button', { name: 'Close' }));
+    expect(account).not.toBeVisible();
+
+    await user.click(screen.getByRole('button', { name: 'Sign in to add an idea' }));
+    expect(account).toBeVisible();
+  });
+
+  it('asks signed-out people to sign in on the Liked tab', async () => {
+    const user = userEvent.setup();
+    Element.prototype.scrollIntoView = vi.fn();
+    const { container } = render(<App />);
+
+    await user.click(screen.getByRole('button', { name: 'Liked' }));
+
+    expect(screen.getByRole('heading', { name: '0 liked ideas' })).toBeInTheDocument();
+    await user.click(
+      within(container.querySelector('#date-ideas')).getByRole('button', { name: 'Sign in' }),
+    );
+    expect(container.querySelector('#account-panel')).toBeVisible();
   });
 });
