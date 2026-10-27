@@ -7,6 +7,7 @@ export default function DateDeckIcon({ name, className = 'icon' }) {
     cards: 'M7 3H5a3 3 0 0 0-3 3v12a3 3 0 0 0 3 3h8',
     sun: 'M12 1v2m0 18v2M1 12h2m18 0h2M4.2 4.2l1.4 1.4m12.8 12.8 1.4 1.4M4.2 19.8l1.4-1.4M18.4 5.6l1.4-1.4',
     close: 'm5 5 14 14M19 5 5 19',
+    user: 'M4 21a8 8 0 0 1 16 0',
     search: 'm15 15 6 6',
     undo: 'm8 4-5 5 5 5M3 9h11a6 6 0 0 1 0 12h-3',
     shuffle:
@@ -18,6 +19,7 @@ export default function DateDeckIcon({ name, className = 'icon' }) {
       {paths[name] && <path d={paths[name]} />}
       {name === 'sun' && <circle cx="12" cy="12" r="4" />}
       {name === 'search' && <circle cx="10" cy="10" r="7" />}
+      {name === 'user' && <circle cx="12" cy="8" r="4" />}
       {name === 'cards' && (
         <rect x="6" y="3" width="13" height="18" rx="3" transform="rotate(8 12 12)" />
       )}

@@ -59,15 +59,17 @@ PocketBase applies any new file in `pb_migrations/` when it starts. On the serve
 
 The ideas are in `backend/seed/dates.json`. From `frontend/`, run the import against the live URL:
 
+Only signed-in users can add ideas, so the import signs in as a PocketBase superuser. Pass the superuser's email and password in the shell, never in `.env`:
+
 ```bash
-VITE_POCKETBASE_URL=https://<live-url> npm run import:ideas
+VITE_POCKETBASE_URL=https://<live-url> PB_SUPERUSER_EMAIL=<email> PB_SUPERUSER_PASSWORD=<password> npm run import:ideas
 ```
 
 It prints how many ideas it added and skipped. It skips ideas that are already there, so it is safe to run again.
 
 ### Public rules
 
-The `dates` collection rules come from the migrations: anyone can list, view and add ideas, and only an admin can edit or delete them in the dashboard. Check this in the live dashboard under **Collections → dates → API Rules** after the first deploy.
+The `dates` collection rules come from the migrations: anyone can list and view ideas, only signed-in users can add them (credited to themselves in `created_by`), and only the person who added an idea can edit or delete it (DD-10). Admins can still change anything in the dashboard. Check this in the live dashboard under **Collections → dates → API Rules** after the first deploy.
 
 # Branches and Pull Requests
 
@@ -134,7 +136,7 @@ The full stories with acceptance criteria are in [`docs/PLAN.md`](docs/PLAN.md).
 **Sprint 3: Accounts and AI (Nov 2 – Nov 13)**
 
 - [ ] DD-10b Put PocketBase on AWS and go live
-- [ ] DD-17 Sign up and sign in
+- [ ] DD-10 Sign up and sign in
 - [ ] DD-18 Keep saved and hidden ideas in your account
 - [ ] DD-19 Ask the AI for a date idea
 - [ ] DD-20 "Pick one for us" from saved ideas

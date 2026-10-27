@@ -132,6 +132,18 @@
   margin-top: var(--space-2);
   color: var(--muted);
 }
+.home__empty-action {
+  min-height: var(--control-small);
+  margin-top: var(--space-6);
+  padding: var(--space-3) var(--space-7);
+  border-radius: var(--radius-pill);
+  background: var(--action);
+  color: var(--on-action);
+  font-weight: var(--weight-bold);
+}
+.home__empty-action:hover {
+  background: var(--action-hover);
+}
 
 .idea-grid {
   display: grid;

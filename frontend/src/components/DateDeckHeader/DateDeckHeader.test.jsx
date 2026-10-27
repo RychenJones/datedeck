@@ -49,4 +49,24 @@ describe('DateDeckHeader', () => {
     await user.click(add);
     expect(onAddIdea).toHaveBeenCalledOnce();
   });
+
+  it('offers Sign in when nobody is signed in', async () => {
+    const user = userEvent.setup();
+    const onAccount = vi.fn();
+    render(<DateDeckHeader onAccount={onAccount} />);
+
+    const account = screen.getByRole('button', { name: 'Sign in' });
+    expect(account).toHaveAttribute('aria-expanded', 'false');
+    await user.click(account);
+    expect(onAccount).toHaveBeenCalledOnce();
+  });
+
+  it('shows who is signed in', () => {
+    render(
+      <DateDeckHeader user={{ id: 'user-1', name: 'Gabriel', email: 'gabriel@example.com' }} />,
+    );
+
+    expect(screen.getByRole('button', { name: 'Signed in as Gabriel' })).toBeInTheDocument();
+    expect(screen.getByText('G')).toBeInTheDocument();
+  });
 });
