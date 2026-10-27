@@ -47,8 +47,18 @@ async function main() {
     );
   }
 
+  // Only signed-in users can add ideas (DD-10), so the import signs in as a superuser.
+  // These come from the shell, never from .env, so the password stays out of the app.
+  const { PB_SUPERUSER_EMAIL: email, PB_SUPERUSER_PASSWORD: password } = process.env;
+  if (!email || !password) {
+    throw new Error('Set PB_SUPERUSER_EMAIL and PB_SUPERUSER_PASSWORD before importing.');
+  }
+
+  const pb = new PocketBase(url);
+  await pb.collection('_superusers').authWithPassword(email, password, { requestKey: null });
+
   const ideas = JSON.parse(await readFile(seedPath, 'utf8'));
-  const { added, skipped } = await importIdeas(new PocketBase(url), ideas);
+  const { added, skipped } = await importIdeas(pb, ideas);
   console.log(`${added} added, ${skipped} skipped.`);
 }
 

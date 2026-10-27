@@ -9,7 +9,13 @@ export default function DateDeckHeader({
   onThemeToggle,
   onAddIdea,
   isAddIdeaOpen = false,
+  user = null,
+  onAccount,
+  isAccountOpen = false,
 }) {
+  const userName = user && (user.name || user.email);
+  const accountLabel = user ? `Signed in as ${userName}` : 'Sign in';
+
   const views = [
     { value: 'deck', label: 'Deck', icon: 'cards' },
     { value: 'browse', label: 'All ideas', icon: 'grid' },
@@ -49,6 +55,26 @@ export default function DateDeckHeader({
           onClick={onThemeToggle}
         >
           <DateDeckIcon name="sun" />
+        </button>
+        <button
+          className="account-button"
+          type="button"
+          aria-label={accountLabel}
+          title={accountLabel}
+          aria-controls="account-panel"
+          aria-expanded={isAccountOpen}
+          onClick={onAccount}
+        >
+          {user ? (
+            <span className="account-initial" aria-hidden="true">
+              {userName.charAt(0).toUpperCase()}
+            </span>
+          ) : (
+            <DateDeckIcon name="user" />
+          )}
+          <span className="account-label" aria-hidden="true">
+            {user ? userName : 'Sign in'}
+          </span>
         </button>
         <button
           className="button"

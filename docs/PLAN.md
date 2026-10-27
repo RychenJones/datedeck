@@ -232,10 +232,26 @@ Generated from the Trello export (`datedeck-trello.json`). The Trello board is t
 **Acceptance criteria**
 
 - [ ] Netlify rebuilds the app on every merge to main, so everything merged goes live on its own with no final deploy step (`netlify.toml` in the repo)
-- [ ] Public rules: anyone can view and add ideas, nobody can edit or delete from the app
+- [ ] Public rules: anyone can view and add ideas, nobody can edit or delete from the app (changed by DD-10: adding needs an account, and creators edit or remove their own)
 - [ ] README deploy steps: how to apply new migrations and how to load the DD-08 ideas into the live database
 
 **Sprint 2 update:** DD-10 was split. Hosting PocketBase on AWS moved to DD-10b in sprint 3, so until then the Netlify site has no live database.
+
+### DD-10 Sign up and sign in
+
+- **Owner:** Gabriel · **Week:** 4 · **Due:** 2026-10-30 · **Points:** 3 · **Labels:** Backend, Frontend
+- **Branch:** `gabriel/dd-10` · **Depends on:** DD-01, DD-02
+
+> As a user, I want my own DateDeck account, so that my choices follow me to any device.
+
+**Acceptance criteria**
+
+- [ ] Sign up and sign in with email and password using the PocketBase users collection
+- [ ] An auth context in React; signed-in state shows in the header
+- [ ] Sign out, and stay signed in after a reload
+- [ ] Ideas record who added them; only signed-in users add ideas, and only the creator edits or removes theirs
+
+**Sprint 2 update:** this story was DD-17 (Rychen, sprint 3). It moved to Gabriel in week 4 as DD-10 and replaces DD-10a's public rule: adding an idea now needs an account, and the import script signs in as a superuser.
 
 ### DD-15 Show my Liked (Saved) and Hidden lists
 
@@ -276,21 +292,7 @@ Generated from the Trello export (`datedeck-trello.json`). The Trello board is t
 - [ ] Migrations applied and the DD-08 ideas loaded into the live database with the README deploy steps
 - [ ] Smoke test on the live link from a phone: load, save or hide, add
 
-DD-17 and DD-19 can be built against local PocketBase before this lands; they go live with it.
-
-### DD-17 Sign up and sign in
-
-- **Owner:** Rychen · **Week:** 5 · **Due:** 2026-11-06 · **Points:** 3 · **Labels:** Backend, Frontend
-- **Branch:** `rychen/dd-17` · **Depends on:** DD-10a
-
-> As a user, I want my own DateDeck account, so that my choices follow me to any device.
-
-**Acceptance criteria**
-
-- [ ] Sign up and sign in with email and password using the PocketBase users collection
-- [ ] An auth context in React; signed-in state shows in the header
-- [ ] Sign out, and stay signed in after a reload
-- [ ] Ideas record who added them; only signed-in users add ideas, and only the creator edits or removes theirs
+DD-10 and DD-19 can be built against local PocketBase before this lands; they go live with it.
 
 ### DD-19 Ask the AI for a date idea
 
@@ -336,7 +338,7 @@ DD-17 and DD-19 can be built against local PocketBase before this lands; they go
 ### DD-18 Keep saved and hidden ideas in your account
 
 - **Owner:** Rychen · **Week:** 6 · **Due:** 2026-11-13 · **Points:** 3 · **Labels:** Backend
-- **Branch:** `rychen/dd-18` · **Depends on:** DD-17
+- **Branch:** `rychen/dd-18` · **Depends on:** DD-10
 
 > As a signed-in user, I want my saved and hidden ideas stored in my account, so that they are the same on my phone and laptop.
 
@@ -364,7 +366,7 @@ DD-17 and DD-19 can be built against local PocketBase before this lands; they go
 ### DD-22 Edit and remove my own ideas
 
 - **Owner:** Gabriel · **Week:** 6 · **Due:** 2026-11-13 · **Points:** 2 · **Labels:** Frontend
-- **Branch:** `gabriel/dd-22` · **Depends on:** DD-06, DD-17
+- **Branch:** `gabriel/dd-22` · **Depends on:** DD-06, DD-10
 
 > As someone who added an idea, I want to fix or remove it, so that my ideas stay accurate.
 
@@ -378,7 +380,7 @@ DD-17 and DD-19 can be built against local PocketBase before this lands; they go
 ### DD-23 Approve new ideas before they go live
 
 - **Owner:** Talmage · **Week:** 6 · **Due:** 2026-11-13 · **Points:** 2 · **Labels:** Backend, QA
-- **Branch:** `talmage/dd-23` · **Depends on:** DD-17
+- **Branch:** `talmage/dd-23` · **Depends on:** DD-10
 
 > As the team, we want to check new ideas before everyone sees them, so that the deck stays useful and appropriate.
 

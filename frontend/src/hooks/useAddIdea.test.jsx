@@ -5,6 +5,7 @@ import { useAddIdea } from './useAddIdea.js';
 
 vi.mock('../lib/pocketbase.js', () => ({
   pb: {
+    authStore: { record: { id: 'user-1' } },
     collection: vi.fn(),
   },
 }));
@@ -19,7 +20,7 @@ describe('useAddIdea', () => {
     pb.collection.mockReturnValue(collection);
   });
 
-  it('adds an idea to the dates collection', async () => {
+  it('adds an idea to the dates collection, credited to the signed-in user', async () => {
     const newIdea = { id: 'new-idea', title: 'New idea' };
     collection.create.mockResolvedValue(newIdea);
     const { result } = renderHook(() => useAddIdea());
@@ -30,7 +31,10 @@ describe('useAddIdea', () => {
     });
 
     expect(pb.collection).toHaveBeenCalledWith('dates');
-    expect(collection.create).toHaveBeenCalledWith({ title: 'New idea' }, { requestKey: null });
+    expect(collection.create).toHaveBeenCalledWith(
+      { title: 'New idea', created_by: 'user-1' },
+      { requestKey: null },
+    );
     expect(added).toEqual(newIdea);
   });
 

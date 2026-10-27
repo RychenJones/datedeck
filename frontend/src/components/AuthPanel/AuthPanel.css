@@ -1,0 +1,138 @@
+/* Follow docs/STYLE_GUIDE.md; matches the add idea form so both panels read as one system. */
+.auth {
+  display: grid;
+  gap: var(--space-4);
+  width: 100%;
+  min-width: 0;
+  max-width: var(--deck-width);
+  margin: 0 auto var(--space-8);
+  padding: var(--space-4);
+  border-radius: var(--radius-lg);
+  background: var(--panel);
+  color: var(--ink);
+  overflow-wrap: anywhere;
+}
+
+.auth h2 {
+  font-size: var(--text-xl);
+  line-height: var(--leading-heading);
+}
+
+.auth p {
+  margin: 0;
+}
+
+.auth__muted {
+  color: var(--muted);
+}
+
+.auth__field {
+  display: grid;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.auth__field label {
+  font-weight: var(--weight-bold);
+}
+
+.auth__field input {
+  width: 100%;
+  min-width: 0;
+  min-height: var(--control-small);
+  padding: var(--space-3) var(--space-4);
+  border: var(--border-strong) solid var(--line);
+  border-radius: var(--radius-sm);
+  background: var(--field);
+  color: var(--ink);
+  font-size: var(--text-sm);
+  line-height: var(--leading-body);
+}
+
+.auth__field [aria-invalid='true'] {
+  border-color: var(--focus);
+}
+
+.auth__error,
+.auth__message {
+  color: var(--focus);
+  font-size: var(--text-sm);
+}
+
+.auth__message {
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-sm);
+  background: var(--field);
+}
+
+.auth__actions {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.auth__submit,
+.auth__secondary {
+  width: 100%;
+  min-height: var(--control-small);
+  padding: var(--space-3) var(--space-7);
+  border-radius: var(--radius-pill);
+  font-weight: var(--weight-bold);
+}
+
+.auth__submit {
+  background: var(--action);
+  color: var(--on-action);
+}
+
+.auth__submit:not(:disabled):hover {
+  background: var(--action-hover);
+}
+
+.auth__submit:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+
+.auth__secondary {
+  border: var(--border-width) solid var(--line);
+  background: transparent;
+  color: var(--ink);
+}
+
+.auth__secondary:hover {
+  background: var(--field);
+}
+
+.auth__switch {
+  color: var(--muted);
+}
+
+.auth__link {
+  min-height: var(--control-small);
+  padding: 0;
+  background: transparent;
+  color: var(--ink);
+  font-weight: var(--weight-bold);
+  text-decoration: underline;
+}
+
+.auth :focus-visible {
+  outline: var(--focus-width) solid var(--focus);
+  outline-offset: var(--space-1);
+}
+
+@media (min-width: 480px) {
+  .auth {
+    padding: var(--space-6);
+  }
+
+  .auth__actions {
+    display: flex;
+    flex-wrap: wrap;
+  }
+
+  .auth__submit,
+  .auth__secondary {
+    width: auto;
+  }
+}

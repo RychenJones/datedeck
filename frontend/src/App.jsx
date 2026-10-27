@@ -1,10 +1,13 @@
+import AuthProvider from './components/AuthProvider/AuthProvider.jsx';
 import SwipesProvider from './components/SwipesProvider/SwipesProvider.jsx';
 import Home from './pages/Home.jsx';
 
 export default function App() {
   return (
-    <SwipesProvider>
-      <Home />
-    </SwipesProvider>
+    <AuthProvider>
+      <SwipesProvider>
+        <Home />
+      </SwipesProvider>
+    </AuthProvider>
   );
 }
