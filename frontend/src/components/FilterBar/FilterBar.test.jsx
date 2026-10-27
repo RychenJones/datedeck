@@ -5,13 +5,19 @@ import { NO_FILTERS } from '../../hooks/useIdeas.js';
 import FilterBar from './FilterBar.jsx';
 
 describe('FilterBar', () => {
+  const counts = {
+    locations: { 'Downtown Rexburg': 3 },
+    prices: { free: 2 },
+    categories: { Outdoors: 1 },
+  };
+
   it('selects and clears a location filter', async () => {
     const user = userEvent.setup();
     const onChange = vi.fn();
 
-    render(<FilterBar filters={NO_FILTERS} onChange={onChange} />);
+    render(<FilterBar filters={NO_FILTERS} onChange={onChange} counts={counts} />);
 
-    await user.click(screen.getByRole('button', { name: 'Downtown Rexburg' }));
+    await user.click(screen.getByRole('button', { name: /^Downtown Rexburg/ }));
 
     expect(onChange).toHaveBeenLastCalledWith({
       ...NO_FILTERS,
@@ -24,13 +30,15 @@ describe('FilterBar', () => {
     const onChange = vi.fn();
     const filters = { ...NO_FILTERS, minPrice: 10, maxPrice: 25 };
 
-    const { rerender } = render(<FilterBar filters={NO_FILTERS} onChange={onChange} />);
+    const { rerender } = render(
+      <FilterBar filters={NO_FILTERS} onChange={onChange} counts={counts} />,
+    );
 
-    await user.click(screen.getByRole('button', { name: '$10 to $25' }));
+    await user.click(screen.getByRole('button', { name: /^\$10 to \$25/ }));
     expect(onChange).toHaveBeenLastCalledWith(filters);
 
-    rerender(<FilterBar filters={filters} onChange={onChange} />);
-    await user.click(screen.getByRole('button', { name: '$10 to $25' }));
+    rerender(<FilterBar filters={filters} onChange={onChange} counts={counts} />);
+    await user.click(screen.getByRole('button', { name: /^\$10 to \$25/ }));
     expect(onChange).toHaveBeenLastCalledWith(NO_FILTERS);
   });
 
@@ -38,9 +46,9 @@ describe('FilterBar', () => {
     const user = userEvent.setup();
     const onChange = vi.fn();
 
-    render(<FilterBar filters={NO_FILTERS} onChange={onChange} />);
+    render(<FilterBar filters={NO_FILTERS} onChange={onChange} counts={counts} />);
 
-    await user.click(screen.getByRole('button', { name: 'Outdoors' }));
+    await user.click(screen.getByRole('button', { name: /^Outdoors/ }));
 
     expect(onChange).toHaveBeenLastCalledWith({
       ...NO_FILTERS,
@@ -52,7 +60,7 @@ describe('FilterBar', () => {
     const user = userEvent.setup();
     const onChange = vi.fn();
 
-    render(<FilterBar filters={NO_FILTERS} onChange={onChange} />);
+    render(<FilterBar filters={NO_FILTERS} onChange={onChange} counts={counts} />);
 
     await user.type(screen.getByRole('searchbox', { name: 'Search ideas' }), 'park');
 
@@ -71,13 +79,23 @@ describe('FilterBar', () => {
       search: 'park',
     };
 
-    const { rerender } = render(<FilterBar filters={NO_FILTERS} onChange={onChange} />);
+    const { rerender } = render(
+      <FilterBar filters={NO_FILTERS} onChange={onChange} counts={counts} />,
+    );
 
     expect(screen.queryByRole('button', { name: 'Clear all' })).not.toBeInTheDocument();
 
-    rerender(<FilterBar filters={filters} onChange={onChange} />);
+    rerender(<FilterBar filters={filters} onChange={onChange} counts={counts} />);
     await user.click(screen.getByRole('button', { name: 'Clear all' }));
 
     expect(onChange).toHaveBeenCalledWith(NO_FILTERS);
+  });
+
+  it('shows counts for each filter option', () => {
+    render(<FilterBar filters={NO_FILTERS} onChange={vi.fn()} counts={counts} />);
+
+    expect(screen.getByRole('button', { name: 'Downtown Rexburg (3)' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Free (2)' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Outdoors (1)' })).toBeInTheDocument();
   });
 });

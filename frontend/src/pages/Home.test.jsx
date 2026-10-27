@@ -152,21 +152,21 @@ describe('Home deck', () => {
     pb.filter.mockImplementation((filter) => filter);
     render(<App />);
 
-    await user.click(screen.getByRole('button', { name: 'Downtown Rexburg' }));
+    await user.click(screen.getByRole('button', { name: /^Downtown Rexburg/ }));
     await waitFor(() =>
       expect(collection.getList).toHaveBeenLastCalledWith(1, PAGE_SIZE, {
-          filter: '(location = {:area0})',
+        filter: '(location = {:area0})',
         sort: '-created,id',
         requestKey: null,
       }),
     );
 
     await user.click(screen.getByRole('button', { name: 'All ideas' }));
-    expect(screen.getByRole('button', { name: 'Downtown Rexburg' })).toHaveAttribute(
+    expect(screen.getByRole('button', { name: /^Downtown Rexburg/ })).toHaveAttribute(
       'aria-pressed',
       'true',
     );
-    expect(screen.getByRole('button', { name: 'Free' })).toHaveAttribute('aria-pressed', 'false');
+    expect(screen.getByRole('button', { name: /^Free/ })).toHaveAttribute('aria-pressed', 'false');
   });
 
   it('shows sample and PocketBase ideas together in the All ideas grid', async () => {

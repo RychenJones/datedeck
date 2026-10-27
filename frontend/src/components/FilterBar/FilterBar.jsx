@@ -6,7 +6,7 @@ function isPriceSelected(filters, option) {
   return filters.minPrice === option.minPrice && filters.maxPrice === option.maxPrice;
 }
 
-export default function FilterBar({ filters, onChange }) {
+export default function FilterBar({ filters, onChange, counts }) {
   const hasActiveFilters =
     filters.areas.length > 0 ||
     filters.categories.length > 0 ||
@@ -71,7 +71,7 @@ export default function FilterBar({ filters, onChange }) {
                 key={option.id}
                 onClick={() => toggleCategory(option.label)}
               >
-                {option.label}
+                {option.label} <small>({counts.categories[option.label] ?? 0})</small>
               </button>
             );
           })}
@@ -91,7 +91,7 @@ export default function FilterBar({ filters, onChange }) {
                 key={location}
                 onClick={() => toggleLocation(location)}
               >
-                {location}
+                {location} <small>({counts.locations[location] ?? 0})</small>
               </button>
             );
           })}
@@ -111,7 +111,7 @@ export default function FilterBar({ filters, onChange }) {
                 key={option.id}
                 onClick={() => selectPrice(option)}
               >
-                {option.label}
+                {option.label} <small>({counts.prices[option.id] ?? 0})</small>
               </button>
             );
           })}
