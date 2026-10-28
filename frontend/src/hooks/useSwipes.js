@@ -8,21 +8,39 @@ export const SwipesContext = createContext(null);
 function readSwipes() {
   try {
     const stored = JSON.parse(window.localStorage.getItem(SWIPES_KEY)) ?? {};
+    if (
+      typeof stored !== 'object' ||
+      Array.isArray(stored) ||
+      (stored.saved !== undefined && !Array.isArray(stored.saved)) ||
+      (stored.hidden !== undefined && !Array.isArray(stored.hidden)) ||
+      (Array.isArray(stored.saved) && stored.saved.some((id) => typeof id !== 'string')) ||
+      (Array.isArray(stored.hidden) && stored.hidden.some((id) => typeof id !== 'string'))
+    ) {
+      throw new Error('Invalid swipe data');
+    }
     return {
-      ...stored,
-      saved: Array.isArray(stored.saved) ? stored.saved : [],
-      hidden: Array.isArray(stored.hidden) ? stored.hidden : [],
+      storageError: null,
+      swipes: {
+        ...stored,
+        saved: Array.isArray(stored.saved) ? stored.saved : [],
+        hidden: Array.isArray(stored.hidden) ? stored.hidden : [],
+      },
     };
   } catch {
-    return { saved: [], hidden: [] };
+    return {
+      swipes: { saved: [], hidden: [] },
+      storageError:
+        'Could not read your saved and hidden ideas from this browser. Your choices will work for this visit, but cannot be kept after a reload.',
+    };
   }
 }
 
 function writeSwipes(swipes) {
   try {
     window.localStorage.setItem(SWIPES_KEY, JSON.stringify(swipes));
+    return null;
   } catch {
-    // Private browsing can block storage; choices still work until a reload.
+    return 'Could not store your choices in this browser. Your choices will work for this visit only.';
   }
 }
 
@@ -32,11 +50,23 @@ function without(ids, id) {
 
 /** The saved and hidden state behind SwipesProvider. Use useSwipes() in components. */
 export function useSwipesState() {
-  const [swipes, setSwipes] = useState(readSwipes);
+  const [initial] = useState(readSwipes);
+  const [swipes, setSwipes] = useState(initial.swipes);
+  const [writeError, setWriteError] = useState(null);
 
   useEffect(() => {
-    writeSwipes(swipes);
-  }, [swipes]);
+    // Never overwrite data we could not read.
+    let active = true;
+    if (!initial.storageError) {
+      const error = writeSwipes(swipes);
+      Promise.resolve().then(() => {
+        if (active) setWriteError(error);
+      });
+    }
+    return () => {
+      active = false;
+    };
+  }, [swipes, initial.storageError]);
 
   // An idea is either saved or hidden, never both.
   function save(id) {
@@ -63,7 +93,24 @@ export function useSwipesState() {
     setSwipes((current) => ({ ...current, hidden: without(current.hidden, id) }));
   }
 
-  return { saved: swipes.saved, hidden: swipes.hidden, save, hide, unsave, unhide };
+  function toggleSave(id) {
+    setSwipes((current) => ({
+      ...current,
+      saved: current.saved.includes(id) ? without(current.saved, id) : [...current.saved, id],
+      hidden: without(current.hidden, id),
+    }));
+  }
+
+  return {
+    saved: swipes.saved,
+    hidden: swipes.hidden,
+    save,
+    hide,
+    unsave,
+    unhide,
+    toggleSave,
+    storageError: initial.storageError || writeError,
+  };
 }
 
 /** Saved and hidden idea ids, shared by every tab and stored in datedeck.swipes. */

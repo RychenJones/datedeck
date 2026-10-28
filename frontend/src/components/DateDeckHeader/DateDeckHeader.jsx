@@ -1,3 +1,4 @@
+import { useEffect, useRef } from 'react';
 import DateDeckIcon from '../DateDeckIcon/DateDeckIcon.jsx';
 import './DateDeckHeader.css';
 
@@ -13,6 +14,15 @@ export default function DateDeckHeader({
   onAccount,
   isAccountOpen = false,
 }) {
+  const browseTab = useRef(null);
+  useEffect(() => {
+    function showAllIdeas() {
+      onViewChange?.('browse');
+      browseTab.current?.focus();
+    }
+    window.addEventListener('datedeck:show-all-ideas', showAllIdeas);
+    return () => window.removeEventListener('datedeck:show-all-ideas', showAllIdeas);
+  }, [onViewChange]);
   const userName = user && (user.name || user.email);
   const accountLabel = user ? `Signed in as ${userName}` : 'Sign in';
 
@@ -36,6 +46,7 @@ export default function DateDeckHeader({
             className="tab"
             type="button"
             key={value}
+            ref={value === 'browse' ? browseTab : undefined}
             aria-pressed={view === value}
             aria-controls="date-ideas"
             onClick={() => onViewChange?.(value)}
