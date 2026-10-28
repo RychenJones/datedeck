@@ -116,6 +116,14 @@ function buildIdeaCounts(ideas, filters) {
   };
 }
 
+// An empty filtered page can just mean nothing matches, so ask again without the filter.
+async function isDatabaseEmpty(list, filter) {
+  if (list.totalItems > 0) return false;
+  if (!filter) return true;
+  const all = await pb.collection('dates').getList(1, 1, { requestKey: null });
+  return all.totalItems === 0;
+}
+
 function mergeIdeas(primaryIdeas, additionalIdeas) {
   const seenIds = new Set(primaryIdeas.map((idea) => idea.id));
   return [...primaryIdeas, ...additionalIdeas.filter((idea) => !seenIds.has(idea.id))];
@@ -125,18 +133,26 @@ function mergeIdeas(primaryIdeas, additionalIdeas) {
  * Loads ideas from the PocketBase dates collection that match the filters,
  * PAGE_SIZE at a time. Call loadMore() to add the next page.
  *
+ * includeSamples always mixes in the sample ideas (and uses them if PocketBase fails);
+ * samplesWhenEmpty uses them only while the database has no ideas at all.
+ *
  * @param {{areas?: string[], minPrice?: number|null, maxPrice?: number|null, categories?: string[], search?: string}} filters
  */
-export function useIdeas(filters = NO_FILTERS, { includeSamples = false } = {}) {
+export function useIdeas(
+  filters = NO_FILTERS,
+  { includeSamples = false, samplesWhenEmpty = false } = {},
+) {
   const filter = buildIdeasFilter(filters);
-  const sampleFilterSource = includeSamples ? filters : NO_FILTERS;
+  const usesSamples = includeSamples || samplesWhenEmpty;
+  const sampleFilterSource = usesSamples ? filters : NO_FILTERS;
   const samples = useMemo(
     () =>
-      includeSamples
+      usesSamples
         ? sampleIdeas.filter((idea) => matchesSampleFilters(idea, sampleFilterSource))
         : [],
-    [includeSamples, sampleFilterSource],
+    [usesSamples, sampleFilterSource],
   );
+  const mixedSamples = useMemo(() => (includeSamples ? samples : []), [includeSamples, samples]);
   const [request, setRequest] = useState({ filter, page: 1 });
   const [result, setResult] = useState({
     request: null,
@@ -158,17 +174,29 @@ export function useIdeas(filters = NO_FILTERS, { includeSamples = false } = {}) 
         sort: SORT,
         requestKey: null,
       })
-      .then((list) => {
+      .then(async (list) => {
+        const showSamples =
+          samplesWhenEmpty && request.page === 1 && (await isDatabaseEmpty(list, request.filter));
         if (cancelled) return;
+        if (showSamples) {
+          setResult({
+            request,
+            ideas: samples,
+            totalItems: samples.length,
+            hasMore: false,
+            error: null,
+          });
+          return;
+        }
         setResult((current) => {
           const items = list.items.map(withPhotoUrl);
           const known = request.page === 1 ? [] : current.ideas;
           const knownIds = new Set(known.map((idea) => idea.id));
-          const pageItems = request.page === 1 ? mergeIdeas(items, samples) : items;
+          const pageItems = request.page === 1 ? mergeIdeas(items, mixedSamples) : items;
           return {
             request,
             ideas: [...known, ...pageItems.filter((idea) => !knownIds.has(idea.id))],
-            totalItems: list.totalItems + samples.length,
+            totalItems: list.totalItems + mixedSamples.length,
             hasMore: list.page < list.totalPages,
             error: null,
           };
@@ -192,7 +220,7 @@ export function useIdeas(filters = NO_FILTERS, { includeSamples = false } = {}) 
     return () => {
       cancelled = true;
     };
-  }, [includeSamples, request, samples]);
+  }, [includeSamples, samplesWhenEmpty, request, samples, mixedSamples]);
 
   const isDone = result.request === request;
   const canLoadMore = isDone && result.hasMore && !result.error;

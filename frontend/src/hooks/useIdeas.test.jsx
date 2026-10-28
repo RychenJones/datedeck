@@ -140,6 +140,45 @@ describe('useIdeas', () => {
     expect(collection.getList).toHaveBeenCalledTimes(1);
   });
 
+  it('shows the sample ideas when the database has no ideas yet', async () => {
+    const { result } = renderHook(() => useIdeas(undefined, { samplesWhenEmpty: true }));
+
+    await waitFor(() => expect(result.current.status).toBe('ready'));
+    expect(result.current.ideas.map((idea) => idea.id)).toEqual([
+      'sample-1',
+      'sample-2',
+      'sample-3',
+      'sample-4',
+      'sample-5',
+    ]);
+    expect(result.current.totalItems).toBe(5);
+    expect(result.current.hasMore).toBe(false);
+  });
+
+  it('shows only database ideas when the database has some', async () => {
+    const ideas = makeIdeas(2);
+    serve(ideas);
+
+    const { result } = renderHook(() => useIdeas(undefined, { samplesWhenEmpty: true }));
+
+    await waitFor(() => expect(result.current.status).toBe('ready'));
+    expect(result.current.ideas).toEqual(ideas);
+  });
+
+  it('shows no sample ideas when the filters match nothing in a database that has ideas', async () => {
+    collection.getList.mockImplementation(async (page, perPage, { filter }) => {
+      const items = filter ? [] : makeIdeas(1);
+      return { page, perPage, totalItems: items.length, totalPages: items.length, items };
+    });
+
+    const { result } = renderHook(() =>
+      useIdeas({ categories: ['Outdoors'] }, { samplesWhenEmpty: true }),
+    );
+
+    await waitFor(() => expect(result.current.status).toBe('ready'));
+    expect(result.current.ideas).toEqual([]);
+  });
+
   it('gives each photo its full PocketBase link', async () => {
     serve([{ id: 'idea-1', title: 'Picnic', photo: 'picnic.jpg' }]);
 
