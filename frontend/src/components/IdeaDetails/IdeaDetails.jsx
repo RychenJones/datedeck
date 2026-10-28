@@ -35,7 +35,8 @@ export default function IdeaDetails({ idea, onClose }) {
   }, [onClose]);
 
   const { title, description, place_name, address, price, duration, category, photo } = idea;
-  const photoSource = photo && photo !== failedPhoto ? photo : null;
+  const photoSource =
+    photo && !(failedPhoto?.ideaId === idea.id && failedPhoto.photo === photo) ? photo : null;
 
   return (
     <div className="idea-details__backdrop">
@@ -60,7 +61,7 @@ export default function IdeaDetails({ idea, onClose }) {
               className="idea-details__photo"
               src={photoSource}
               alt={title}
-              onError={() => setFailedPhoto(photo)}
+              onError={() => setFailedPhoto({ ideaId: idea.id, photo })}
             />
           ) : (
             <div className="idea-details__placeholder" aria-label="Photo placeholder">

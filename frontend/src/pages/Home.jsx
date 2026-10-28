@@ -2,8 +2,9 @@ import { useEffect, useRef, useState } from 'react';
 import AddIdeaForm from '../components/AddIdeaForm/AddIdeaForm.jsx';
 import AuthPanel from '../components/AuthPanel/AuthPanel.jsx';
 import DateDeckHeader from '../components/DateDeckHeader/DateDeckHeader.jsx';
+import FilterBar from '../components/FilterBar/FilterBar.jsx';
+import { NO_FILTERS, useIdeaCounts } from '../hooks/useIdeas.js';
 import { useAuth } from '../hooks/useAuth.js';
-import { NO_FILTERS } from '../hooks/useIdeas.js';
 import Browse from './Browse.jsx';
 import Deck from './Deck.jsx';
 import Liked from './Liked.jsx';
@@ -13,13 +14,17 @@ import '../styles/home.css';
 const PAGES = { deck: Deck, browse: Browse, liked: Liked };
 
 // Main screen: the header, the account panel, the tab you picked and the form to add an idea.
+// Main screen: the header, the account panel, the tab you picked and the form to add an idea.
 export default function Home() {
   const { user } = useAuth();
   const [view, setView] = useState('deck');
   const [theme, setTheme] = useState('dark');
+
+  // Shared by the deck and All ideas so both views respond to the same filters.
+  const [filters, setFilters] = useState(NO_FILTERS);
+  const counts = useIdeaCounts(filters);
+
   const [isAccountOpen, setIsAccountOpen] = useState(false);
-  // Shared by the deck and All ideas; DD-13 adds setFilters for its filter bar.
-  const [filters] = useState(NO_FILTERS);
   const accountPanel = useRef(null);
   const addIdeaPanel = useRef(null);
   const Page = PAGES[view];
@@ -54,7 +59,12 @@ export default function Home() {
           onAccount={() => setIsAccountOpen((open) => !open)}
           isAccountOpen={isAccountOpen}
         />
+
         <main className={view === 'deck' ? 'home home--deck' : 'home'}>
+          {view !== 'liked' && (
+            <FilterBar filters={filters} onChange={setFilters} counts={counts} />
+          )}
+
           <section
             id="account-panel"
             ref={accountPanel}

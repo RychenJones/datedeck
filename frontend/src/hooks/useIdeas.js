@@ -15,6 +15,12 @@ export const NO_FILTERS = {
   search: '',
 };
 
+export const EMPTY_IDEA_COUNTS = {
+  locations: {},
+  prices: {},
+  categories: {},
+};
+
 // Joins "field = value" checks with || so any of the chosen values matches.
 function anyOf(field, values, name, parts, params) {
   if (!values?.length) return;
@@ -57,18 +63,57 @@ function withPhotoUrl(idea) {
   return idea.photo ? { ...idea, photo: pb.files.getURL(idea, idea.photo) } : idea;
 }
 
-function matchesSampleFilters(idea, filters) {
+export function matchesIdeaFilters(idea, filters, excludedFacet = null) {
   const { areas, minPrice, maxPrice, categories, search } = { ...NO_FILTERS, ...filters };
   const searchText = search.trim().toLowerCase();
   const searchableText = `${idea.title} ${idea.description} ${idea.place_name}`.toLowerCase();
 
   return (
-    (!areas.length || areas.includes(idea.location)) &&
-    (minPrice == null || idea.price >= minPrice) &&
-    (maxPrice == null || idea.price <= maxPrice) &&
-    (!categories.length || categories.includes(idea.category)) &&
+    (excludedFacet === 'location' || !areas.length || areas.includes(idea.location)) &&
+    (excludedFacet === 'price' || minPrice == null || idea.price >= minPrice) &&
+    (excludedFacet === 'price' || maxPrice == null || idea.price <= maxPrice) &&
+    (excludedFacet === 'category' || !categories.length || categories.includes(idea.category)) &&
     (!searchText || searchableText.includes(searchText))
   );
+}
+
+function matchesSampleFilters(idea, filters) {
+  return matchesIdeaFilters(idea, filters);
+}
+
+function countFacet(ideas, filters, facet, value) {
+  const candidateFilters = { ...filters };
+  if (facet === 'location') candidateFilters.areas = [value];
+  if (facet === 'category') candidateFilters.categories = [value];
+  if (facet === 'price') {
+    candidateFilters.minPrice = value.minPrice;
+    candidateFilters.maxPrice = value.maxPrice;
+  }
+  return ideas.filter((idea) => matchesIdeaFilters(idea, candidateFilters, facet)).length;
+}
+
+function buildIdeaCounts(ideas, filters) {
+  return {
+    locations: {
+      'Downtown Rexburg': countFacet(ideas, filters, 'location', 'Downtown Rexburg'),
+      'Outside Rexburg': countFacet(ideas, filters, 'location', 'Outside Rexburg'),
+      'BYU-Idaho Campus': countFacet(ideas, filters, 'location', 'BYU-Idaho Campus'),
+    },
+    prices: {
+      free: countFacet(ideas, filters, 'price', { minPrice: 0, maxPrice: 0 }),
+      'under-10': countFacet(ideas, filters, 'price', { minPrice: null, maxPrice: 9.99 }),
+      '10-to-25': countFacet(ideas, filters, 'price', { minPrice: 10, maxPrice: 25 }),
+      '25-plus': countFacet(ideas, filters, 'price', { minPrice: 25, maxPrice: null }),
+    },
+    categories: {
+      Outdoors: countFacet(ideas, filters, 'category', 'Outdoors'),
+      Active: countFacet(ideas, filters, 'category', 'Active'),
+      Show: countFacet(ideas, filters, 'category', 'Show'),
+      Animals: countFacet(ideas, filters, 'category', 'Animals'),
+      Creative: countFacet(ideas, filters, 'category', 'Creative'),
+      Food: countFacet(ideas, filters, 'category', 'Food'),
+    },
+  };
 }
 
 function mergeIdeas(primaryIdeas, additionalIdeas) {
@@ -169,4 +214,36 @@ export function useIdeas(filters = NO_FILTERS, { includeSamples = false } = {}) 
     hasMore: result.hasMore,
     loadMore,
   };
+}
+
+export function useIdeaCounts(filters = NO_FILTERS) {
+  const [counts, setCounts] = useState(EMPTY_IDEA_COUNTS);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    Promise.resolve()
+      .then(() =>
+        pb.collection('dates').getFullList({
+          filter: '',
+          sort: SORT,
+          requestKey: null,
+        }),
+      )
+      .then((items) => {
+        if (cancelled) return;
+        const knownIds = new Set(items.map((idea) => idea.id));
+        const allIdeas = [...items, ...sampleIdeas.filter((idea) => !knownIds.has(idea.id))];
+        setCounts(buildIdeaCounts(allIdeas, filters));
+      })
+      .catch(() => {
+        if (!cancelled) setCounts(buildIdeaCounts(sampleIdeas, filters));
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [filters]);
+
+  return counts;
 }
