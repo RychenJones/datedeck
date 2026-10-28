@@ -108,6 +108,21 @@ describe('Home deck', () => {
     expect(JSON.parse(window.localStorage.getItem('datedeck.swipes')).hidden).toEqual(['sample-1']);
   });
 
+  it('keeps the top idea when you press an arrow key on a header button or the add form', async () => {
+    const user = userEvent.setup();
+    render(<App />);
+    expect(await topIdeaTitle()).toBe('Picnic at Porter Park');
+
+    screen.getByRole('button', { name: 'Switch to light theme' }).focus();
+    await user.keyboard('{ArrowLeft}');
+    within(screen.getByRole('region', { name: 'Add a date idea' }))
+      .getAllByRole('button')[0]
+      .focus();
+    await user.keyboard('{ArrowRight}');
+
+    expect(await topIdeaTitle()).toBe('Picnic at Porter Park');
+  });
+
   it('remembers saved and hidden ideas after a reload', async () => {
     const user = userEvent.setup();
     const { unmount } = render(<App />);

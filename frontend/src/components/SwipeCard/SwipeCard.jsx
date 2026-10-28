@@ -25,6 +25,14 @@ function ownsArrowKeys(target) {
   return target.isContentEditable || Boolean(target.closest(OWNS_ARROW_KEYS));
 }
 
+// Arrows only count when nothing is focused or focus is in the deck around this card, so a
+// stray arrow on the header or the add idea form does not hide a card you can't see.
+function isInDeck(target, card) {
+  if (target === document.body) return true;
+  const deck = card?.closest('section') ?? card;
+  return Boolean(deck?.contains(target));
+}
+
 /**
  * Wraps the top card of the deck. Drag right (or press →) to save, drag left (or press ←)
  * to hide. Short drags spring back. Pointer events cover mouse, touch and pen.
@@ -33,11 +41,14 @@ export default function SwipeCard({ onSave, onHide, children }) {
   const [offset, setOffset] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
   const drag = useRef(null);
+  const card = useRef(null);
 
   useEffect(() => {
     function handleKeyDown(event) {
       if (event.defaultPrevented || event.altKey || event.ctrlKey || event.metaKey) return;
-      if (event.shiftKey || ownsArrowKeys(event.target)) return;
+      // Holding a key down would otherwise run through the deck.
+      if (event.shiftKey || event.repeat || ownsArrowKeys(event.target)) return;
+      if (!isInDeck(event.target, card.current)) return;
       if (document.querySelector('[role="dialog"]')) return;
       if (event.key === 'ArrowRight') {
         event.preventDefault();
@@ -104,6 +115,7 @@ export default function SwipeCard({ onSave, onHide, children }) {
 
   return (
     <div
+      ref={card}
       className={`swipe-card${isDragging ? ' swipe-card--dragging' : ''}`}
       style={style}
       onPointerDown={handlePointerDown}

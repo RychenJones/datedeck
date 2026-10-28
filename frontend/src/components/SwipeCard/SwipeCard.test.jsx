@@ -131,6 +131,16 @@ describe('SwipeCard', () => {
     expect(onHide).toHaveBeenCalledTimes(1);
   });
 
+  it('only chooses once when you hold an arrow key down', () => {
+    const { onSave } = renderCard();
+
+    fireEvent.keyDown(document.body, { key: 'ArrowRight' });
+    fireEvent.keyDown(document.body, { key: 'ArrowRight', repeat: true });
+    fireEvent.keyDown(document.body, { key: 'ArrowRight', repeat: true });
+
+    expect(onSave).toHaveBeenCalledTimes(1);
+  });
+
   it('leaves the arrow keys alone while you type in a field', async () => {
     const user = userEvent.setup();
     const { onSave, onHide } = renderCard(
