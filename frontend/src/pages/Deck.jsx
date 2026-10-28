@@ -1,5 +1,6 @@
 import { useEffect, useMemo } from 'react';
 import IdeaCard from '../components/IdeaCard/IdeaCard.jsx';
+import SwipeCard from '../components/SwipeCard/SwipeCard.jsx';
 import { useIdeas } from '../hooks/useIdeas.js';
 import { useSwipes } from '../hooks/useSwipes.js';
 
@@ -18,7 +19,7 @@ function DeckMessage({ title, children }) {
   );
 }
 
-// Deck tab: one idea at a time with Save and Hide buttons.
+// Deck tab: one idea at a time. Swipe the top card, use the arrow keys, or press Save and Hide.
 export default function Deck({ filters }) {
   const { ideas, status, totalItems, hasMore, loadMore } = useIdeas(filters);
   const { saved, hidden, save, hide } = useSwipes();
@@ -56,7 +57,13 @@ export default function Deck({ filters }) {
           </div>
         ))}
         <div className="deck__top">
-          <IdeaCard idea={currentIdea} />
+          <SwipeCard
+            key={currentIdea.id}
+            onSave={() => save(currentIdea.id)}
+            onHide={() => hide(currentIdea.id)}
+          >
+            <IdeaCard idea={currentIdea} />
+          </SwipeCard>
         </div>
         <div className="deck__controls" aria-label="Deck controls">
           <button

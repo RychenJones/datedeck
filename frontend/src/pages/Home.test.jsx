@@ -1,4 +1,4 @@
-import { render, screen, waitFor, within } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import App from '../App.jsx';
@@ -83,6 +83,44 @@ describe('Home deck', () => {
 
     expect(await topIdeaTitle()).toBe('Sunset at the sand dunes');
     expect(screen.getByText('4 ideas left')).toBeInTheDocument();
+  });
+
+  it('saves the top idea when you swipe it right', async () => {
+    render(<App />);
+    const card = (await screen.findByText('SAVE')).parentElement;
+
+    fireEvent.pointerDown(card, { pointerId: 1, pointerType: 'touch', button: 0, clientX: 100 });
+    fireEvent.pointerMove(card, { pointerId: 1, pointerType: 'touch', clientX: 300 });
+    fireEvent.pointerUp(card, { pointerId: 1, pointerType: 'touch', clientX: 300 });
+
+    expect(await topIdeaTitle()).toBe('Sunset at the sand dunes');
+    expect(JSON.parse(window.localStorage.getItem('datedeck.swipes')).saved).toEqual(['sample-1']);
+  });
+
+  it('hides the top idea when you press the left arrow key', async () => {
+    const user = userEvent.setup();
+    render(<App />);
+    expect(await topIdeaTitle()).toBe('Picnic at Porter Park');
+
+    await user.keyboard('{ArrowLeft}');
+
+    expect(await topIdeaTitle()).toBe('Sunset at the sand dunes');
+    expect(JSON.parse(window.localStorage.getItem('datedeck.swipes')).hidden).toEqual(['sample-1']);
+  });
+
+  it('keeps the top idea when you press an arrow key on a header button or the add form', async () => {
+    const user = userEvent.setup();
+    render(<App />);
+    expect(await topIdeaTitle()).toBe('Picnic at Porter Park');
+
+    screen.getByRole('button', { name: 'Switch to light theme' }).focus();
+    await user.keyboard('{ArrowLeft}');
+    within(screen.getByRole('region', { name: 'Add a date idea' }))
+      .getAllByRole('button')[0]
+      .focus();
+    await user.keyboard('{ArrowRight}');
+
+    expect(await topIdeaTitle()).toBe('Picnic at Porter Park');
   });
 
   it('remembers saved and hidden ideas after a reload', async () => {
