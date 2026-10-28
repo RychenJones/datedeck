@@ -148,6 +148,28 @@ describe('Home deck', () => {
     expect(screen.queryByRole('region', { name: 'Date idea deck' })).not.toBeInTheDocument();
   });
 
+  it('shares location and price filters between the deck and All ideas', async () => {
+    const user = userEvent.setup();
+    pb.filter.mockImplementation((filter) => filter);
+    render(<App />);
+
+    await user.click(screen.getByRole('button', { name: /^Downtown Rexburg/ }));
+    await waitFor(() =>
+      expect(collection.getList).toHaveBeenLastCalledWith(1, PAGE_SIZE, {
+        filter: '(location = {:area0})',
+        sort: '-created,id',
+        requestKey: null,
+      }),
+    );
+
+    await user.click(screen.getByRole('button', { name: 'All ideas' }));
+    expect(screen.getByRole('button', { name: /^Downtown Rexburg/ })).toHaveAttribute(
+      'aria-pressed',
+      'true',
+    );
+    expect(screen.getByRole('button', { name: /^Free/ })).toHaveAttribute('aria-pressed', 'false');
+  });
+
   it('shows sample and PocketBase ideas together in the All ideas grid', async () => {
     serve([{ ...sampleIdeas[0], id: 'database-1', title: 'Database date' }]);
     const user = userEvent.setup();
