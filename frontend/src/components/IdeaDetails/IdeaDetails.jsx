@@ -4,7 +4,7 @@ import './IdeaDetails.css';
 
 function formatPrice(price) {
   if (price === 0) return 'Free';
-  return `$${price} per person`;
+  return `$${price} per person. `;
 }
 
 function formatDuration(minutes) {
