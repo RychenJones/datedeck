@@ -21,7 +21,14 @@ function formatDuration(minutes) {
  *
  * @param {{title: string, place_name: string, location: string, price: number, duration: number, photo?: string}} idea
  */
-export default function IdeaCard({ idea, onOpenDetails, onSave, onHide, isStacked = false }) {
+export default function IdeaCard({
+  idea,
+  onOpenDetails,
+  onSave,
+  onHide,
+  actions,
+  isStacked = false,
+}) {
   const { title, description, place_name, location, price, duration, category, photo } = idea;
   const priceLabel = formatPrice(price);
   const durationLabel = formatDuration(duration);
@@ -72,6 +79,7 @@ export default function IdeaCard({ idea, onOpenDetails, onSave, onHide, isStacke
           </button>
         )}
 
+        {actions && <div className="idea-card__actions">{actions}</div>}
         {(onSave || onHide) && (
           <div className="idea-card__actions" aria-label="Choose what to do with this idea">
             <button

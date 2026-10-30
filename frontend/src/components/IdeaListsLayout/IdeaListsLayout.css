@@ -1,0 +1,107 @@
+.idea-lists-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-8);
+}
+.idea-lists-layout__main,
+.choice-sidebar,
+.choice-list {
+  min-width: 0;
+}
+.choice-sidebar {
+  display: grid;
+  align-content: start;
+  gap: var(--space-8);
+}
+.choice-list h2 {
+  margin-bottom: var(--space-4);
+  font-size: var(--text-xl);
+}
+.choice-list__count {
+  display: inline-grid;
+  place-items: center;
+  min-width: var(--icon-large);
+  padding: var(--space-1);
+  border-radius: var(--radius-pill);
+  background: var(--accent);
+  color: var(--on-action);
+  font-size: var(--text-sm);
+}
+.choice-list__items {
+  display: grid;
+  gap: var(--space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.choice-list__item {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  border-radius: var(--radius-lg);
+  background: var(--panel);
+}
+.choice-list__photo {
+  flex: 0 0 var(--control-small);
+  height: var(--control-small);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  background: var(--field);
+}
+.choice-list__photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.choice-list__copy {
+  flex: 1;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.choice-list__copy p:first-child {
+  font-weight: var(--weight-bold);
+}
+.choice-list__copy p + p {
+  margin-top: var(--space-1);
+  color: var(--muted);
+  font-size: var(--text-xs);
+}
+.choice-list__action {
+  flex-shrink: 0;
+  min-width: var(--control-small);
+  min-height: var(--control-small);
+  max-width: var(--control-action);
+  padding: var(--space-2);
+  border-radius: var(--radius-pill);
+  background: var(--action);
+  color: var(--on-action);
+  font-size: var(--text-xs);
+}
+.choice-list__action:hover {
+  background: var(--action-hover);
+}
+.liked-heading {
+  margin-bottom: var(--space-5);
+  font-size: var(--text-heading);
+}
+.home--deck:has(.idea-lists-layout) {
+  max-width: var(--page-width);
+}
+.idea-lists-layout .deck {
+  max-width: var(--deck-width);
+  margin-inline: auto;
+}
+@media (max-width: 639px) {
+  .choice-list .home__empty-action,
+  .deck__empty .home__empty-action {
+    width: 100%;
+  }
+}
+@media (min-width: 1280px) {
+  .idea-lists-layout {
+    grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+    align-items: start;
+  }
+}

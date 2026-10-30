@@ -1,13 +1,16 @@
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import IdeaCard from '../components/IdeaCard/IdeaCard.jsx';
 import SwipeCard from '../components/SwipeCard/SwipeCard.jsx';
 import { useIdeas } from '../hooks/useIdeas.js';
 import { useSwipes } from '../hooks/useSwipes.js';
+import LikeButton from '../components/LikeButton/LikeButton.jsx';
+import IdeaListsLayout from '../components/IdeaListsLayout/IdeaListsLayout.jsx';
+import AllIdeasButton from '../components/AllIdeasButton/AllIdeasButton.jsx';
 
 // Load the next page before the stack behind the top card runs out.
 const LOW_STACK = 3;
 
-function DeckMessage({ title, children }) {
+function DeckMessage({ title, children, browse = false }) {
   return (
     <div className="deck__empty" role="status">
       <span className="deck__empty-icon" aria-hidden="true">
@@ -15,14 +18,16 @@ function DeckMessage({ title, children }) {
       </span>
       <h2>{title}</h2>
       <p>{children}</p>
+      {browse && <AllIdeasButton />}
     </div>
   );
 }
 
 // Deck tab: one idea at a time. Swipe the top card, use the arrow keys, or press Save and Hide.
-export default function Deck({ filters }) {
+function DeckContent({ filters }) {
   const { ideas, status, totalItems, hasMore, loadMore } = useIdeas(filters);
   const { saved, hidden, save, hide } = useSwipes();
+  const heading = useRef(null);
   const remainingIdeas = useMemo(
     () => ideas.filter((idea) => !saved.includes(idea.id) && !hidden.includes(idea.id)),
     [ideas, saved, hidden],
@@ -77,19 +82,21 @@ export default function Deck({ filters }) {
           <button
             type="button"
             className="deck__control deck__control--hide"
-            onClick={() => hide(currentIdea.id)}
+            onClick={() => {
+              hide(currentIdea.id);
+              if (remainingIdeas.length === 1) heading.current?.focus();
+            }}
             aria-label={`Hide ${currentIdea.title}`}
           >
             <span aria-hidden="true">×</span>
           </button>
-          <button
-            type="button"
+          <LikeButton
+            idea={currentIdea}
             className="deck__control deck__control--save"
-            onClick={() => save(currentIdea.id)}
-            aria-label={`Save ${currentIdea.title}`}
-          >
-            <span aria-hidden="true">♥</span>
-          </button>
+            onToggle={() => {
+              if (remainingIdeas.length === 1) heading.current?.focus();
+            }}
+          />
           <button
             type="button"
             className="deck__control deck__control--secondary"
@@ -105,14 +112,16 @@ export default function Deck({ filters }) {
     content = <DeckMessage title="Loading ideas">Getting more date ideas…</DeckMessage>;
   } else if (ideas.length === 0) {
     content = (
-      <DeckMessage title="No ideas found">
-        No date ideas match right now. Add one with the Add idea button.
+      <DeckMessage title="No ideas found" browse>
+        No date ideas match right now. Try All Ideas and use hearts to save favorites, or add one
+        with the Add idea button.
       </DeckMessage>
     );
   } else {
     content = (
-      <DeckMessage title="You are all caught up">
-        There are no more ideas to choose from right now.
+      <DeckMessage title="You are all caught up" browse>
+        Swipe right or use hearts to save ideas, and swipe left to hide them. Visit All Ideas to
+        like again, or use Bring back in Hidden ideas to return an idea to the deck.
       </DeckMessage>
     );
   }
@@ -121,7 +130,9 @@ export default function Deck({ filters }) {
     <>
       <header className="home__header">
         <p className="home__eyebrow">DateDeck</p>
-        <h1>Pick a date idea</h1>
+        <h1 ref={heading} tabIndex={-1}>
+          Pick a date idea
+        </h1>
         <p>Save what sounds fun. Hide what does not.</p>
       </header>
 
@@ -134,5 +145,13 @@ export default function Deck({ filters }) {
         {content}
       </section>
     </>
+  );
+}
+
+export default function Deck(props) {
+  return (
+    <IdeaListsLayout>
+      <DeckContent {...props} />
+    </IdeaListsLayout>
   );
 }
