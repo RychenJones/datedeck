@@ -24,9 +24,10 @@ function DeckMessage({ title, children, browse = false }) {
 }
 
 // Deck tab: one idea at a time. Swipe the top card, use the arrow keys, or press Save and Hide.
-export default function Deck({ filters }) {
+function DeckContent({ filters }) {
   const { ideas, status, totalItems, hasMore, loadMore } = useIdeas(filters);
-  const { saved, hidden, hide } = useSwipes();
+  const { saved, hidden, save, hide } = useSwipes();
+  const heading = useRef(null);
   const remainingIdeas = useMemo(
     () => ideas.filter((idea) => !saved.includes(idea.id) && !hidden.includes(idea.id)),
     [ideas, saved, hidden],
