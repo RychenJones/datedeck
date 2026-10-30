@@ -21,7 +21,10 @@ function DeckMessage({ title, children }) {
 
 // Deck tab: one idea at a time. Swipe the top card, use the arrow keys, or press Save and Hide.
 export default function Deck({ filters }) {
-  const { ideas, status, totalItems, hasMore, loadMore } = useIdeas(filters);
+  // Database ideas when there are some; the sample ideas until the database has any.
+  const { ideas, status, totalItems, hasMore, loadMore } = useIdeas(filters, {
+    samplesWhenEmpty: true,
+  });
   const { saved, hidden, save, hide } = useSwipes();
   const remainingIdeas = useMemo(
     () => ideas.filter((idea) => !saved.includes(idea.id) && !hidden.includes(idea.id)),

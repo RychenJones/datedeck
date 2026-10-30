@@ -334,12 +334,21 @@ describe('Home deck', () => {
     expect(screen.getByText('0 ideas left')).toBeInTheDocument();
   });
 
-  it('says so when there are no ideas yet', async () => {
+  it('shows only database ideas in the deck when the database has ideas', async () => {
+    serve([{ ...sampleIdeas[0], id: 'database-1', title: 'Database date' }]);
+    render(<App />);
+
+    expect(await topIdeaTitle()).toBe('Database date');
+    expect(screen.getByText('1 idea left')).toBeInTheDocument();
+  });
+
+  it('shows the sample ideas in the deck when the database has no ideas yet', async () => {
     serve([]);
     const user = userEvent.setup();
     render(<App />);
 
-    expect(await screen.findByRole('heading', { name: 'No ideas found' })).toBeInTheDocument();
+    expect(await topIdeaTitle()).toBe('Picnic at Porter Park');
+    expect(screen.getByText('5 ideas left')).toBeInTheDocument();
 
     await user.click(screen.getByRole('button', { name: 'All ideas' }));
     expect(
