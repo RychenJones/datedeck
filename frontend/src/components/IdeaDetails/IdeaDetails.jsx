@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import IdeaArt from '../IdeaArt/IdeaArt.jsx';
+import { useSwipes } from '../../hooks/useSwipes.js';
 import './IdeaDetails.css';
 
 function formatPrice(price) {
@@ -22,6 +23,7 @@ function mapsUrl(address) {
 export default function IdeaDetails({ idea, onClose }) {
   const closeButtonRef = useRef(null);
   const [failedPhoto, setFailedPhoto] = useState(null);
+  const { saved, hidden, save, hide, unsave, unhide } = useSwipes();
 
   useEffect(() => {
     closeButtonRef.current?.focus();
@@ -37,6 +39,8 @@ export default function IdeaDetails({ idea, onClose }) {
   const { title, description, place_name, address, price, duration, category, photo } = idea;
   const photoSource =
     photo && !(failedPhoto?.ideaId === idea.id && failedPhoto.photo === photo) ? photo : null;
+  const isSaved = saved.includes(idea.id);
+  const isHidden = hidden.includes(idea.id);
 
   return (
     <div className="idea-details__backdrop">
@@ -103,6 +107,25 @@ export default function IdeaDetails({ idea, onClose }) {
               <span className="sr-only"> (opens in a new tab)</span>
             </a>
           )}
+
+          <div className="idea-details__actions" aria-label="Idea actions">
+            <button
+              type="button"
+              className="idea-details__action idea-details__action--save"
+              aria-pressed={isSaved}
+              onClick={() => (isSaved ? unsave(idea.id) : save(idea.id))}
+            >
+              {isSaved ? 'Unsave' : 'Save'}
+            </button>
+            <button
+              type="button"
+              className="idea-details__action idea-details__action--hide"
+              aria-pressed={isHidden}
+              onClick={() => (isHidden ? unhide(idea.id) : hide(idea.id))}
+            >
+              {isHidden ? 'Unhide' : 'Hide'}
+            </button>
+          </div>
         </div>
       </section>
     </div>

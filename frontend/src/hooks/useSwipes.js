@@ -38,19 +38,17 @@ export function useSwipesState() {
     writeSwipes(swipes);
   }, [swipes]);
 
-  // An idea is either saved or hidden, never both.
+  // Saved and hidden are independent choices. An idea may be in both lists.
   function save(id) {
     setSwipes((current) => ({
       ...current,
       saved: current.saved.includes(id) ? current.saved : [...current.saved, id],
-      hidden: without(current.hidden, id),
     }));
   }
 
   function hide(id) {
     setSwipes((current) => ({
       ...current,
-      saved: without(current.saved, id),
       hidden: current.hidden.includes(id) ? current.hidden : [...current.hidden, id],
     }));
   }
