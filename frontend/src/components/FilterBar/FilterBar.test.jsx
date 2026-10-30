@@ -99,6 +99,28 @@ describe('FilterBar', () => {
     expect(screen.getByRole('button', { name: 'Outdoors (1)' })).toBeInTheDocument();
   });
 
+  it('marks active filters with the selected outline class', () => {
+    const filters = {
+      ...NO_FILTERS,
+      areas: ['Downtown Rexburg'],
+      minPrice: 10,
+      maxPrice: 25,
+      categories: ['Outdoors'],
+    };
+
+    render(<FilterBar filters={filters} onChange={vi.fn()} counts={counts} />);
+
+    expect(screen.getByRole('button', { name: /^Downtown Rexburg/ })).toHaveClass(
+      'filter-bar__option--selected',
+    );
+    expect(screen.getByRole('button', { name: /^\$10 to \$25/ })).toHaveClass(
+      'filter-bar__option--selected',
+    );
+    expect(screen.getByRole('button', { name: /^Outdoors/ })).toHaveClass(
+      'filter-bar__option--selected',
+    );
+  });
+
   it('keeps long option labels inside their buttons', () => {
     const longCounts = {
       locations: { 'Downtown Rexburg': 123456 },
