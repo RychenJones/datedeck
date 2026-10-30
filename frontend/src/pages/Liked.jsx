@@ -1,9 +1,13 @@
+import { useState } from 'react';
 import IdeaCard from '../components/IdeaCard/IdeaCard.jsx';
 import sampleIdeas from '../data/sample-ideas.json';
+import IdeaDetails from '../components/IdeaDetails/IdeaDetails.jsx';
 
 // Liked tab: shows the same grid as All ideas until DD-15 lists the saved ideas here.
 // Saved ideas belong to an account, so signed-out people see none (DD-10).
 export default function Liked({ signedIn = false, onSignIn }) {
+  const [selectedIdea, setSelectedIdea] = useState(null);
+
   if (!signedIn) {
     return (
       <section id="date-ideas" aria-label="Date ideas">
@@ -22,10 +26,13 @@ export default function Liked({ signedIn = false, onSignIn }) {
   }
 
   return (
-    <section className="idea-grid" id="date-ideas" aria-label="Date ideas">
-      {sampleIdeas.map((idea) => (
-        <IdeaCard key={idea.id} idea={idea} />
-      ))}
-    </section>
+    <>
+      <section className="idea-grid" id="date-ideas" aria-label="Date ideas">
+        {sampleIdeas.map((idea) => (
+          <IdeaCard key={idea.id} idea={idea} onOpenDetails={setSelectedIdea} />
+        ))}
+      </section>
+      {selectedIdea && <IdeaDetails idea={selectedIdea} onClose={() => setSelectedIdea(null)} />}
+    </>
   );
 }

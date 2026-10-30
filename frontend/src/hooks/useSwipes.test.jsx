@@ -40,7 +40,7 @@ describe('useSwipes', () => {
     expect(stored()).toEqual({ saved: [], hidden: [] });
   });
 
-  it('moves an idea from hidden to saved instead of keeping it in both', () => {
+  it('allows an idea to be saved and hidden independently', () => {
     const { result } = renderSwipes();
 
     act(() => result.current.hide('idea-1'));
@@ -48,7 +48,8 @@ describe('useSwipes', () => {
     act(() => result.current.save('idea-1'));
 
     expect(result.current.saved).toEqual(['idea-1']);
-    expect(result.current.hidden).toEqual([]);
+    expect(result.current.hidden).toEqual(['idea-1']);
+    expect(stored()).toEqual({ saved: ['idea-1'], hidden: ['idea-1'] });
   });
 
   it('remembers choices from an earlier visit and keeps other stored fields', () => {

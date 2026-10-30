@@ -109,7 +109,7 @@
 }
 
 .filter-bar__option--selected {
-  border-color: var(--accent);
+  border: var(--border-strong) solid var(--focus);
   color: var(--on-accent);
   background: var(--accent);
 }
@@ -141,6 +141,10 @@
 
 .filter-bar__category--foodie {
   background: var(--foodie);
+}
+
+.filter-bar__category.filter-bar__option--selected {
+  border-color: var(--focus);
 }
 
 @media (min-width: 800px) {
