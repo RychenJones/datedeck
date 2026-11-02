@@ -32,19 +32,23 @@ describe('Liked', () => {
     window.removeEventListener('datedeck:show-all-ideas', navigate);
   });
 
-  it('shows the ideas grid when you are signed in', () => {
+  it('shows the saved ideas grid with selected hearts', async () => {
+    localStorage.setItem('datedeck.swipes', JSON.stringify({ saved: [sampleIdeas[0].id] }));
     render(
       <SwipesProvider>
         <Liked signedIn />
       </SwipesProvider>,
     );
 
-    expect(screen.getByRole('heading', { name: sampleIdeas[0].title })).toBeInTheDocument();
-    expect(screen.queryByText('Sign in to be able to save your ideas.')).not.toBeInTheDocument();
+    expect(await screen.findByRole('heading', { name: sampleIdeas[0].title })).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: `Save ${sampleIdeas[0].title}` }),
+    ).toHaveAttribute('aria-pressed', 'true');
   });
 
   it('opens idea details from a liked idea card', async () => {
     const user = userEvent.setup();
+    localStorage.setItem('datedeck.swipes', JSON.stringify({ saved: [sampleIdeas[0].id] }));
 
     render(
       <SwipesProvider>
@@ -53,7 +57,7 @@ describe('Liked', () => {
     );
 
     await user.click(
-      screen.getByRole('button', { name: `View details for ${sampleIdeas[0].title}` }),
+      await screen.findByRole('button', { name: `View details for ${sampleIdeas[0].title}` }),
     );
 
     expect(screen.getByRole('dialog', { name: sampleIdeas[0].title })).toBeInTheDocument();
