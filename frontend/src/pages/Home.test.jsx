@@ -175,6 +175,308 @@ describe('Home deck', () => {
     expect(screen.getByText('3 ideas left')).toBeInTheDocument();
   });
 
+  it('starts with Undo turned off until you make a choice', async () => {
+    const user = userEvent.setup();
+    render(<App />);
+    const undo = await screen.findByRole('button', { name: 'Undo last choice' });
+    expect(undo).toBeDisabled();
+
+    await user.click(screen.getByRole('button', { name: 'Hide Picnic at Porter Park' }));
+
+    expect(screen.getByRole('button', { name: 'Undo last choice' })).toBeEnabled();
+  });
+
+  it('brings back the idea when you undo a button save', async () => {
+    const user = userEvent.setup();
+    render(<App />);
+
+    await user.click(await screen.findByRole('button', { name: 'Save Picnic at Porter Park' }));
+    await user.click(screen.getByRole('button', { name: 'Undo last choice' }));
+
+    expect(await topIdeaTitle()).toBe('Picnic at Porter Park');
+    expect(screen.getByText('5 ideas left')).toBeInTheDocument();
+    expect(JSON.parse(window.localStorage.getItem('datedeck.swipes')).saved).toEqual([]);
+  });
+
+  it('brings back the idea when you undo a swipe left', async () => {
+    const user = userEvent.setup();
+    render(<App />);
+    const card = (await screen.findByText('HIDE')).parentElement;
+
+    fireEvent.pointerDown(card, { pointerId: 1, pointerType: 'touch', button: 0, clientX: 300 });
+    fireEvent.pointerMove(card, { pointerId: 1, pointerType: 'touch', clientX: 100 });
+    fireEvent.pointerUp(card, { pointerId: 1, pointerType: 'touch', clientX: 100 });
+    expect(await topIdeaTitle()).toBe('Sunset at the sand dunes');
+
+    await user.click(screen.getByRole('button', { name: 'Undo last choice' }));
+
+    expect(await topIdeaTitle()).toBe('Picnic at Porter Park');
+    expect(JSON.parse(window.localStorage.getItem('datedeck.swipes')).hidden).toEqual([]);
+  });
+
+  it('brings back the idea when you undo a swipe right', async () => {
+    const user = userEvent.setup();
+    render(<App />);
+    const card = (await screen.findByText('SAVE')).parentElement;
+
+    fireEvent.pointerDown(card, { pointerId: 1, pointerType: 'touch', button: 0, clientX: 100 });
+    fireEvent.pointerMove(card, { pointerId: 1, pointerType: 'touch', clientX: 300 });
+    fireEvent.pointerUp(card, { pointerId: 1, pointerType: 'touch', clientX: 300 });
+    expect(await topIdeaTitle()).toBe('Sunset at the sand dunes');
+
+    await user.click(screen.getByRole('button', { name: 'Undo last choice' }));
+
+    expect(await topIdeaTitle()).toBe('Picnic at Porter Park');
+    expect(JSON.parse(window.localStorage.getItem('datedeck.swipes')).saved).toEqual([]);
+  });
+
+  it('lets you undo your last card from the all caught up screen and keeps focus on Undo', async () => {
+    const user = userEvent.setup();
+    render(<App />);
+    for (let i = 0; i < 5; i += 1) {
+      await user.click(await screen.findByRole('button', { name: /^Hide / }));
+    }
+    expect(screen.getByRole('heading', { name: 'You are all caught up' })).toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: 'Undo last choice' }));
+
+    expect(await topIdeaTitle()).toBe(sampleIdeas[4].title);
+    expect(screen.getByText('1 idea left')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Undo last choice' })).toHaveFocus();
+  });
+
+  it('does not offer Undo on the all caught up screen after a reload', async () => {
+    window.localStorage.setItem(
+      'datedeck.swipes',
+      JSON.stringify({ saved: [], hidden: sampleIdeas.map((idea) => idea.id) }),
+    );
+    render(<App />);
+
+    expect(
+      await screen.findByRole('heading', { name: 'You are all caught up' }),
+    ).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Undo last choice' })).not.toBeInTheDocument();
+  });
+
+  it('shuffles only the ideas that are left and shows a new top card', async () => {
+    const user = userEvent.setup();
+    render(<App />);
+    await user.click(await screen.findByRole('button', { name: 'Hide Picnic at Porter Park' }));
+
+    await user.click(screen.getByRole('button', { name: 'Shuffle ideas' }));
+
+    expect(await topIdeaTitle()).not.toBe('Sunset at the sand dunes');
+    expect(screen.getByText('4 ideas left')).toBeInTheDocument();
+
+    // Going through the shuffled deck shows each idea that was left exactly once.
+    const seen = [];
+    for (let i = 0; i < 4; i += 1) {
+      seen.push(await topIdeaTitle());
+      await user.click(screen.getByRole('button', { name: `Hide ${seen.at(-1)}` }));
+    }
+    expect(seen.sort()).toEqual(
+      sampleIdeas
+        .slice(1)
+        .map((idea) => idea.title)
+        .sort(),
+    );
+    expect(screen.getByRole('heading', { name: 'You are all caught up' })).toBeInTheDocument();
+  });
+
+  it('mixes ideas from pages not loaded yet into a shuffle', async () => {
+    const manyIdeas = Array.from({ length: PAGE_SIZE + 2 }, (_, index) => ({
+      ...sampleIdeas[0],
+      id: `idea-${index + 1}`,
+      title: `Idea ${index + 1}`,
+    }));
+    serve(manyIdeas);
+    // With this value the shuffle swaps the top card with the very last idea.
+    const random = vi.spyOn(Math, 'random').mockReturnValue(0.99);
+    const user = userEvent.setup();
+    render(<App />);
+    expect(await topIdeaTitle()).toBe('Idea 1');
+
+    await user.click(screen.getByRole('button', { name: 'Shuffle ideas' }));
+
+    expect(
+      await screen.findByRole('heading', { level: 2, name: `Idea ${PAGE_SIZE + 2}` }),
+    ).toBeInTheDocument();
+    expect(collection.getList).toHaveBeenCalledWith(2, PAGE_SIZE, expect.any(Object));
+    expect(screen.getByText(`${PAGE_SIZE + 2} ideas left`)).toBeInTheDocument();
+    random.mockRestore();
+  });
+
+  it('offers Undo on the no ideas found screen', async () => {
+    const idea = { ...sampleIdeas[0], id: 'database-1', title: 'Database date' };
+    collection.getList.mockImplementation(async (page, perPage, options) => {
+      const items = options?.filter ? [] : [idea];
+      return { page, perPage, totalItems: items.length, totalPages: 1, items };
+    });
+    pb.filter.mockImplementation((filter) => filter);
+    const user = userEvent.setup();
+    render(<App />);
+    await user.click(await screen.findByRole('button', { name: 'Hide Database date' }));
+
+    await user.click(screen.getByRole('button', { name: /^Downtown Rexburg/ }));
+    expect(await screen.findByRole('heading', { name: 'No ideas found' })).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: 'Undo last choice' }));
+
+    expect(JSON.parse(window.localStorage.getItem('datedeck.swipes')).hidden).toEqual([]);
+    expect(screen.queryByRole('button', { name: 'Undo last choice' })).not.toBeInTheDocument();
+    expect(screen.getByRole('region', { name: 'Date idea deck' })).toHaveFocus();
+  });
+
+  it('offers Undo on the error screen when the next page fails to load', async () => {
+    const manyIdeas = Array.from({ length: PAGE_SIZE + 2 }, (_, index) => ({
+      ...sampleIdeas[0],
+      id: `idea-${index + 1}`,
+      title: `Idea ${index + 1}`,
+    }));
+    collection.getList.mockImplementation(async (page, perPage) => {
+      if (page > 1) throw new Error('PocketBase is unavailable');
+      return {
+        page,
+        perPage,
+        totalItems: manyIdeas.length,
+        totalPages: 2,
+        items: manyIdeas.slice(0, perPage),
+      };
+    });
+    // Only the last idea on page one is left, so the deck asks for page two straight away.
+    window.localStorage.setItem(
+      'datedeck.swipes',
+      JSON.stringify({
+        saved: [],
+        hidden: manyIdeas.slice(0, PAGE_SIZE - 1).map((idea) => idea.id),
+      }),
+    );
+    const user = userEvent.setup();
+    render(<App />);
+
+    await user.click(await screen.findByRole('button', { name: `Hide Idea ${PAGE_SIZE}` }));
+    expect(
+      await screen.findByRole('heading', { name: 'Could not load ideas' }),
+    ).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: 'Undo last choice' }));
+
+    expect(await topIdeaTitle()).toBe(`Idea ${PAGE_SIZE}`);
+  });
+
+  it('still shuffles the ideas it has when the next page fails to load', async () => {
+    const manyIdeas = Array.from({ length: PAGE_SIZE + 2 }, (_, index) => ({
+      ...sampleIdeas[0],
+      id: `idea-${index + 1}`,
+      title: `Idea ${index + 1}`,
+    }));
+    collection.getList.mockImplementation(async (page, perPage) => {
+      if (page > 1) throw new Error('PocketBase is unavailable');
+      return {
+        page,
+        perPage,
+        totalItems: manyIdeas.length,
+        totalPages: 2,
+        items: manyIdeas.slice(0, perPage),
+      };
+    });
+    // With this value the shuffle swaps the top card with the last loaded idea.
+    const random = vi.spyOn(Math, 'random').mockReturnValue(0.99);
+    const user = userEvent.setup();
+    render(<App />);
+    expect(await topIdeaTitle()).toBe('Idea 1');
+
+    await user.click(screen.getByRole('button', { name: 'Shuffle ideas' }));
+
+    expect(
+      await screen.findByRole('heading', { level: 2, name: `Idea ${PAGE_SIZE}` }),
+    ).toBeInTheDocument();
+    random.mockRestore();
+  });
+
+  it('turns Shuffle off when only one idea is left', async () => {
+    const user = userEvent.setup();
+    render(<App />);
+    for (let i = 0; i < 4; i += 1) {
+      await user.click(await screen.findByRole('button', { name: /^Hide / }));
+    }
+
+    expect(screen.getByRole('button', { name: 'Shuffle ideas' })).toBeDisabled();
+  });
+
+  it('puts an undone idea back on top even after a shuffle', async () => {
+    const user = userEvent.setup();
+    render(<App />);
+    await user.click(await screen.findByRole('button', { name: 'Hide Picnic at Porter Park' }));
+    await user.click(screen.getByRole('button', { name: 'Shuffle ideas' }));
+
+    await user.click(screen.getByRole('button', { name: 'Undo last choice' }));
+
+    expect(await topIdeaTitle()).toBe('Picnic at Porter Park');
+  });
+
+  it('keeps the shuffled order when you switch tabs and come back', async () => {
+    const user = userEvent.setup();
+    render(<App />);
+    await screen.findByRole('button', { name: 'Shuffle ideas' });
+    await user.click(screen.getByRole('button', { name: 'Shuffle ideas' }));
+    const shuffledTop = await topIdeaTitle();
+    expect(shuffledTop).not.toBe('Picnic at Porter Park');
+
+    await user.click(screen.getByRole('button', { name: 'All ideas' }));
+    await user.click(screen.getByRole('button', { name: 'Deck' }));
+
+    expect(await topIdeaTitle()).toBe(shuffledTop);
+  });
+
+  it('never brings a hidden idea back after a shuffle and a reload', async () => {
+    const user = userEvent.setup();
+    const { unmount } = render(<App />);
+    await user.click(await screen.findByRole('button', { name: 'Hide Picnic at Porter Park' }));
+    await user.click(screen.getByRole('button', { name: 'Shuffle ideas' }));
+    unmount();
+
+    render(<App />);
+
+    expect(await topIdeaTitle()).toBe('Sunset at the sand dunes');
+    expect(screen.getByText('4 ideas left')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Undo last choice' })).toBeDisabled();
+    expect(screen.queryByRole('heading', { name: 'Picnic at Porter Park' })).toBeNull();
+  });
+
+  it('keeps ideas hidden on any page out of the deck after a reload', async () => {
+    const manyIdeas = Array.from({ length: PAGE_SIZE + 2 }, (_, index) => ({
+      ...sampleIdeas[0],
+      id: `idea-${index + 1}`,
+      title: `Idea ${index + 1}`,
+    }));
+    serve(manyIdeas);
+    // Hidden: all of page one but its last idea, and the first idea on page two.
+    window.localStorage.setItem(
+      'datedeck.swipes',
+      JSON.stringify({
+        saved: [],
+        hidden: [...manyIdeas.slice(0, PAGE_SIZE - 1), manyIdeas[PAGE_SIZE]].map((idea) => idea.id),
+      }),
+    );
+    const user = userEvent.setup();
+    const { unmount } = render(<App />);
+
+    expect(await topIdeaTitle()).toBe(`Idea ${PAGE_SIZE}`);
+    await user.click(screen.getByRole('button', { name: `Hide Idea ${PAGE_SIZE}` }));
+    expect(await topIdeaTitle()).toBe(`Idea ${PAGE_SIZE + 2}`);
+    await user.click(screen.getByRole('button', { name: `Hide Idea ${PAGE_SIZE + 2}` }));
+    expect(
+      await screen.findByRole('heading', { name: 'You are all caught up' }),
+    ).toBeInTheDocument();
+    unmount();
+
+    render(<App />);
+
+    expect(
+      await screen.findByRole('heading', { name: 'You are all caught up' }),
+    ).toBeInTheDocument();
+    expect(screen.getByText('0 ideas left')).toBeInTheDocument();
+  });
+
   it('shows every idea in a grid when you open the All ideas tab', async () => {
     const user = userEvent.setup();
     render(<App />);

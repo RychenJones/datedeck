@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import IdeaCard from '../components/IdeaCard/IdeaCard.jsx';
 import SwipeCard from '../components/SwipeCard/SwipeCard.jsx';
 import { useIdeas } from '../hooks/useIdeas.js';
@@ -7,7 +7,17 @@ import { useSwipes } from '../hooks/useSwipes.js';
 // Load the next page before the stack behind the top card runs out.
 const LOW_STACK = 3;
 
-function DeckMessage({ title, children }) {
+// Ideas named in the deck order come first; anything else (like a page loaded later) follows.
+function inDeckOrder(ideas, deckOrder) {
+  const byId = new Map(ideas.map((idea) => [idea.id, idea]));
+  const placed = new Set(deckOrder);
+  return [
+    ...deckOrder.filter((id) => byId.has(id)).map((id) => byId.get(id)),
+    ...ideas.filter((idea) => !placed.has(idea.id)),
+  ];
+}
+
+function DeckMessage({ title, action, children }) {
   return (
     <div className="deck__empty" role="status">
       <span className="deck__empty-icon" aria-hidden="true">
@@ -15,35 +25,76 @@ function DeckMessage({ title, children }) {
       </span>
       <h2>{title}</h2>
       <p>{children}</p>
+      {action}
     </div>
   );
 }
 
 // Deck tab: one idea at a time. Swipe the top card, use the arrow keys, or press Save and Hide.
+// Undo takes back the last choice and Shuffle mixes up the ideas that are left.
 export default function Deck({ filters }) {
   // Database ideas when there are some; the sample ideas until the database has any.
   const { ideas, status, totalItems, hasMore, loadMore } = useIdeas(filters, {
     samplesWhenEmpty: true,
   });
-  const { saved, hidden, save, hide } = useSwipes();
+  const { saved, hidden, canUndo, deckOrder, save, hide, undo, shuffle } = useSwipes();
   const remainingIdeas = useMemo(
-    () => ideas.filter((idea) => !saved.includes(idea.id) && !hidden.includes(idea.id)),
-    [ideas, saved, hidden],
+    () =>
+      inDeckOrder(ideas, deckOrder).filter(
+        (idea) => !saved.includes(idea.id) && !hidden.includes(idea.id),
+      ),
+    [ideas, deckOrder, saved, hidden],
   );
   const currentIdea = remainingIdeas[0];
   // Ideas on pages not loaded yet count as left too.
   const ideasLeft = remainingIdeas.length + Math.max(totalItems - ideas.length, 0);
 
+  // A shuffle mixes every idea that is left, so it waits until all the pages have loaded.
+  const shuffleWanted = useRef(false);
+
+  function loadOrShuffle() {
+    if (status === 'ready' && hasMore) {
+      if (shuffleWanted.current || remainingIdeas.length < LOW_STACK) loadMore();
+    } else if (shuffleWanted.current && (status === 'ready' || status === 'error')) {
+      shuffleWanted.current = false;
+      shuffle(remainingIdeas.map((idea) => idea.id));
+    }
+  }
+
   useEffect(() => {
-    if (status === 'ready' && hasMore && remainingIdeas.length < LOW_STACK) loadMore();
-  }, [status, hasMore, remainingIdeas.length, loadMore]);
+    loadOrShuffle();
+  });
+
+  // Undo on an empty deck can swap that screen for the cards, so keep keyboard focus on Undo,
+  // or on the deck itself when no Undo button is left.
+  const deck = useRef(null);
+  const undoButton = useRef(null);
+  const refocusUndo = useRef(false);
+  useEffect(() => {
+    if (refocusUndo.current) (undoButton.current ?? deck.current)?.focus();
+    refocusUndo.current = false;
+  });
+
+  const undoAction = canUndo && (
+    <button
+      type="button"
+      className="home__empty-action"
+      ref={undoButton}
+      onClick={() => {
+        refocusUndo.current = true;
+        undo();
+      }}
+    >
+      Undo last choice
+    </button>
+  );
 
   let content;
   if (status === 'loading') {
     content = <DeckMessage title="Loading ideas">Finding date ideas in Rexburg…</DeckMessage>;
   } else if (status === 'error' && !currentIdea) {
     content = (
-      <DeckMessage title="Could not load ideas">
+      <DeckMessage title="Could not load ideas" action={undoAction}>
         Check your connection and reload the page to try again.
       </DeckMessage>
     );
@@ -72,7 +123,9 @@ export default function Deck({ filters }) {
           <button
             type="button"
             className="deck__control deck__control--secondary"
-            disabled
+            ref={undoButton}
+            disabled={!canUndo}
+            onClick={undo}
             aria-label="Undo last choice"
           >
             <span aria-hidden="true">↶</span>
@@ -95,8 +148,12 @@ export default function Deck({ filters }) {
           </button>
           <button
             type="button"
-            className="deck__control deck__control--secondary"
-            disabled
+            className="deck__control deck__control--secondary deck__control--shuffle"
+            disabled={ideasLeft < 2}
+            onClick={() => {
+              shuffleWanted.current = true;
+              loadOrShuffle();
+            }}
             aria-label="Shuffle ideas"
           >
             <span aria-hidden="true">⤨</span>
@@ -108,13 +165,13 @@ export default function Deck({ filters }) {
     content = <DeckMessage title="Loading ideas">Getting more date ideas…</DeckMessage>;
   } else if (ideas.length === 0) {
     content = (
-      <DeckMessage title="No ideas found">
+      <DeckMessage title="No ideas found" action={undoAction}>
         No date ideas match right now. Add one with the Add idea button.
       </DeckMessage>
     );
   } else {
     content = (
-      <DeckMessage title="You are all caught up">
+      <DeckMessage title="You are all caught up" action={undoAction}>
         There are no more ideas to choose from right now.
       </DeckMessage>
     );
@@ -128,7 +185,13 @@ export default function Deck({ filters }) {
         <p>Save what sounds fun. Hide what does not.</p>
       </header>
 
-      <section className="deck" id="date-ideas" aria-label="Date idea deck">
+      <section
+        className="deck"
+        id="date-ideas"
+        aria-label="Date idea deck"
+        ref={deck}
+        tabIndex={-1}
+      >
         {status !== 'loading' && status !== 'error' && (
           <p className="deck__count" aria-live="polite">
             {ideasLeft} {ideasLeft === 1 ? 'idea' : 'ideas'} left

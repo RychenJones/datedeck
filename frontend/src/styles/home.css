@@ -93,6 +93,10 @@
   font-size: var(--text-xl);
   box-shadow: none;
 }
+.deck__control--shuffle {
+  color: var(--on-mood);
+  background: var(--shuffle);
+}
 .deck__control--save {
   width: var(--control-action);
   height: var(--control-action);
