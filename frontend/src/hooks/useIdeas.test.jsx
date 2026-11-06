@@ -1,7 +1,7 @@
 import { act, renderHook, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { pb } from '../lib/pocketbase.js';
-import { PAGE_SIZE, buildIdeasFilter, useIdeas } from './useIdeas.js';
+import { NO_FILTERS, PAGE_SIZE, buildIdeasFilter, useIdeaCounts, useIdeas } from './useIdeas.js';
 
 vi.mock('../lib/pocketbase.js', () => ({
   pb: {
@@ -227,5 +227,56 @@ describe('buildIdeasFilter', () => {
 
   it('finds free ideas with a maximum price of 0', () => {
     expect(buildIdeasFilter({ maxPrice: 0 })).toBe('price <= 0');
+  });
+});
+
+describe('useIdeaCounts', () => {
+  const databaseIdea = {
+    id: 'database-1',
+    title: 'Database date',
+    description: '',
+    place_name: '',
+    location: 'Downtown Rexburg',
+    price: 5,
+    category: 'Food',
+  };
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+    pb.collection.mockReturnValue({ getFullList: vi.fn().mockResolvedValue([databaseIdea]) });
+  });
+
+  it('counts only database ideas for the deck once the database has ideas', async () => {
+    const { result } = renderHook(() => useIdeaCounts(NO_FILTERS, { samplesWhenEmpty: true }));
+
+    await waitFor(() => expect(result.current.categories.Food).toBe(1));
+    expect(result.current.categories.Outdoors).toBe(0);
+    expect(result.current.locations['Outside Rexburg']).toBe(0);
+  });
+
+  it('counts the sample ideas too for All ideas, which shows them', async () => {
+    const { result } = renderHook(() => useIdeaCounts(NO_FILTERS, { includeSamples: true }));
+
+    await waitFor(() => expect(result.current.categories.Food).toBe(1));
+    expect(result.current.categories.Outdoors).toBe(2);
+  });
+
+  it('counts the sample ideas for the deck while the database is empty', async () => {
+    pb.collection.mockReturnValue({ getFullList: vi.fn().mockResolvedValue([]) });
+
+    const { result } = renderHook(() => useIdeaCounts(NO_FILTERS, { samplesWhenEmpty: true }));
+
+    await waitFor(() => expect(result.current.categories.Outdoors).toBe(2));
+  });
+
+  it('counts nothing for the deck when PocketBase fails, because the deck shows an error', async () => {
+    pb.collection.mockReturnValue({ getFullList: vi.fn().mockRejectedValue(new Error('down')) });
+    const getFullList = pb.collection().getFullList;
+
+    const { result } = renderHook(() => useIdeaCounts(NO_FILTERS, { samplesWhenEmpty: true }));
+
+    await waitFor(() => expect(getFullList).toHaveBeenCalled());
+    await act(async () => {});
+    expect(result.current.categories.Outdoors ?? 0).toBe(0);
   });
 });

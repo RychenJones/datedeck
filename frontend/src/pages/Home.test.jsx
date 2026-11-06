@@ -208,6 +208,41 @@ describe('Home deck', () => {
     expect(screen.getByRole('button', { name: /^Free/ })).toHaveAttribute('aria-pressed', 'false');
   });
 
+  it('keeps the filter panel on the deck and All ideas but not on Liked', async () => {
+    const user = userEvent.setup();
+    render(<App />);
+    const panel = () => screen.queryByRole('heading', { name: 'Find your mood' });
+
+    expect(panel()).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: 'All ideas' }));
+    expect(panel()).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: 'Liked' }));
+    expect(panel()).not.toBeInTheDocument();
+  });
+
+  it('Clear all resets the deck and All ideas together', async () => {
+    const user = userEvent.setup();
+    pb.filter.mockImplementation((filter) => filter);
+    render(<App />);
+
+    await user.click(screen.getByRole('button', { name: /^Downtown Rexburg/ }));
+    await user.click(screen.getByRole('button', { name: 'All ideas' }));
+    await user.click(screen.getByRole('button', { name: 'Clear all' }));
+
+    await waitFor(() =>
+      expect(collection.getList).toHaveBeenLastCalledWith(1, PAGE_SIZE, {
+        filter: '',
+        sort: '-created,id',
+        requestKey: null,
+      }),
+    );
+    await user.click(screen.getByRole('button', { name: 'Deck' }));
+    expect(screen.getByRole('button', { name: /^Downtown Rexburg/ })).toHaveAttribute(
+      'aria-pressed',
+      'false',
+    );
+  });
+
   it('shows sample and PocketBase ideas together in the All ideas grid', async () => {
     serve([{ ...sampleIdeas[0], id: 'database-1', title: 'Database date' }]);
     const user = userEvent.setup();
