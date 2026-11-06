@@ -115,6 +115,10 @@
   background: transparent;
   box-shadow: none;
 }
+.deck__control--shuffle {
+  color: var(--on-mood);
+  background: var(--shuffle);
+}
 .deck__control--save {
   width: calc(var(--control-large) + var(--space-2));
   height: calc(var(--control-large) + var(--space-2));
