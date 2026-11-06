@@ -712,7 +712,9 @@ describe('Home deck', () => {
 
     const heading = await screen.findByRole('heading', { name: 'Picnic at Porter Park' });
     expect(
-      within(heading.closest('article')).getByRole('img', { name: 'Picnic at Porter Park' }),
+      within(heading.closest('article')).getByRole('img', {
+        name: `${sampleIdeas[0].place_name}, ${sampleIdeas[0].location}`,
+      }),
     ).toHaveAttribute('src', 'http://pb.test/files/porter_park.jpg');
   });
 

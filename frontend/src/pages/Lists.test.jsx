@@ -41,10 +41,9 @@ it('keeps All ideas and the liked grid together without deleting the idea', asyn
   expect(heart).toHaveAttribute('aria-pressed', 'true');
   await user.click(screen.getByRole('button', { name: 'Liked', exact: true }));
   const liked = await screen.findByRole('region', { name: 'Liked ideas' });
-  expect(await within(liked).findByRole('img', { name: idea.title })).toHaveAttribute(
-    'src',
-    'https://example.com/park.jpg',
-  );
+  expect(
+    await within(liked).findByRole('img', { name: `${idea.place_name}, ${idea.location}` }),
+  ).toHaveAttribute('src', 'https://example.com/park.jpg');
   expect(within(liked).getByText(idea.location)).toBeVisible();
   expect(within(liked).getByText('Free')).toBeVisible();
   await user.click(

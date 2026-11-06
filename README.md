@@ -65,7 +65,7 @@ Only signed-in users can add ideas, so the import signs in as a PocketBase super
 VITE_POCKETBASE_URL=https://<live-url> PB_SUPERUSER_EMAIL=<email> PB_SUPERUSER_PASSWORD=<password> npm run import:ideas
 ```
 
-It prints how many ideas it added and skipped. It skips ideas that are already there, so it is safe to run again.
+It prints how many ideas it added, updated and skipped. Photos linked in the seed are downloaded, center-cropped to the card's 600:285 ratio and compressed as WebP files below 200 KB before upload. Existing ideas are updated in place; matching fields and photos are skipped, so one rerun also loads the latest seed photos without duplicating ideas. Run `npm install` first after pulling this change to install the importer's Sharp development dependency.
 
 ### Public rules
 

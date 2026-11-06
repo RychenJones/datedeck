@@ -79,10 +79,12 @@ describe('IdeaDetails', () => {
   it('shows the placeholder when the photo cannot be loaded', () => {
     renderDetails({ idea: { ...idea, photo: 'https://example.com/dunes.jpg' } });
 
-    fireEvent.error(screen.getByRole('img', { name: idea.title }));
+    fireEvent.error(screen.getByRole('img', { name: 'St. Anthony Sand Dunes, Outside Rexburg' }));
 
     expect(screen.getByText('No photo')).toBeInTheDocument();
-    expect(screen.queryByRole('img', { name: idea.title })).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('img', { name: 'St. Anthony Sand Dunes, Outside Rexburg' }),
+    ).not.toBeInTheDocument();
   });
 
   it('keeps the placeholder when the same failed photo receives refreshed idea data', () => {
@@ -94,7 +96,7 @@ describe('IdeaDetails', () => {
       </SwipesProvider>,
     );
 
-    fireEvent.error(screen.getByRole('img', { name: idea.title }));
+    fireEvent.error(screen.getByRole('img', { name: 'St. Anthony Sand Dunes, Outside Rexburg' }));
     rerender(
       <SwipesProvider>
         <IdeaDetails idea={{ ...photoIdea }} onClose={onClose} />
@@ -102,7 +104,9 @@ describe('IdeaDetails', () => {
     );
 
     expect(screen.getByText('No photo')).toBeInTheDocument();
-    expect(screen.queryByRole('img', { name: idea.title })).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('img', { name: 'St. Anthony Sand Dunes, Outside Rexburg' }),
+    ).not.toBeInTheDocument();
   });
 
   it('shows a new photo after the previous photo failed', () => {
@@ -112,7 +116,7 @@ describe('IdeaDetails', () => {
       onClose,
     });
 
-    fireEvent.error(screen.getByRole('img', { name: idea.title }));
+    fireEvent.error(screen.getByRole('img', { name: 'St. Anthony Sand Dunes, Outside Rexburg' }));
     rerender(
       <SwipesProvider>
         <IdeaDetails
@@ -122,10 +126,9 @@ describe('IdeaDetails', () => {
       </SwipesProvider>,
     );
 
-    expect(screen.getByRole('img', { name: idea.title })).toHaveAttribute(
-      'src',
-      'https://example.com/new-dunes.jpg',
-    );
+    expect(
+      screen.getByRole('img', { name: 'St. Anthony Sand Dunes, Outside Rexburg' }),
+    ).toHaveAttribute('src', 'https://example.com/new-dunes.jpg');
     expect(screen.queryByText('No photo')).not.toBeInTheDocument();
   });
 

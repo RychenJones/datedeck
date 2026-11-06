@@ -39,7 +39,11 @@ export default function IdeaCard({
     <article className={`idea-card${isStacked ? ' idea-card--stacked' : ''}`}>
       <div className="idea-card__photo-wrap">
         {photo ? (
-          <img className="idea-card__photo" src={photo} alt={title} />
+          <img
+            className="idea-card__photo"
+            src={photo}
+            alt={[place_name, location].filter(Boolean).join(', ') || title}
+          />
         ) : (
           <div className="idea-card__placeholder" aria-label="Photo placeholder">
             <IdeaArt category={category} />
