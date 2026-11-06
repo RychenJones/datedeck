@@ -23,28 +23,28 @@ export default function IdeaGridCard({ idea }) {
               href={mapsUrl(address)}
               target="_blank"
               rel="noopener noreferrer"
+              aria-label={`Open in Maps for ${title} (opens in a new tab)`}
             >
               Open in Maps
-              <span className="sr-only"> for {title} (opens in a new tab)</span>
             </a>
           )}
           <button
             type="button"
             className="idea-grid-card__choice idea-grid-card__choice--save"
             aria-pressed={isSaved}
+            aria-label={`${isSaved ? 'Unsave' : 'Save'} ${title}`}
             onClick={() => (isSaved ? unsave(id) : save(id))}
           >
             {isSaved ? 'Unsave' : 'Save'}
-            <span className="sr-only"> {title}</span>
           </button>
           <button
             type="button"
             className="idea-grid-card__choice"
             aria-pressed={isHidden}
+            aria-label={`${isHidden ? 'Unhide' : 'Hide'} ${title}`}
             onClick={() => (isHidden ? unhide(id) : hide(id))}
           >
             {isHidden ? 'Unhide' : 'Hide'}
-            <span className="sr-only"> {title}</span>
           </button>
         </div>
       }
