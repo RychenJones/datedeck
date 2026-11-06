@@ -9,7 +9,7 @@ import './IdeaGridCard.css';
  * Liked removes one, passing `onRemove` to move focus once the card is gone. Hiding is for the deck.
  */
 export default function IdeaGridCard({ idea, onRemove }) {
-  const { saved, save, unsave } = useSwipes();
+  const { saved, toggleSave, unsave } = useSwipes();
   const { id, title, address } = idea;
   const isSaved = saved.includes(id);
 
@@ -48,7 +48,7 @@ export default function IdeaGridCard({ idea, onRemove }) {
               className="idea-grid-card__choice idea-grid-card__choice--save"
               aria-pressed={isSaved}
               aria-label={`${isSaved ? 'Unsave' : 'Save'} ${title}`}
-              onClick={() => (isSaved ? unsave(id) : save(id))}
+              onClick={() => toggleSave(id)}
             >
               {isSaved ? 'Unsave' : 'Save'}
             </button>

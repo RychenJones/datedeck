@@ -1,5 +1,6 @@
 import IdeaGridCard from '../components/IdeaGridCard/IdeaGridCard.jsx';
 import { useIdeas } from '../hooks/useIdeas.js';
+import IdeaListsLayout from '../components/IdeaListsLayout/IdeaListsLayout.jsx';
 
 function BrowseMessage({ title, children }) {
   return (
@@ -11,7 +12,7 @@ function BrowseMessage({ title, children }) {
 }
 
 // All ideas tab: every idea in a grid, one page at a time.
-export default function Browse({ filters }) {
+function BrowseContent({ filters }) {
   const { ideas, status, hasMore, loadMore } = useIdeas(filters, { includeSamples: true });
 
   if (status === 'loading') {
@@ -57,5 +58,13 @@ export default function Browse({ filters }) {
         </p>
       )}
     </>
+  );
+}
+
+export default function Browse(props) {
+  return (
+    <IdeaListsLayout>
+      <BrowseContent {...props} />
+    </IdeaListsLayout>
   );
 }
