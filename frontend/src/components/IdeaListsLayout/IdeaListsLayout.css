@@ -98,6 +98,9 @@
   .deck__empty .home__empty-action {
     width: 100%;
   }
+  .deck__empty .home__empty-action + .home__empty-action {
+    margin-inline-start: 0;
+  }
 }
 @media (min-width: 1280px) {
   .idea-lists-layout {

@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef } from 'react';
-import { Heart, Shuffle, Undo2, X } from 'lucide-react';
+import { Shuffle, Undo2, X } from 'lucide-react';
 import IdeaCard from '../components/IdeaCard/IdeaCard.jsx';
 import SwipeCard from '../components/SwipeCard/SwipeCard.jsx';
 import { useIdeas } from '../hooks/useIdeas.js';
@@ -36,7 +36,8 @@ function DeckMessage({ title, action, children }) {
 
 // Deck tab: one idea at a time. Swipe the top card, use the arrow keys, or press Save and Hide.
 // Undo takes back the last choice and Shuffle mixes up the ideas that are left.
-export default function Deck({ filters }) {
+function DeckContent({ filters }) {
+  const heading = useRef(null);
   // Database ideas when there are some; the sample ideas until the database has any.
   const { ideas, status, totalItems, hasMore, loadMore } = useIdeas(filters, {
     samplesWhenEmpty: true,
@@ -148,11 +149,10 @@ export default function Deck({ filters }) {
           <LikeButton
             idea={currentIdea}
             className="deck__control deck__control--save"
-            onClick={() => save(currentIdea.id)}
-            aria-label={`Save ${currentIdea.title}`}
-          >
-            <Heart aria-hidden="true" />
-          </button>
+            onToggle={() => {
+              if (remainingIdeas.length === 1) heading.current?.focus();
+            }}
+          />
           <button
             type="button"
             className="deck__control deck__control--secondary deck__control--shuffle"
@@ -172,8 +172,17 @@ export default function Deck({ filters }) {
     content = <DeckMessage title="Loading ideas">Getting more date ideas…</DeckMessage>;
   } else if (ideas.length === 0) {
     content = (
-      <DeckMessage title="No ideas found" action={undoAction}>
-        No date ideas match right now. Add one with the Add idea button.
+      <DeckMessage
+        title="No ideas found"
+        action={
+          <>
+            {undoAction}
+            <AllIdeasButton />
+          </>
+        }
+      >
+        No date ideas match right now. Try All ideas and use hearts to save favorites, or add one
+        with the Add idea button.
       </DeckMessage>
     );
   } else {
@@ -183,6 +192,7 @@ export default function Deck({ filters }) {
         action={
           <>
             {undoAction}
+            <AllIdeasButton />
             {ideas.some((idea) => hidden.includes(idea.id) && !saved.includes(idea.id)) && (
               <button
                 type="button"
@@ -198,7 +208,8 @@ export default function Deck({ filters }) {
           </>
         }
       >
-        There are no more ideas to choose from right now.
+        Swipe right or use hearts to save ideas, and swipe left to hide them. Visit All ideas to
+        like again, or use Bring back in Hidden ideas to return an idea to the deck.
       </DeckMessage>
     );
   }

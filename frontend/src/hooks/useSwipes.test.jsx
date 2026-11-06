@@ -96,6 +96,25 @@ describe('useSwipes', () => {
     expect(stored()).toEqual({ saved: [], hidden: ['other'], version: 4 });
   });
 
+  it('keeps the hidden choice when its heart is toggled and undo restores only the like', () => {
+    localStorage.setItem(
+      'datedeck.swipes',
+      JSON.stringify({ saved: [], hidden: ['idea-1'], version: 4 }),
+    );
+    const { result } = renderSwipes();
+
+    act(() => result.current.toggleSave('idea-1'));
+    expect(result.current.saved).toEqual(['idea-1']);
+    expect(result.current.hidden).toEqual(['idea-1']);
+    act(() => result.current.undo());
+    expect(stored()).toEqual({ saved: [], hidden: ['idea-1'], version: 4 });
+
+    act(() => result.current.toggleSave('idea-1'));
+    act(() => result.current.toggleSave('idea-1'));
+    expect(result.current.canUndo).toBe(false);
+    expect(stored()).toEqual({ saved: [], hidden: ['idea-1'], version: 4 });
+  });
+
   it('explains blocked storage reads and still allows choices for this visit', () => {
     vi.spyOn(Storage.prototype, 'getItem').mockImplementation(() => {
       throw new Error('blocked');
