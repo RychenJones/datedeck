@@ -119,7 +119,7 @@
   width: calc(var(--control-large) + var(--space-2));
   height: calc(var(--control-large) + var(--space-2));
   border: 0;
-  color: var(--on-action);
+  color: var(--on-accent);
   background: var(--accent);
   box-shadow: var(--shadow-save);
 }
