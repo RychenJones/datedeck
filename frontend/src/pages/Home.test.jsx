@@ -115,12 +115,70 @@ describe('Home deck', () => {
 
     screen.getByRole('button', { name: 'Switch to light theme' }).focus();
     await user.keyboard('{ArrowLeft}');
-    within(screen.getByRole('region', { name: 'Add a date idea' }))
-      .getAllByRole('button')[0]
-      .focus();
+    await user.click(screen.getByRole('button', { name: 'Add idea' }));
     await user.keyboard('{ArrowRight}');
 
     expect(await topIdeaTitle()).toBe('Picnic at Porter Park');
+  });
+
+  it('shows the add idea form only after you press Add idea', async () => {
+    const user = userEvent.setup();
+    render(<App />);
+    expect(await topIdeaTitle()).toBe('Picnic at Porter Park');
+
+    expect(screen.queryByRole('heading', { name: 'Add a date idea' })).not.toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: 'Add idea' }));
+
+    const modal = screen.getByRole('dialog', { name: 'Add a date idea' });
+    expect(within(modal).getByRole('heading', { name: 'Add a date idea' })).toBeInTheDocument();
+    expect(within(modal).getByRole('button', { name: 'Sign in to add an idea' })).toHaveFocus();
+  });
+
+  it('opens the add idea modal from every tab', async () => {
+    const user = userEvent.setup();
+    render(<App />);
+
+    for (const tab of ['Deck', 'All ideas', 'Liked']) {
+      await user.click(screen.getByRole('button', { name: tab }));
+      await user.click(screen.getByRole('button', { name: 'Add idea' }));
+      expect(screen.getByRole('dialog', { name: 'Add a date idea' })).toBeInTheDocument();
+      await user.keyboard('{Escape}');
+    }
+  });
+
+  it('closes the add idea modal with Close or Escape and returns to the Add idea button', async () => {
+    const user = userEvent.setup();
+    render(<App />);
+    const add = screen.getByRole('button', { name: 'Add idea' });
+
+    await user.click(add);
+    await user.click(screen.getByRole('button', { name: 'Close' }));
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    expect(add).toHaveFocus();
+
+    await user.click(add);
+    await user.keyboard('{Escape}');
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    expect(add).toHaveFocus();
+  });
+
+  it('keeps Tab inside the add idea modal', async () => {
+    const user = userEvent.setup();
+    render(<App />);
+
+    await user.click(screen.getByRole('button', { name: 'Add idea' }));
+    const close = screen.getByRole('button', { name: 'Close' });
+    const signIn = screen.getByRole('button', { name: 'Sign in to add an idea' });
+
+    await user.tab();
+    expect(close).toHaveFocus();
+    await user.tab();
+    expect(signIn).toHaveFocus();
+    await user.tab({ shift: true });
+    expect(close).toHaveFocus();
+    await user.tab({ shift: true });
+    expect(signIn).toHaveFocus();
   });
 
   it('remembers saved and hidden ideas after a reload', async () => {
@@ -422,8 +480,10 @@ describe('Home deck', () => {
     await user.click(within(account).getByRole('button', { name: 'Close' }));
     expect(account).not.toBeVisible();
 
+    await user.click(screen.getByRole('button', { name: 'Add idea' }));
     await user.click(screen.getByRole('button', { name: 'Sign in to add an idea' }));
     expect(account).toBeVisible();
+    expect(screen.queryByRole('dialog', { name: 'Add a date idea' })).not.toBeInTheDocument();
   });
 
   it('asks signed-out people to sign in on the Liked tab', async () => {

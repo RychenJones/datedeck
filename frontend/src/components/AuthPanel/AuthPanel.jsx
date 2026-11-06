@@ -35,9 +35,9 @@ function errorMessage(error, mode) {
   return 'We could not reach DateDeck. Check your connection and try again.';
 }
 
-/** Sign in, create an account, or sign out (DD-10). */
-export default function AuthPanel({ onClose }) {
-  const { user, signIn, signUp, signOut } = useAuth();
+/** Sign in or create an account (DD-10). Shows nothing once you are signed in. */
+export default function AuthPanel({ onClose, onSignedIn }) {
+  const { user, signIn, signUp } = useAuth();
   const [mode, setMode] = useState('signin');
   const [values, setValues] = useState(EMPTY_FORM);
   const [errors, setErrors] = useState({});
@@ -73,17 +73,13 @@ export default function AuthPanel({ onClose }) {
         await signIn(email, values.password);
       }
       setValues(EMPTY_FORM);
+      setMode('signin');
+      onSignedIn?.();
     } catch (error) {
       setMessage(errorMessage(error, mode));
     } finally {
       setBusy(false);
     }
-  }
-
-  function handleSignOut() {
-    signOut();
-    setMode('signin');
-    setMessage(null);
   }
 
   function fieldProps(name) {
@@ -112,23 +108,7 @@ export default function AuthPanel({ onClose }) {
     </button>
   );
 
-  if (user) {
-    return (
-      <div className="auth">
-        <h2 id="auth-heading">Your account</h2>
-        <p role="status">
-          Signed in as <strong>{user.name || user.email}</strong>
-        </p>
-        {user.name && <p className="auth__muted">{user.email}</p>}
-        <div className="auth__actions">
-          <button className="auth__submit" type="button" onClick={handleSignOut}>
-            Sign out
-          </button>
-          {closeButton}
-        </div>
-      </div>
-    );
-  }
+  if (user) return null;
 
   const signingUp = mode === 'signup';
 

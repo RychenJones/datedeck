@@ -1,3 +1,4 @@
+import { useRef } from 'react';
 import DateDeckIcon from '../DateDeckIcon/DateDeckIcon.jsx';
 import './DateDeckHeader.css';
 
@@ -12,7 +13,10 @@ export default function DateDeckHeader({
   user = null,
   onAccount,
   isAccountOpen = false,
+  onSignOut,
 }) {
+  const accountButton = useRef(null);
+  const isMenuOpen = Boolean(user) && isAccountOpen;
   const userName = user && (user.name || user.email);
   const accountLabel = user ? `Signed in as ${userName}` : 'Sign in';
 
@@ -56,26 +60,49 @@ export default function DateDeckHeader({
         >
           <DateDeckIcon name="sun" />
         </button>
-        <button
-          className="account-button"
-          type="button"
-          aria-label={accountLabel}
-          title={accountLabel}
-          aria-controls="account-panel"
-          aria-expanded={isAccountOpen}
-          onClick={onAccount}
+        <div
+          className="account-menu"
+          onBlur={(event) => {
+            if (isMenuOpen && !event.currentTarget.contains(event.relatedTarget)) onAccount?.();
+          }}
+          onKeyDown={(event) => {
+            if (isMenuOpen && event.key === 'Escape') onAccount?.();
+          }}
         >
-          {user ? (
-            <span className="account-initial" aria-hidden="true">
-              {userName.charAt(0).toUpperCase()}
+          <button
+            ref={accountButton}
+            className="account-button"
+            type="button"
+            aria-label={accountLabel}
+            title={accountLabel}
+            aria-controls={user ? undefined : 'account-panel'}
+            aria-expanded={isAccountOpen}
+            onClick={onAccount}
+          >
+            {user ? (
+              <span className="account-initial" aria-hidden="true">
+                {userName.charAt(0).toUpperCase()}
+              </span>
+            ) : (
+              <DateDeckIcon name="user" />
+            )}
+            <span className="account-label" aria-hidden="true">
+              {user ? userName : 'Sign in'}
             </span>
-          ) : (
-            <DateDeckIcon name="user" />
+          </button>
+          {isMenuOpen && (
+            <button
+              className="account-menu__sign-out"
+              type="button"
+              onClick={() => {
+                onSignOut?.();
+                accountButton.current?.focus();
+              }}
+            >
+              Sign out
+            </button>
           )}
-          <span className="account-label" aria-hidden="true">
-            {user ? userName : 'Sign in'}
-          </span>
-        </button>
+        </div>
         <button
           className="button"
           type="button"

@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { LocalAuthStore } from 'pocketbase';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
@@ -30,10 +30,10 @@ function pocketBaseError(status, data = {}) {
   return Object.assign(new Error('Failed'), { status, response: { status, data } });
 }
 
-function renderPanel() {
+function renderPanel(props) {
   return render(
     <AuthProvider>
-      <AuthPanel />
+      <AuthPanel {...props} />
     </AuthProvider>,
   );
 }
@@ -52,7 +52,8 @@ describe('AuthPanel', () => {
 
   it('signs you in with your email and password', async () => {
     const user = userEvent.setup();
-    renderPanel();
+    const onSignedIn = vi.fn();
+    const { container } = renderPanel({ onSignedIn });
 
     await user.type(screen.getByLabelText('Email'), 'gabriel@example.com');
     await user.type(screen.getByLabelText('Password'), 'secret-password');
@@ -61,7 +62,8 @@ describe('AuthPanel', () => {
     expect(users.authWithPassword).toHaveBeenCalledWith('gabriel@example.com', 'secret-password', {
       requestKey: null,
     });
-    expect(await screen.findByRole('status')).toHaveTextContent('Signed in as Gabriel');
+    await waitFor(() => expect(onSignedIn).toHaveBeenCalledOnce());
+    expect(container).toBeEmptyDOMElement();
   });
 
   it('tells you when the email or password is missing', async () => {
@@ -92,7 +94,8 @@ describe('AuthPanel', () => {
 
   it('creates an account with your name, email and password', async () => {
     const user = userEvent.setup();
-    renderPanel();
+    const onSignedIn = vi.fn();
+    const { container } = renderPanel({ onSignedIn });
 
     await user.click(screen.getByRole('button', { name: 'Create an account' }));
     await user.type(screen.getByLabelText('Name'), 'Gabriel');
@@ -109,7 +112,8 @@ describe('AuthPanel', () => {
       }),
       { requestKey: null },
     );
-    expect(await screen.findByRole('status')).toHaveTextContent('Signed in as Gabriel');
+    await waitFor(() => expect(onSignedIn).toHaveBeenCalledOnce());
+    expect(container).toBeEmptyDOMElement();
   });
 
   it('asks for a longer password when creating an account', async () => {
@@ -144,15 +148,11 @@ describe('AuthPanel', () => {
     );
   });
 
-  it('signs you out', async () => {
-    const user = userEvent.setup();
+  it('shows no card once you are signed in', () => {
     pb.authStore.save(fakeToken(), gabriel);
-    renderPanel();
+    const { container } = renderPanel();
 
-    expect(screen.getByRole('status')).toHaveTextContent('Signed in as Gabriel');
-    await user.click(screen.getByRole('button', { name: 'Sign out' }));
-
-    expect(screen.getByRole('heading', { name: 'Sign in' })).toBeInTheDocument();
-    expect(pb.authStore.isValid).toBe(false);
+    expect(container).toBeEmptyDOMElement();
+    expect(screen.queryByText(/signed in as/i)).not.toBeInTheDocument();
   });
 });

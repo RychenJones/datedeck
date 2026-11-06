@@ -1,0 +1,63 @@
+.add-idea-modal__backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  display: grid;
+  place-items: center;
+  padding: calc(var(--space-4) + env(safe-area-inset-top, 0px))
+    calc(var(--space-4) + env(safe-area-inset-right, 0px))
+    calc(var(--space-4) + env(safe-area-inset-bottom, 0px))
+    calc(var(--space-4) + env(safe-area-inset-left, 0px));
+  background: var(--overlay);
+}
+
+.add-idea-modal {
+  width: 100%;
+  min-width: 0;
+  max-width: var(--deck-width);
+  max-height: 100%;
+  overflow-y: auto;
+  border-radius: var(--radius-card);
+  background: var(--panel);
+  box-shadow: var(--shadow-card);
+}
+
+/* Takes no height, so Close stays in reach while the long form scrolls under it. */
+.add-idea-modal__bar {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  display: flex;
+  justify-content: flex-end;
+  height: 0;
+  padding-inline-end: var(--space-3);
+}
+
+.add-idea-modal__close {
+  align-self: flex-start;
+  flex-shrink: 0;
+  min-width: var(--control-small);
+  min-height: var(--control-small);
+  margin-top: var(--space-3);
+  padding: var(--space-2) var(--space-3);
+  border: var(--border-width) solid var(--line);
+  border-radius: var(--radius-pill);
+  color: var(--ink);
+  background: var(--panel);
+  font-weight: var(--weight-bold);
+}
+
+.add-idea-modal__close:hover {
+  background: var(--field);
+}
+
+.add-idea-modal .add-idea {
+  max-width: none;
+  margin-top: 0;
+  background: transparent;
+}
+
+/* Long headings wrap before they reach the Close button. */
+.add-idea-modal .add-idea h2 {
+  padding-inline-end: calc(var(--control-small) * 2);
+}
