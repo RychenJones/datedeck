@@ -1,4 +1,5 @@
 import { useEffect, useMemo } from 'react';
+import { Heart, Shuffle, Undo2, X } from 'lucide-react';
 import IdeaCard from '../components/IdeaCard/IdeaCard.jsx';
 import SwipeCard from '../components/SwipeCard/SwipeCard.jsx';
 import { useIdeas } from '../hooks/useIdeas.js';
@@ -75,7 +76,7 @@ export default function Deck({ filters }) {
             disabled
             aria-label="Undo last choice"
           >
-            <span aria-hidden="true">↶</span>
+            <Undo2 aria-hidden="true" />
           </button>
           <button
             type="button"
@@ -83,7 +84,7 @@ export default function Deck({ filters }) {
             onClick={() => hide(currentIdea.id)}
             aria-label={`Hide ${currentIdea.title}`}
           >
-            <span aria-hidden="true">×</span>
+            <X aria-hidden="true" />
           </button>
           <button
             type="button"
@@ -91,7 +92,7 @@ export default function Deck({ filters }) {
             onClick={() => save(currentIdea.id)}
             aria-label={`Save ${currentIdea.title}`}
           >
-            <span aria-hidden="true">♥</span>
+            <Heart aria-hidden="true" />
           </button>
           <button
             type="button"
@@ -99,7 +100,7 @@ export default function Deck({ filters }) {
             disabled
             aria-label="Shuffle ideas"
           >
-            <span aria-hidden="true">⤨</span>
+            <Shuffle aria-hidden="true" />
           </button>
         </div>
       </div>

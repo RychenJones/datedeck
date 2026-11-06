@@ -91,9 +91,21 @@
   border-radius: var(--radius-pill);
   color: var(--ink);
   background: var(--panel);
-  font-size: var(--icon-large);
-  line-height: 1;
   box-shadow: var(--shadow-card);
+}
+.deck__control svg {
+  width: var(--icon-large);
+  height: var(--icon-large);
+}
+.deck__control--hide svg {
+  stroke-width: 2.5;
+}
+.deck__control--secondary svg {
+  width: var(--icon-size);
+  height: var(--icon-size);
+}
+.deck__control--save svg {
+  fill: currentColor;
 }
 .deck__control--secondary {
   width: var(--control-small);
@@ -101,7 +113,6 @@
   border: 0;
   color: var(--muted);
   background: transparent;
-  font-size: var(--text-xl);
   box-shadow: none;
 }
 .deck__control--save {
