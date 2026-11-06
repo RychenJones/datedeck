@@ -54,10 +54,19 @@ describe('IdeaCard', () => {
   it('shows the photo when the idea has one', () => {
     render(<IdeaCard idea={{ ...idea, photo: 'https://example.com/dunes.jpg' }} />);
 
-    expect(screen.getByRole('img', { name: 'Sunset at the sand dunes' })).toHaveAttribute(
-      'src',
-      'https://example.com/dunes.jpg',
-    );
+    expect(
+      screen.getByRole('img', { name: 'St. Anthony Sand Dunes, Outside Rexburg' }),
+    ).toHaveAttribute('src', 'https://example.com/dunes.jpg');
     expect(screen.queryByText('No photo')).not.toBeInTheDocument();
+  });
+
+  it('uses the idea title as photo alt text when the place and area are missing', () => {
+    render(
+      <IdeaCard
+        idea={{ ...idea, place_name: '', location: '', photo: 'https://example.com/dunes.jpg' }}
+      />,
+    );
+
+    expect(screen.getByRole('img', { name: idea.title })).toBeInTheDocument();
   });
 });

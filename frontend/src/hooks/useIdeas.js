@@ -63,16 +63,16 @@ function withPhotoUrl(idea) {
   return idea.photo ? { ...idea, photo: pb.files.getURL(idea, idea.photo) } : idea;
 }
 
-export function matchesIdeaFilters(idea, filters, excludedFacet = null) {
+export function matchesIdeaFilters(idea, filters) {
   const { areas, minPrice, maxPrice, categories, search } = { ...NO_FILTERS, ...filters };
   const searchText = search.trim().toLowerCase();
   const searchableText = `${idea.title} ${idea.description} ${idea.place_name}`.toLowerCase();
 
   return (
-    (excludedFacet === 'location' || !areas.length || areas.includes(idea.location)) &&
-    (excludedFacet === 'price' || minPrice == null || idea.price >= minPrice) &&
-    (excludedFacet === 'price' || maxPrice == null || idea.price <= maxPrice) &&
-    (excludedFacet === 'category' || !categories.length || categories.includes(idea.category)) &&
+    (!areas.length || areas.includes(idea.location)) &&
+    (minPrice == null || idea.price >= minPrice) &&
+    (maxPrice == null || idea.price <= maxPrice) &&
+    (!categories.length || categories.includes(idea.category)) &&
     (!searchText || searchableText.includes(searchText))
   );
 }
@@ -81,6 +81,7 @@ function matchesSampleFilters(idea, filters) {
   return matchesIdeaFilters(idea, filters);
 }
 
+// How many ideas you would see if this option replaced your current choice in its group.
 function countFacet(ideas, filters, facet, value) {
   const candidateFilters = { ...filters };
   if (facet === 'location') candidateFilters.areas = [value];
@@ -89,7 +90,7 @@ function countFacet(ideas, filters, facet, value) {
     candidateFilters.minPrice = value.minPrice;
     candidateFilters.maxPrice = value.maxPrice;
   }
-  return ideas.filter((idea) => matchesIdeaFilters(idea, candidateFilters, facet)).length;
+  return ideas.filter((idea) => matchesIdeaFilters(idea, candidateFilters)).length;
 }
 
 function buildIdeaCounts(ideas, filters) {
@@ -244,7 +245,14 @@ export function useIdeas(
   };
 }
 
-export function useIdeaCounts(filters = NO_FILTERS) {
+/**
+ * Counts how many ideas match each filter option. Pass the same sample options as the view's
+ * useIdeas call, so the numbers match the ideas that view really shows.
+ */
+export function useIdeaCounts(
+  filters = NO_FILTERS,
+  { includeSamples = false, samplesWhenEmpty = false } = {},
+) {
   const [counts, setCounts] = useState(EMPTY_IDEA_COUNTS);
 
   useEffect(() => {
@@ -260,18 +268,19 @@ export function useIdeaCounts(filters = NO_FILTERS) {
       )
       .then((items) => {
         if (cancelled) return;
-        const knownIds = new Set(items.map((idea) => idea.id));
-        const allIdeas = [...items, ...sampleIdeas.filter((idea) => !knownIds.has(idea.id))];
-        setCounts(buildIdeaCounts(allIdeas, filters));
+        let ideas = items;
+        if (includeSamples) ideas = mergeIdeas(items, sampleIdeas);
+        else if (samplesWhenEmpty && items.length === 0) ideas = sampleIdeas;
+        setCounts(buildIdeaCounts(ideas, filters));
       })
       .catch(() => {
-        if (!cancelled) setCounts(buildIdeaCounts(sampleIdeas, filters));
+        if (!cancelled) setCounts(buildIdeaCounts(includeSamples ? sampleIdeas : [], filters));
       });
 
     return () => {
       cancelled = true;
     };
-  }, [filters]);
+  }, [filters, includeSamples, samplesWhenEmpty]);
 
   return counts;
 }

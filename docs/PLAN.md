@@ -274,9 +274,9 @@ Generated from the Trello export (`datedeck-trello.json`). The Trello board is t
 
 **Sprint 2 update:** DD-15 moved to week 4, so it builds on DD-09 (real ideas, the shared `useSwipes` hook and `pages/Liked.jsx`) instead of the examples in `Home.jsx`. Add the heart button as its own component so the Deck and All ideas pages each need only a one-line change.
 
-## Sprint 3: Accounts and AI (2026-11-02 to 2026-11-13)
+## Sprint 3: Accounts (2026-11-02 to 2026-11-13)
 
-**Goal:** Put DateDeck online, add sign-in so saved and hidden ideas follow each person, let people edit their own ideas, and add AI that suggests dates and helps write new ideas. Planned now so you can adjust it after sprint 2.
+**Goal:** Put DateDeck online, add sign-in so saved and hidden ideas follow each person, and let people edit their own ideas. Planned now so you can adjust it after sprint 2.
 
 ### DD-10b Put PocketBase on AWS and go live
 
@@ -292,21 +292,7 @@ Generated from the Trello export (`datedeck-trello.json`). The Trello board is t
 - [ ] Migrations applied and the DD-08 ideas loaded into the live database with the README deploy steps
 - [ ] Smoke test on the live link from a phone: load, save or hide, add
 
-DD-10 and DD-19 can be built against local PocketBase before this lands; they go live with it.
-
-### DD-19 Ask the AI for a date idea
-
-- **Owner:** Riley · **Week:** 5 · **Due:** 2026-11-06 · **Points:** 3 · **Labels:** Backend, Frontend
-- **Branch:** `riley/dd-19` · **Depends on:** DD-09, DD-10a
-
-> As a user, I want to describe what I am in the mood for and get matching ideas, so that choosing is even faster.
-
-**Acceptance criteria**
-
-- [ ] A box where you type something like “cheap outdoor date for Friday night”
-- [ ] A PocketBase hook sends it, with the matching DateDeck ideas, to an AI API; the API key stays on the server
-- [ ] Shows 3 ideas from DateDeck with a one-line reason each, and Save buttons
-- [ ] Handles slow or failed AI answers with a clear message
+DD-10 can be built against local PocketBase before this lands; it goes live with it.
 
 ### DD-20 Pick one for us
 
@@ -348,20 +334,6 @@ DD-10 and DD-19 can be built against local PocketBase before this lands; they go
 - [ ] Rules: each person reads and changes only their own swipes
 - [ ] On first sign-in, choices saved in the browser move to the account
 - [ ] Rules checked with two test accounts
-
-### DD-21 Let the AI help write a new idea
-
-- **Owner:** Riley · **Week:** 6 · **Due:** 2026-11-13 · **Points:** 3 · **Labels:** Frontend
-- **Branch:** `riley/dd-21` · **Depends on:** DD-06, DD-19
-
-> As a user adding an idea, I want help filling in the details, so that new ideas are complete and easy to read.
-
-**Acceptance criteria**
-
-- [ ] From a title and place, the AI suggests a description, category, price range and duration
-- [ ] Suggestions fill the form and stay editable; nothing saves until you press Add
-- [ ] Uses the same server-side AI hook as DD-19
-- [ ] Works normally when the AI is unavailable
 
 ### DD-22 Edit and remove my own ideas
 

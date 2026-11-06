@@ -13,6 +13,7 @@
     "import:ideas": "node scripts/import-ideas.js"
   },
   "dependencies": {
+    "lucide-react": "^1.57.0",
     "pocketbase": "^0.28.1",
     "react": "^19.3.0",
     "react-dom": "^19.3.0"
@@ -29,6 +30,7 @@
     "globals": "^17.13.0",
     "jsdom": "^29.1.1",
     "prettier": "^3.9.9",
+    "sharp": "^0.35.5",
     "vite": "^8.3.2",
     "vitest": "^5.0.3"
   }

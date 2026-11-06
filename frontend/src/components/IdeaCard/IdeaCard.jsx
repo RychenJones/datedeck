@@ -21,8 +21,17 @@ function formatDuration(minutes) {
  *
  * @param {{title: string, place_name: string, location: string, price: number, duration: number, photo?: string}} idea
  */
-export default function IdeaCard({ idea, onOpenDetails, onSave, onHide, isStacked = false }) {
-  const { title, description, place_name, location, price, duration, category, photo } = idea;
+export default function IdeaCard({
+  idea,
+  onOpenDetails,
+  onSave,
+  onHide,
+  isStacked = false,
+  showAddress = false,
+  actions,
+}) {
+  const { title, description, place_name, address, location, price, duration, category, photo } =
+    idea;
   const priceLabel = formatPrice(price);
   const durationLabel = formatDuration(duration);
 
@@ -30,7 +39,11 @@ export default function IdeaCard({ idea, onOpenDetails, onSave, onHide, isStacke
     <article className={`idea-card${isStacked ? ' idea-card--stacked' : ''}`}>
       <div className="idea-card__photo-wrap">
         {photo ? (
-          <img className="idea-card__photo" src={photo} alt={title} />
+          <img
+            className="idea-card__photo"
+            src={photo}
+            alt={[place_name, location].filter(Boolean).join(', ') || title}
+          />
         ) : (
           <div className="idea-card__placeholder" aria-label="Photo placeholder">
             <IdeaArt category={category} />
@@ -60,7 +73,15 @@ export default function IdeaCard({ idea, onOpenDetails, onSave, onHide, isStacke
             <dt>Location</dt>
             <dd>{location}</dd>
           </div>
+          {showAddress && (
+            <div className="idea-card__address">
+              <dt>Address</dt>
+              <dd>{address || 'Address coming soon'}</dd>
+            </div>
+          )}
         </dl>
+
+        {actions}
 
         {onOpenDetails && (
           <button

@@ -128,6 +128,33 @@
   background: var(--field);
 }
 
+.datedeck-header .account-menu {
+  position: relative;
+  display: flex;
+  min-width: 0;
+}
+
+.datedeck-header .account-menu__sign-out {
+  position: absolute;
+  top: calc(100% + var(--space-2));
+  right: 0;
+  z-index: 5;
+  min-height: var(--control-small);
+  padding: var(--space-2) var(--space-5);
+  border: var(--border-width) solid var(--line);
+  border-radius: var(--radius-pill);
+  background: var(--panel);
+  color: var(--ink);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-bold);
+  white-space: nowrap;
+  box-shadow: var(--shadow-card);
+}
+
+.datedeck-header .account-menu__sign-out:hover {
+  background: var(--field);
+}
+
 .datedeck-header .account-initial {
   display: grid;
   place-items: center;

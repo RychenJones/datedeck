@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import IdeaArt from '../IdeaArt/IdeaArt.jsx';
 import { useSwipes } from '../../hooks/useSwipes.js';
+import { mapsUrl } from '../../lib/mapsUrl.js';
 import './IdeaDetails.css';
 
 function formatPrice(price) {
@@ -14,10 +15,6 @@ function formatDuration(minutes) {
   if (hours === 0) return `${rest} min`;
   if (rest === 0) return `${hours} hr`;
   return `${hours} hr ${rest} min`;
-}
-
-function mapsUrl(address) {
-  return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`;
 }
 
 export default function IdeaDetails({ idea, onClose }) {
@@ -36,7 +33,8 @@ export default function IdeaDetails({ idea, onClose }) {
     return () => document.removeEventListener('keydown', handleKeyDown);
   }, [onClose]);
 
-  const { title, description, place_name, address, price, duration, category, photo } = idea;
+  const { title, description, place_name, location, address, price, duration, category, photo } =
+    idea;
   const photoSource =
     photo && !(failedPhoto?.ideaId === idea.id && failedPhoto.photo === photo) ? photo : null;
   const isSaved = saved.includes(idea.id);
@@ -64,7 +62,7 @@ export default function IdeaDetails({ idea, onClose }) {
             <img
               className="idea-details__photo"
               src={photoSource}
-              alt={title}
+              alt={[place_name, location].filter(Boolean).join(', ') || title}
               onError={() => setFailedPhoto({ ideaId: idea.id, photo })}
             />
           ) : (

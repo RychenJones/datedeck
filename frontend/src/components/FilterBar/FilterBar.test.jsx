@@ -134,4 +134,72 @@ describe('FilterBar', () => {
       'filter-bar__option',
     );
   });
+
+  describe('on a phone', () => {
+    it('opens the filters as a sheet from the Filters button and moves focus into it', async () => {
+      const user = userEvent.setup();
+      render(<FilterBar filters={NO_FILTERS} onChange={vi.fn()} counts={counts} />);
+
+      expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+      await user.click(screen.getByRole('button', { name: 'Filters' }));
+
+      expect(screen.getByRole('dialog', { name: 'Find your mood' })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: 'Done' })).toHaveFocus();
+    });
+
+    it('closes the sheet with Done and returns focus to the Filters button', async () => {
+      const user = userEvent.setup();
+      render(<FilterBar filters={NO_FILTERS} onChange={vi.fn()} counts={counts} />);
+      const toggle = screen.getByRole('button', { name: 'Filters' });
+
+      await user.click(toggle);
+      await user.click(screen.getByRole('button', { name: 'Done' }));
+
+      expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+      expect(toggle).toHaveFocus();
+    });
+
+    it('closes the sheet with Escape', async () => {
+      const user = userEvent.setup();
+      render(<FilterBar filters={NO_FILTERS} onChange={vi.fn()} counts={counts} />);
+
+      await user.click(screen.getByRole('button', { name: 'Filters' }));
+      await user.keyboard('{Escape}');
+
+      expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    });
+
+    it('closes the sheet when you tap outside it', async () => {
+      const user = userEvent.setup();
+      render(<FilterBar filters={NO_FILTERS} onChange={vi.fn()} counts={counts} />);
+
+      await user.click(screen.getByRole('button', { name: 'Filters' }));
+      await user.click(screen.getByRole('button', { name: 'Close filters' }));
+
+      expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    });
+
+    it('keeps Tab inside the open sheet', async () => {
+      const user = userEvent.setup();
+      render(<FilterBar filters={NO_FILTERS} onChange={vi.fn()} counts={counts} />);
+
+      await user.click(screen.getByRole('button', { name: 'Filters' }));
+      await user.tab({ shift: true });
+      expect(screen.getByRole('dialog')).toContainElement(document.activeElement);
+    });
+
+    it('shows how many filters are on, on the Filters button', () => {
+      const filters = {
+        ...NO_FILTERS,
+        areas: ['Downtown Rexburg'],
+        minPrice: 10,
+        maxPrice: 25,
+        search: 'park',
+      };
+
+      render(<FilterBar filters={filters} onChange={vi.fn()} counts={counts} />);
+
+      expect(screen.getByRole('button', { name: 'Filters, 3 on' })).toBeInTheDocument();
+    });
+  });
 });
