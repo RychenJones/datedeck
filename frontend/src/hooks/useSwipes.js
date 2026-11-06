@@ -8,21 +8,39 @@ export const SwipesContext = createContext(null);
 function readSwipes() {
   try {
     const stored = JSON.parse(window.localStorage.getItem(SWIPES_KEY)) ?? {};
+    if (
+      typeof stored !== 'object' ||
+      Array.isArray(stored) ||
+      (stored.saved !== undefined && !Array.isArray(stored.saved)) ||
+      (stored.hidden !== undefined && !Array.isArray(stored.hidden)) ||
+      (Array.isArray(stored.saved) && stored.saved.some((id) => typeof id !== 'string')) ||
+      (Array.isArray(stored.hidden) && stored.hidden.some((id) => typeof id !== 'string'))
+    ) {
+      throw new Error('Invalid swipe data');
+    }
     return {
-      ...stored,
-      saved: Array.isArray(stored.saved) ? stored.saved : [],
-      hidden: Array.isArray(stored.hidden) ? stored.hidden : [],
+      storageError: null,
+      swipes: {
+        ...stored,
+        saved: Array.isArray(stored.saved) ? stored.saved : [],
+        hidden: Array.isArray(stored.hidden) ? stored.hidden : [],
+      },
     };
   } catch {
-    return { saved: [], hidden: [] };
+    return {
+      swipes: { saved: [], hidden: [] },
+      storageError:
+        'Could not read your saved and hidden ideas from this browser. Your choices will work for this visit, but cannot be kept after a reload.',
+    };
   }
 }
 
 function writeSwipes(swipes) {
   try {
     window.localStorage.setItem(SWIPES_KEY, JSON.stringify(swipes));
+    return null;
   } catch {
-    // Private browsing can block storage; choices still work until a reload.
+    return 'Could not store your choices in this browser. Your choices will work for this visit only.';
   }
 }
 
@@ -53,15 +71,26 @@ export function useSwipesState() {
   // Only `swipes` is stored. The undo history and deck order last until the page reloads, so a
   // reload can never bring a hidden idea back.
   const [state, setState] = useState(() => ({
-    swipes: readSwipes(),
+    ...readSwipes(),
     history: [],
     deckOrder: [],
   }));
-  const { swipes, history, deckOrder } = state;
+  const { swipes, history, deckOrder, storageError } = state;
+  const [writeError, setWriteError] = useState(null);
 
   useEffect(() => {
-    writeSwipes(swipes);
-  }, [swipes]);
+    // Keep unreadable data intact; choices can still work in memory for this visit.
+    let active = true;
+    if (!storageError) {
+      const error = writeSwipes(swipes);
+      Promise.resolve().then(() => {
+        if (active) setWriteError(error);
+      });
+    }
+    return () => {
+      active = false;
+    };
+  }, [swipes, storageError]);
 
   // Follow choices made in another browser tab, so this tab's next write can't undo them and
   // bring a hidden idea back. Undo here forgets anything that tab has already taken back.
@@ -71,8 +100,8 @@ export function useSwipesState() {
       const latest = readSwipes();
       setState((current) => ({
         ...current,
-        swipes: latest,
-        history: current.history.filter((entry) => latest[entry.list].includes(entry.id)),
+        ...latest,
+        history: current.history.filter((entry) => latest.swipes[entry.list].includes(entry.id)),
       }));
     }
     window.addEventListener('storage', handleStorage);
@@ -100,6 +129,22 @@ export function useSwipesState() {
     }));
   }
 
+  function toggleSave(id) {
+    setState((current) => {
+      const isSaved = current.swipes.saved.includes(id);
+      return {
+        ...current,
+        swipes: {
+          ...current.swipes,
+          saved: isSaved ? without(current.swipes.saved, id) : [...current.swipes.saved, id],
+        },
+        history: isSaved
+          ? current.history.filter((entry) => entry.list !== 'saved' || entry.id !== id)
+          : [...current.history, { list: 'saved', id }],
+      };
+    });
+  }
+
   /** Returns every hidden idea to the deck. Saved ideas stay saved. */
   function unhideAll() {
     setState((current) => ({
@@ -115,6 +160,7 @@ export function useSwipesState() {
       const last = current.history.at(-1);
       if (!last) return current;
       return {
+        ...current,
         swipes: { ...current.swipes, [last.list]: without(current.swipes[last.list], last.id) },
         history: current.history.slice(0, -1),
         deckOrder: [last.id, ...without(current.deckOrder, last.id)],
@@ -140,6 +186,8 @@ export function useSwipesState() {
     unhideAll,
     undo,
     shuffle,
+    toggleSave,
+    storageError: storageError || writeError,
   };
 }
 

@@ -1,0 +1,27 @@
+.like-button {
+  display: grid;
+  place-items: center;
+  min-width: var(--control-small);
+  min-height: var(--control-small);
+  border-radius: var(--radius-pill);
+  border: var(--border-width) solid var(--line);
+  color: var(--ink);
+  background: var(--panel);
+}
+.like-toggle .icon {
+  fill: none;
+}
+.like-toggle[aria-pressed='true'] .icon {
+  fill: currentColor;
+}
+.like-button[aria-pressed='true'] {
+  background: var(--accent);
+  color: var(--on-action);
+}
+.like-button:hover {
+  border-color: var(--ink);
+}
+.like-toggle:focus-visible {
+  outline: var(--focus-width) solid var(--focus);
+  outline-offset: var(--space-1);
+}
