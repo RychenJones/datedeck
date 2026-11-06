@@ -38,7 +38,7 @@ export default function Deck({ filters }) {
   const { ideas, status, totalItems, hasMore, loadMore } = useIdeas(filters, {
     samplesWhenEmpty: true,
   });
-  const { saved, hidden, canUndo, deckOrder, save, hide, undo, shuffle } = useSwipes();
+  const { saved, hidden, canUndo, deckOrder, save, hide, undo, unhideAll, shuffle } = useSwipes();
   const remainingIdeas = useMemo(
     () =>
       inDeckOrder(ideas, deckOrder).filter(
@@ -172,7 +172,26 @@ export default function Deck({ filters }) {
     );
   } else {
     content = (
-      <DeckMessage title="You are all caught up" action={undoAction}>
+      <DeckMessage
+        title="You are all caught up"
+        action={
+          <>
+            {undoAction}
+            {ideas.some((idea) => hidden.includes(idea.id) && !saved.includes(idea.id)) && (
+              <button
+                type="button"
+                className="home__empty-action"
+                onClick={() => {
+                  unhideAll();
+                  deck.current?.focus();
+                }}
+              >
+                Bring back hidden ideas
+              </button>
+            )}
+          </>
+        }
+      >
         There are no more ideas to choose from right now.
       </DeckMessage>
     );

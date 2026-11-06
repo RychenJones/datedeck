@@ -167,6 +167,9 @@
   color: var(--on-action);
   font-weight: var(--weight-bold);
 }
+.home__empty-action + .home__empty-action {
+  margin-inline-start: var(--space-3);
+}
 .home__empty-action:hover {
   background: var(--action-hover);
 }

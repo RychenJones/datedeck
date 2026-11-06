@@ -233,6 +233,40 @@ describe('Home deck', () => {
     expect(screen.getByText('3 ideas left')).toBeInTheDocument();
   });
 
+  it('brings every refused idea back from the all caught up screen, even after a reload', async () => {
+    const user = userEvent.setup();
+    window.localStorage.setItem(
+      'datedeck.swipes',
+      JSON.stringify({ saved: ['sample-1'], hidden: sampleIdeas.slice(1).map((idea) => idea.id) }),
+    );
+    render(<App />);
+
+    await user.click(await screen.findByRole('button', { name: 'Bring back hidden ideas' }));
+
+    expect(await topIdeaTitle()).toBe(sampleIdeas[1].title);
+    expect(screen.getByText(`${sampleIdeas.length - 1} ideas left`)).toBeInTheDocument();
+    expect(screen.getByRole('region', { name: 'Date idea deck' })).toHaveFocus();
+    expect(JSON.parse(window.localStorage.getItem('datedeck.swipes'))).toEqual({
+      saved: ['sample-1'],
+      hidden: [],
+    });
+  });
+
+  it('offers no way to bring ideas back when you refused none', async () => {
+    window.localStorage.setItem(
+      'datedeck.swipes',
+      JSON.stringify({ saved: sampleIdeas.map((idea) => idea.id), hidden: [] }),
+    );
+    render(<App />);
+
+    expect(
+      await screen.findByRole('heading', { name: 'You are all caught up' }),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: 'Bring back hidden ideas' }),
+    ).not.toBeInTheDocument();
+  });
+
   it('starts with Undo turned off until you make a choice', async () => {
     const user = userEvent.setup();
     render(<App />);
