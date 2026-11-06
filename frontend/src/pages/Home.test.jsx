@@ -686,25 +686,20 @@ describe('Home deck', () => {
     expect(screen.queryByRole('button', { name: /View details/ })).not.toBeInTheDocument();
   });
 
-  it('saves and hides an idea right on its All ideas card', async () => {
+  it('saves an idea right on its All ideas card, which has no Hide button', async () => {
     const user = userEvent.setup();
     render(<App />);
 
     await user.click(screen.getByRole('button', { name: 'All ideas' }));
     await user.click(await screen.findByRole('button', { name: 'Save Picnic at Porter Park' }));
-    await user.click(screen.getByRole('button', { name: 'Hide Picnic at Porter Park' }));
 
     expect(screen.getByRole('button', { name: 'Unsave Picnic at Porter Park' })).toHaveAttribute(
       'aria-pressed',
       'true',
     );
-    expect(screen.getByRole('button', { name: 'Unhide Picnic at Porter Park' })).toHaveAttribute(
-      'aria-pressed',
-      'true',
-    );
+    expect(screen.queryByRole('button', { name: /^(Hide|Unhide) / })).not.toBeInTheDocument();
     const stored = JSON.parse(window.localStorage.getItem('datedeck.swipes'));
     expect(stored.saved).toEqual([sampleIdeas[0].id]);
-    expect(stored.hidden).toEqual([sampleIdeas[0].id]);
   });
 
   it('shows the PocketBase photo on the All ideas card', async () => {

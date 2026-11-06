@@ -4,12 +4,14 @@ import IdeaCard from '../IdeaCard/IdeaCard.jsx';
 
 import './IdeaGridCard.css';
 
-/** A card for the idea grids: all the details and every action, with nothing to open. */
-export default function IdeaGridCard({ idea }) {
-  const { saved, hidden, save, hide, unsave, unhide } = useSwipes();
+/**
+ * A card for the idea grids: all the details, with nothing to open. All ideas saves an idea, and
+ * Liked removes one, passing `onRemove` to move focus once the card is gone. Hiding is for the deck.
+ */
+export default function IdeaGridCard({ idea, onRemove }) {
+  const { saved, save, unsave } = useSwipes();
   const { id, title, address } = idea;
   const isSaved = saved.includes(id);
-  const isHidden = hidden.includes(id);
 
   return (
     <IdeaCard
@@ -28,24 +30,29 @@ export default function IdeaGridCard({ idea }) {
               Open in Maps
             </a>
           )}
-          <button
-            type="button"
-            className="idea-grid-card__choice idea-grid-card__choice--save"
-            aria-pressed={isSaved}
-            aria-label={`${isSaved ? 'Unsave' : 'Save'} ${title}`}
-            onClick={() => (isSaved ? unsave(id) : save(id))}
-          >
-            {isSaved ? 'Unsave' : 'Save'}
-          </button>
-          <button
-            type="button"
-            className="idea-grid-card__choice"
-            aria-pressed={isHidden}
-            aria-label={`${isHidden ? 'Unhide' : 'Hide'} ${title}`}
-            onClick={() => (isHidden ? unhide(id) : hide(id))}
-          >
-            {isHidden ? 'Unhide' : 'Hide'}
-          </button>
+          {onRemove ? (
+            <button
+              type="button"
+              className="idea-grid-card__choice"
+              aria-label={`Remove ${title} from liked ideas`}
+              onClick={() => {
+                unsave(id);
+                onRemove();
+              }}
+            >
+              Remove
+            </button>
+          ) : (
+            <button
+              type="button"
+              className="idea-grid-card__choice idea-grid-card__choice--save"
+              aria-pressed={isSaved}
+              aria-label={`${isSaved ? 'Unsave' : 'Save'} ${title}`}
+              onClick={() => (isSaved ? unsave(id) : save(id))}
+            >
+              {isSaved ? 'Unsave' : 'Save'}
+            </button>
+          )}
         </div>
       }
     />

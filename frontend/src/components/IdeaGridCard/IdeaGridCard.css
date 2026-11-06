@@ -1,7 +1,8 @@
 /* Pushed to the bottom, so the actions line up across a row of cards with different text. */
 .idea-grid-card__actions {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(0, 1fr);
   gap: var(--space-2);
   margin-top: auto;
   padding-top: var(--space-4);
@@ -21,7 +22,6 @@
 }
 
 .idea-grid-card__maps {
-  grid-column: 1 / -1;
   color: var(--on-action);
   background: var(--action);
   text-decoration: none;
