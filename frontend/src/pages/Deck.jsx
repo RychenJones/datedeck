@@ -209,7 +209,7 @@ function DeckContent({ filters }) {
         }
       >
         Swipe right or use hearts to save ideas, and swipe left to hide them. Visit All ideas to
-        like again, or use Bring back in Hidden ideas to return an idea to the deck.
+        like again, or use Hidden ideas there to bring one back to the deck.
       </DeckMessage>
     );
   }
@@ -244,7 +244,7 @@ function DeckContent({ filters }) {
 
 export default function Deck(props) {
   return (
-    <IdeaListsLayout>
+    <IdeaListsLayout showLists={false}>
       <DeckContent {...props} />
     </IdeaListsLayout>
   );

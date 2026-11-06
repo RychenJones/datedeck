@@ -1,8 +1,5 @@
-import { useState } from 'react';
-import IdeaCard from '../components/IdeaCard/IdeaCard.jsx';
-import IdeaDetails from '../components/IdeaDetails/IdeaDetails.jsx';
+import IdeaGridCard from '../components/IdeaGridCard/IdeaGridCard.jsx';
 import { useIdeas } from '../hooks/useIdeas.js';
-import LikeButton from '../components/LikeButton/LikeButton.jsx';
 import IdeaListsLayout from '../components/IdeaListsLayout/IdeaListsLayout.jsx';
 
 function BrowseMessage({ title, children }) {
@@ -17,7 +14,6 @@ function BrowseMessage({ title, children }) {
 // All ideas tab: every idea in a grid, one page at a time.
 function BrowseContent({ filters }) {
   const { ideas, status, hasMore, loadMore } = useIdeas(filters, { includeSamples: true });
-  const [selectedIdea, setSelectedIdea] = useState(null);
 
   if (status === 'loading') {
     return <BrowseMessage title="Loading ideas">Finding date ideas in Rexburg…</BrowseMessage>;
@@ -41,15 +37,9 @@ function BrowseContent({ filters }) {
     <>
       <section className="idea-grid" id="date-ideas" aria-label="Date ideas">
         {ideas.map((idea) => (
-          <IdeaCard
-            key={idea.id}
-            idea={idea}
-            onOpenDetails={setSelectedIdea}
-            actions={<LikeButton idea={idea} />}
-          />
+          <IdeaGridCard key={idea.id} idea={idea} />
         ))}
       </section>
-      {selectedIdea && <IdeaDetails idea={selectedIdea} onClose={() => setSelectedIdea(null)} />}
       {status === 'error' && (
         <p className="idea-grid__more" role="alert">
           Could not load more ideas. Reload the page to try again.

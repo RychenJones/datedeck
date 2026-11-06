@@ -1,0 +1,49 @@
+/* Pushed to the bottom, so the actions line up across a row of cards with different text. */
+.idea-grid-card__actions {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(0, 1fr);
+  gap: var(--space-2);
+  margin-top: auto;
+  padding-top: var(--space-4);
+}
+
+.idea-grid-card__maps,
+.idea-grid-card__choice {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+  min-height: var(--control-small);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-pill);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-bold);
+}
+
+.idea-grid-card__maps {
+  color: var(--on-action);
+  background: var(--action);
+  text-decoration: none;
+}
+
+.idea-grid-card__maps:hover {
+  background: var(--action-hover);
+}
+
+.idea-grid-card__choice {
+  border: var(--border-width) solid var(--line);
+  color: var(--ink);
+  background: transparent;
+}
+
+.idea-grid-card__choice:hover {
+  background: var(--field);
+}
+
+.idea-grid-card__choice--save[aria-pressed='true'],
+.idea-grid-card__choice--save[aria-pressed='true']:hover {
+  border-color: var(--accent);
+  color: var(--on-action);
+  background: var(--accent);
+}

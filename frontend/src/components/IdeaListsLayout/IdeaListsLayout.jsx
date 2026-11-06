@@ -2,25 +2,30 @@
 import ChoiceList from './ChoiceList.jsx';
 import './IdeaListsLayout.css';
 
-export default function IdeaListsLayout({ children }) {
-  const { saved, hidden, unsave, unhide, storageError, lists } = useSwipes();
+/** A page's content with any storage warning, and the hidden ideas list unless `showLists` is off. */
+export default function IdeaListsLayout({ children, showLists = true }) {
+  const { hidden, unhide, storageError, lists } = useSwipes();
+  const warning = storageError && (
+    <p role="alert" className="storage-message">
+      {storageError}
+    </p>
+  );
+
+  if (!showLists) {
+    return (
+      <>
+        {warning}
+        {children}
+      </>
+    );
+  }
+
   return (
     <>
-      {storageError && (
-        <p role="alert" className="storage-message">
-          {storageError}
-        </p>
-      )}
+      {warning}
       <div className="idea-lists-layout">
         <div className="idea-lists-layout__main">{children}</div>
-        <aside className="choice-sidebar" aria-label="Saved for later">
-          <ChoiceList
-            ids={saved}
-            title="Saved for later"
-            action="Unlike"
-            onAction={unsave}
-            {...lists}
-          />
+        <aside className="choice-sidebar" aria-label="Hidden ideas list">
           <ChoiceList
             ids={hidden}
             title="Hidden ideas"

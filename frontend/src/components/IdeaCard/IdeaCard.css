@@ -135,6 +135,49 @@
 .idea-card__action:hover {
   transform: translateY(calc(var(--space-1) * -1));
 }
+.idea-card__address {
+  grid-column: 1 / -1;
+}
+/* Cards in a row match heights, so their actions can sit along the bottom. */
+.idea-grid .idea-card {
+  display: flex;
+  flex-direction: column;
+}
+.idea-grid .idea-card__photo-wrap {
+  flex-shrink: 0;
+  aspect-ratio: 600 / 200;
+}
+.idea-grid .idea-card__content {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+  padding: var(--space-4) var(--space-5) var(--space-5);
+}
+/* Smaller than the deck card, since a grid shows many at once. */
+.idea-grid .idea-card__title {
+  margin-top: var(--space-2);
+  font-size: var(--text-lg);
+}
+.idea-grid .idea-card__place {
+  margin-top: var(--space-1);
+  font-size: var(--text-sm);
+}
+.idea-grid .idea-card__description {
+  margin-top: var(--space-2);
+}
+.idea-grid .idea-card__details {
+  margin-top: var(--space-3);
+}
+.idea-grid .idea-card__details div {
+  padding: var(--space-2) var(--space-3);
+}
+.idea-grid .idea-card__details dd {
+  font-size: var(--text-sm);
+}
+.idea-grid .idea-card__category {
+  align-self: flex-start;
+}
 .idea-card--stacked {
   pointer-events: none;
   box-shadow: none;

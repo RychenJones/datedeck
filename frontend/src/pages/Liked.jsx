@@ -1,7 +1,5 @@
-import { useRef, useState } from 'react';
-import IdeaCard from '../components/IdeaCard/IdeaCard.jsx';
-import IdeaDetails from '../components/IdeaDetails/IdeaDetails.jsx';
-import LikeButton from '../components/LikeButton/LikeButton.jsx';
+import { useRef } from 'react';
+import IdeaGridCard from '../components/IdeaGridCard/IdeaGridCard.jsx';
 import AllIdeasButton from '../components/AllIdeasButton/AllIdeasButton.jsx';
 import IdeaListsLayout from '../components/IdeaListsLayout/IdeaListsLayout.jsx';
 import { useSwipes } from '../hooks/useSwipes.js';
@@ -9,11 +7,10 @@ import { useSwipes } from '../hooks/useSwipes.js';
 export default function Liked({ signedIn = false, onSignIn }) {
   const { saved, lists } = useSwipes();
   const heading = useRef(null);
-  const [selectedIdea, setSelectedIdea] = useState(null);
   const ideas = lists.ideas.filter((idea) => saved.includes(idea.id));
 
   return (
-    <IdeaListsLayout>
+    <IdeaListsLayout showLists={false}>
       <section id="date-ideas" aria-label="Liked ideas">
         <h1 className="liked-heading" ref={heading} tabIndex={-1}>
           {saved.length} liked ideas
@@ -22,8 +19,8 @@ export default function Liked({ signedIn = false, onSignIn }) {
           <div className="deck__empty" role="status">
             <h2>No liked ideas yet</h2>
             <p>
-              Swipe right in the Deck or press a heart in All Ideas to save ideas here and in Saved
-              for later. Press a selected heart again to unlike.
+              Swipe right in the Deck or press Save in All Ideas to save ideas here. Press Remove to
+              take one off your list.
             </p>
             <AllIdeasButton />
             {!signedIn && onSignIn && (
@@ -44,24 +41,16 @@ export default function Liked({ signedIn = false, onSignIn }) {
               </p>
             )}
             {lists.status === 'ready' && ideas.length < saved.length && (
-              <p role="status">
-                Some saved ideas are no longer available. You can remove them in Saved for later.
-              </p>
+              <p role="status">Some saved ideas are no longer available.</p>
             )}
             <div className="idea-grid">
               {ideas.map((idea) => (
-                <IdeaCard
-                  key={idea.id}
-                  idea={idea}
-                  onOpenDetails={setSelectedIdea}
-                  actions={<LikeButton idea={idea} onToggle={() => heading.current?.focus()} />}
-                />
+                <IdeaGridCard key={idea.id} idea={idea} onRemove={() => heading.current?.focus()} />
               ))}
             </div>
           </>
         )}
       </section>
-      {selectedIdea && <IdeaDetails idea={selectedIdea} onClose={() => setSelectedIdea(null)} />}
     </IdeaListsLayout>
   );
 }

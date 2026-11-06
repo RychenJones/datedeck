@@ -26,10 +26,12 @@ export default function IdeaCard({
   onOpenDetails,
   onSave,
   onHide,
-  actions,
   isStacked = false,
+  showAddress = false,
+  actions,
 }) {
-  const { title, description, place_name, location, price, duration, category, photo } = idea;
+  const { title, description, place_name, address, location, price, duration, category, photo } =
+    idea;
   const priceLabel = formatPrice(price);
   const durationLabel = formatDuration(duration);
 
@@ -67,7 +69,15 @@ export default function IdeaCard({
             <dt>Location</dt>
             <dd>{location}</dd>
           </div>
+          {showAddress && (
+            <div className="idea-card__address">
+              <dt>Address</dt>
+              <dd>{address || 'Address coming soon'}</dd>
+            </div>
+          )}
         </dl>
+
+        {actions}
 
         {onOpenDetails && (
           <button
@@ -79,7 +89,6 @@ export default function IdeaCard({
           </button>
         )}
 
-        {actions && <div className="idea-card__actions">{actions}</div>}
         {(onSave || onHide) && (
           <div className="idea-card__actions" aria-label="Choose what to do with this idea">
             <button

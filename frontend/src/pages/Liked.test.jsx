@@ -9,6 +9,18 @@ vi.mock('../lib/pocketbase.js', () => ({
   pb: { files: { getURL: vi.fn() } },
 }));
 
+function saveInBrowser(saved) {
+  window.localStorage.setItem('datedeck.swipes', JSON.stringify({ saved, hidden: [] }));
+}
+
+function renderLiked() {
+  return render(
+    <SwipesProvider>
+      <Liked signedIn />
+    </SwipesProvider>,
+  );
+}
+
 describe('Liked', () => {
   beforeEach(() => localStorage.clear());
 
@@ -32,34 +44,50 @@ describe('Liked', () => {
     window.removeEventListener('datedeck:show-all-ideas', navigate);
   });
 
-  it('shows the saved ideas grid with selected hearts', async () => {
-    localStorage.setItem('datedeck.swipes', JSON.stringify({ saved: [sampleIdeas[0].id] }));
-    render(
-      <SwipesProvider>
-        <Liked signedIn />
-      </SwipesProvider>,
-    );
+  it('shows only the ideas you saved', async () => {
+    saveInBrowser([sampleIdeas[0].id]);
+    renderLiked();
 
     expect(await screen.findByRole('heading', { name: sampleIdeas[0].title })).toBeInTheDocument();
-    expect(
-      screen.getByRole('button', { name: `Save ${sampleIdeas[0].title}` }),
-    ).toHaveAttribute('aria-pressed', 'true');
+    expect(screen.queryByRole('heading', { name: sampleIdeas[1].title })).not.toBeInTheDocument();
+    expect(screen.queryByText('Sign in to be able to save your ideas.')).not.toBeInTheDocument();
   });
 
-  it('opens idea details from a liked idea card', async () => {
+  it('removes a liked idea and keeps the others', async () => {
     const user = userEvent.setup();
-    localStorage.setItem('datedeck.swipes', JSON.stringify({ saved: [sampleIdeas[0].id] }));
-
-    render(
-      <SwipesProvider>
-        <Liked signedIn />
-      </SwipesProvider>,
-    );
+    saveInBrowser([sampleIdeas[0].id, sampleIdeas[1].id]);
+    renderLiked();
 
     await user.click(
-      await screen.findByRole('button', { name: `View details for ${sampleIdeas[0].title}` }),
+      await screen.findByRole('button', {
+        name: `Remove ${sampleIdeas[0].title} from liked ideas`,
+      }),
     );
 
-    expect(screen.getByRole('dialog', { name: sampleIdeas[0].title })).toBeInTheDocument();
+    expect(screen.queryByRole('heading', { name: sampleIdeas[0].title })).not.toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: sampleIdeas[1].title })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: '1 liked ideas' })).toHaveFocus();
+    expect(JSON.parse(window.localStorage.getItem('datedeck.swipes')).saved).toEqual([
+      sampleIdeas[1].id,
+    ]);
+  });
+
+  it('explains what to do once you have removed every liked idea', async () => {
+    const user = userEvent.setup();
+    saveInBrowser([sampleIdeas[0].id]);
+    renderLiked();
+
+    await user.click(await screen.findByRole('button', { name: /^Remove / }));
+
+    expect(screen.getByRole('heading', { name: 'No liked ideas yet' })).toBeInTheDocument();
+  });
+
+  it('has no Hide button', async () => {
+    saveInBrowser([sampleIdeas[0].id]);
+    renderLiked();
+
+    await screen.findByRole('heading', { name: sampleIdeas[0].title });
+
+    expect(screen.queryByRole('button', { name: /^(Hide|Unhide) / })).not.toBeInTheDocument();
   });
 });

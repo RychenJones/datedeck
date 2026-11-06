@@ -17,11 +17,7 @@ export default function ChoiceList({ ids, title, action, onAction, ideas, status
       )}
       {ids.length === 0 ? (
         <div className="saved-empty">
-          <p>
-            {action === 'Unlike'
-              ? 'Swipe right or use a heart to save ideas here and in Liked.'
-              : 'Swipe left or choose Hide to set an idea aside. Bring back returns it to the deck.'}
-          </p>
+          <p>Swipe left or choose Hide to set an idea aside. Bring back returns it to the deck.</p>
           <AllIdeasButton />
         </div>
       ) : (
@@ -42,7 +38,10 @@ export default function ChoiceList({ ids, title, action, onAction, ideas, status
                   <p>{name}</p>
                   {idea && (
                     <p>
-                      {idea.location} · {idea.price === 0 ? 'Free' : `$${idea.price} per person`}
+                      {idea.location} ·{' '}
+                      <span className="choice-list__price">
+                        {idea.price === 0 ? 'Free' : `$${idea.price} per person`}
+                      </span>
                     </p>
                   )}
                 </div>

@@ -27,7 +27,7 @@ beforeEach(() => {
   });
 });
 
-it('keeps hearts, the liked grid, and the sidebar together without deleting the idea', async () => {
+it('keeps All ideas and the liked grid together without deleting the idea', async () => {
   const user = userEvent.setup();
   render(<App />);
   await user.click(screen.getByRole('button', { name: 'All ideas' }));
@@ -47,18 +47,16 @@ it('keeps hearts, the liked grid, and the sidebar together without deleting the 
   );
   expect(within(liked).getByText(idea.location)).toBeVisible();
   expect(within(liked).getByText('Free')).toBeVisible();
-  await user.click(within(liked).getByRole('button', { name: `Save ${idea.title}` }));
+  await user.click(
+    within(liked).getByRole('button', { name: `Remove ${idea.title} from liked ideas` }),
+  );
   expect(screen.getByRole('heading', { name: '0 liked ideas' })).toBeVisible();
   expect(screen.getByRole('heading', { name: '0 liked ideas' })).toHaveFocus();
-  expect(
-    within(screen.getByRole('complementary', { name: 'Saved for later' })).queryByText(idea.title),
-  ).not.toBeInTheDocument();
   await user.click(within(liked).getByRole('button', { name: 'All Ideas' }));
   expect(screen.getByRole('button', { name: 'All ideas' })).toHaveFocus();
   const newGrid = await screen.findByRole('region', { name: 'Date ideas' });
   await user.click(await within(newGrid).findByRole('button', { name: `Save ${idea.title}` }));
-  const sidebar = screen.getByRole('complementary', { name: 'Saved for later' });
-  await user.click(await within(sidebar).findByRole('button', { name: `Unlike ${idea.title}` }));
+  await user.click(await within(newGrid).findByRole('button', { name: `Unsave ${idea.title}` }));
   expect(within(newGrid).getByRole('button', { name: `Save ${idea.title}` })).toHaveAttribute(
     'aria-pressed',
     'false',
@@ -73,9 +71,11 @@ it('brings a hidden idea back to the deck with the keyboard', async () => {
   );
   const user = userEvent.setup();
   render(<App />);
+  await user.click(screen.getByRole('button', { name: 'All ideas' }));
   const button = await screen.findByRole('button', { name: `Bring back ${idea.title}` });
   button.focus();
   await user.keyboard('{Enter}');
+  await user.click(screen.getByRole('button', { name: 'Deck' }));
   const deck = screen.getByRole('region', { name: 'Date idea deck' });
   expect(await within(deck).findByRole('heading', { name: idea.title })).toBeVisible();
   await waitFor(() =>
@@ -85,6 +85,23 @@ it('brings a hidden idea back to the deck with the keyboard', async () => {
       version: 3,
     }),
   );
+});
+
+it('shows Hidden ideas only on All ideas, and no Saved for later section', async () => {
+  const user = userEvent.setup();
+  render(<App />);
+  await screen.findByRole('region', { name: 'Date idea deck' });
+  expect(screen.queryByRole('region', { name: 'Hidden ideas' })).not.toBeInTheDocument();
+  expect(screen.queryByText('Saved for later')).not.toBeInTheDocument();
+
+  await user.click(screen.getByRole('button', { name: 'All ideas' }));
+  expect(await screen.findByRole('region', { name: 'Hidden ideas' })).toBeVisible();
+  expect(screen.queryByText('Saved for later')).not.toBeInTheDocument();
+
+  await user.click(screen.getByRole('button', { name: 'Liked' }));
+  await screen.findByRole('region', { name: 'Liked ideas' });
+  expect(screen.queryByRole('region', { name: 'Hidden ideas' })).not.toBeInTheDocument();
+  expect(screen.queryByText('Saved for later')).not.toBeInTheDocument();
 });
 
 it('explains unreadable storage and preserves the original value', async () => {
