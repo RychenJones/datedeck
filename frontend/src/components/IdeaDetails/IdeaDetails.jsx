@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import IdeaArt from '../IdeaArt/IdeaArt.jsx';
 import { useSwipes } from '../../hooks/useSwipes.js';
+import { mapsUrl } from '../../lib/mapsUrl.js';
 import './IdeaDetails.css';
 
 function formatPrice(price) {
@@ -14,10 +15,6 @@ function formatDuration(minutes) {
   if (hours === 0) return `${rest} min`;
   if (rest === 0) return `${hours} hr`;
   return `${hours} hr ${rest} min`;
-}
-
-function mapsUrl(address) {
-  return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`;
 }
 
 export default function IdeaDetails({ idea, onClose }) {

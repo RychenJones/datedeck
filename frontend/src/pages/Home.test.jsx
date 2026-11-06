@@ -664,69 +664,61 @@ describe('Home deck', () => {
     ).toBeInTheDocument();
   });
 
-  it('opens the selected idea details from the All ideas grid', async () => {
+  it('shows all of an idea on its All ideas card, with nothing to open', async () => {
     const user = userEvent.setup();
     render(<App />);
 
     await user.click(screen.getByRole('button', { name: 'All ideas' }));
-    await user.click(
-      await screen.findByRole('button', { name: 'View details for Picnic at Porter Park' }),
-    );
 
-    const dialog = screen.getByRole('dialog', { name: 'Picnic at Porter Park' });
+    const card = (await screen.findByRole('heading', { name: 'Picnic at Porter Park' })).closest(
+      'article',
+    );
     expect(
-      within(dialog).getByText(
+      within(card).getByText(
         'Bring a blanket and some snacks and spend a slow evening in the park.',
       ),
     ).toBeInTheDocument();
+    expect(within(card).getByText(sampleIdeas[0].address)).toBeInTheDocument();
+    expect(within(card).getByRole('link', { name: /Open in Maps/ })).toHaveAttribute(
+      'href',
+      expect.stringContaining(encodeURIComponent(sampleIdeas[0].address)),
+    );
+    expect(screen.queryByRole('button', { name: /View details/ })).not.toBeInTheDocument();
   });
 
-  it('shows the PocketBase photo in the idea details', async () => {
+  it('saves and hides an idea right on its All ideas card', async () => {
+    const user = userEvent.setup();
+    render(<App />);
+
+    await user.click(screen.getByRole('button', { name: 'All ideas' }));
+    await user.click(await screen.findByRole('button', { name: 'Save Picnic at Porter Park' }));
+    await user.click(screen.getByRole('button', { name: 'Hide Picnic at Porter Park' }));
+
+    expect(screen.getByRole('button', { name: 'Unsave Picnic at Porter Park' })).toHaveAttribute(
+      'aria-pressed',
+      'true',
+    );
+    expect(screen.getByRole('button', { name: 'Unhide Picnic at Porter Park' })).toHaveAttribute(
+      'aria-pressed',
+      'true',
+    );
+    const stored = JSON.parse(window.localStorage.getItem('datedeck.swipes'));
+    expect(stored.saved).toEqual([sampleIdeas[0].id]);
+    expect(stored.hidden).toEqual([sampleIdeas[0].id]);
+  });
+
+  it('shows the PocketBase photo on the All ideas card', async () => {
     serve([{ ...sampleIdeas[0], photo: 'porter_park.jpg' }]);
     pb.files.getURL.mockReturnValue('http://pb.test/files/porter_park.jpg');
     const user = userEvent.setup();
     render(<App />);
 
     await user.click(screen.getByRole('button', { name: 'All ideas' }));
-    await user.click(
-      await screen.findByRole('button', { name: 'View details for Picnic at Porter Park' }),
-    );
 
-    const dialog = screen.getByRole('dialog', { name: 'Picnic at Porter Park' });
-    expect(within(dialog).getByRole('img', { name: 'Picnic at Porter Park' })).toHaveAttribute(
-      'src',
-      'http://pb.test/files/porter_park.jpg',
-    );
-  });
-
-  it('closes idea details with the Close button', async () => {
-    const user = userEvent.setup();
-    render(<App />);
-
-    await user.click(screen.getByRole('button', { name: 'All ideas' }));
-    await user.click(
-      await screen.findByRole('button', { name: 'View details for Picnic at Porter Park' }),
-    );
-    await user.click(screen.getByRole('button', { name: 'Close' }));
-
-    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'All ideas' })).toHaveAttribute(
-      'aria-pressed',
-      'true',
-    );
-  });
-
-  it('closes idea details with Escape', async () => {
-    const user = userEvent.setup();
-    render(<App />);
-
-    await user.click(screen.getByRole('button', { name: 'All ideas' }));
-    await user.click(
-      await screen.findByRole('button', { name: 'View details for Picnic at Porter Park' }),
-    );
-    await user.keyboard('{Escape}');
-
-    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    const heading = await screen.findByRole('heading', { name: 'Picnic at Porter Park' });
+    expect(
+      within(heading.closest('article')).getByRole('img', { name: 'Picnic at Porter Park' }),
+    ).toHaveAttribute('src', 'http://pb.test/files/porter_park.jpg');
   });
 
   it('shows more ideas in the grid when you click Show more ideas', async () => {

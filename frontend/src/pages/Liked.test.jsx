@@ -34,7 +34,7 @@ describe('Liked', () => {
     expect(screen.queryByText('Sign in to be able to save your ideas.')).not.toBeInTheDocument();
   });
 
-  it('opens idea details from a liked idea card', async () => {
+  it('lets you take a like back right on the card', async () => {
     const user = userEvent.setup();
 
     render(
@@ -43,10 +43,12 @@ describe('Liked', () => {
       </SwipesProvider>,
     );
 
-    await user.click(
-      screen.getByRole('button', { name: `View details for ${sampleIdeas[0].title}` }),
-    );
+    await user.click(screen.getByRole('button', { name: `Save ${sampleIdeas[0].title}` }));
+    await user.click(screen.getByRole('button', { name: `Unsave ${sampleIdeas[0].title}` }));
 
-    expect(screen.getByRole('dialog', { name: sampleIdeas[0].title })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: `Save ${sampleIdeas[0].title}` })).toHaveAttribute(
+      'aria-pressed',
+      'false',
+    );
   });
 });

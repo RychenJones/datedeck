@@ -135,6 +135,23 @@
 .idea-card__action:hover {
   transform: translateY(calc(var(--space-1) * -1));
 }
+.idea-card__address {
+  grid-column: 1 / -1;
+}
+/* Cards in a row match heights, so their actions can sit along the bottom. */
+.idea-grid .idea-card {
+  display: flex;
+  flex-direction: column;
+}
+.idea-grid .idea-card__photo-wrap {
+  flex-shrink: 0;
+}
+.idea-grid .idea-card__content {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+}
 .idea-card--stacked {
   pointer-events: none;
   box-shadow: none;
@@ -162,6 +179,25 @@
 
   .idea-card__details dd {
     margin: 0;
+  }
+}
+
+/* A third of the page is too narrow for tiles side by side, so each takes its own row. */
+@media (min-width: 1280px) {
+  .idea-grid .idea-card__details {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .idea-grid .idea-card__details > div {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
+    align-items: baseline;
+    gap: var(--space-2);
+  }
+
+  .idea-grid .idea-card__details dd {
+    margin: 0;
+    font-size: var(--text-sm);
   }
 }
 
