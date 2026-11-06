@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef } from 'react';
+import { Heart, Shuffle, Undo2, X } from 'lucide-react';
 import IdeaCard from '../components/IdeaCard/IdeaCard.jsx';
 import SwipeCard from '../components/SwipeCard/SwipeCard.jsx';
 import { useIdeas } from '../hooks/useIdeas.js';
@@ -37,7 +38,7 @@ export default function Deck({ filters }) {
   const { ideas, status, totalItems, hasMore, loadMore } = useIdeas(filters, {
     samplesWhenEmpty: true,
   });
-  const { saved, hidden, canUndo, deckOrder, save, hide, undo, shuffle } = useSwipes();
+  const { saved, hidden, canUndo, deckOrder, save, hide, undo, unhideAll, shuffle } = useSwipes();
   const remainingIdeas = useMemo(
     () =>
       inDeckOrder(ideas, deckOrder).filter(
@@ -128,7 +129,7 @@ export default function Deck({ filters }) {
             onClick={undo}
             aria-label="Undo last choice"
           >
-            <span aria-hidden="true">↶</span>
+            <Undo2 aria-hidden="true" />
           </button>
           <button
             type="button"
@@ -136,7 +137,7 @@ export default function Deck({ filters }) {
             onClick={() => hide(currentIdea.id)}
             aria-label={`Hide ${currentIdea.title}`}
           >
-            <span aria-hidden="true">×</span>
+            <X aria-hidden="true" />
           </button>
           <button
             type="button"
@@ -144,7 +145,7 @@ export default function Deck({ filters }) {
             onClick={() => save(currentIdea.id)}
             aria-label={`Save ${currentIdea.title}`}
           >
-            <span aria-hidden="true">♥</span>
+            <Heart aria-hidden="true" />
           </button>
           <button
             type="button"
@@ -156,7 +157,7 @@ export default function Deck({ filters }) {
             }}
             aria-label="Shuffle ideas"
           >
-            <span aria-hidden="true">⤨</span>
+            <Shuffle aria-hidden="true" />
           </button>
         </div>
       </div>
@@ -171,7 +172,26 @@ export default function Deck({ filters }) {
     );
   } else {
     content = (
-      <DeckMessage title="You are all caught up" action={undoAction}>
+      <DeckMessage
+        title="You are all caught up"
+        action={
+          <>
+            {undoAction}
+            {ideas.some((idea) => hidden.includes(idea.id) && !saved.includes(idea.id)) && (
+              <button
+                type="button"
+                className="home__empty-action"
+                onClick={() => {
+                  unhideAll();
+                  deck.current?.focus();
+                }}
+              >
+                Bring back hidden ideas
+              </button>
+            )}
+          </>
+        }
+      >
         There are no more ideas to choose from right now.
       </DeckMessage>
     );

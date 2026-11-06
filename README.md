@@ -82,19 +82,18 @@ The `dates` collection rules come from the migrations: anyone can list and view 
 
 # Architecture
 
-| Layer             | Choice                                                                                                                                       |
-| ----------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
-| Language          | JavaScript (`.jsx`), HTML, CSS                                                                                                               |
-| Frontend          | React 19 (function components and hooks), built with Vite                                                                                    |
-| Styling           | Plain CSS with design-token variables (see [`docs/STYLE_GUIDE.md`](docs/STYLE_GUIDE.md)); no CSS framework                                   |
-| Backend           | PocketBase (REST API, file storage, and sign-in in sprint 3), using the `pocketbase` JavaScript SDK                                          |
-| Data storage      | PocketBase SQLite database: `dates` collection for ideas, `favorites` and `users` for accounts; schema committed in `backend/pb_migrations/` |
-| Browser storage   | `localStorage` (`datedeck.swipes`) for saved and hidden ideas until accounts arrive in sprint 3                                              |
-| Server-side logic | PocketBase `pb_hooks` (JavaScript) for the AI features; API keys stay on the server                                                          |
-| Testing           | Vitest and React Testing Library (PocketBase is mocked)                                                                                      |
-| Code quality      | ESLint and Prettier                                                                                                                          |
-| Hosting           | Netlify (frontend) and AWS (PocketBase)                                                                                                      |
-| Project tools     | GitHub (code, pull requests to a protected `main`), Trello (sprint board), Discord (team chat)                                               |
+| Layer           | Choice                                                                                                                                       |
+| --------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
+| Language        | JavaScript (`.jsx`), HTML, CSS                                                                                                               |
+| Frontend        | React 19 (function components and hooks), built with Vite                                                                                    |
+| Styling         | Plain CSS with design-token variables (see [`docs/STYLE_GUIDE.md`](docs/STYLE_GUIDE.md)); no CSS framework                                   |
+| Backend         | PocketBase (REST API, file storage, and sign-in in sprint 3), using the `pocketbase` JavaScript SDK                                          |
+| Data storage    | PocketBase SQLite database: `dates` collection for ideas, `favorites` and `users` for accounts; schema committed in `backend/pb_migrations/` |
+| Browser storage | `localStorage` (`datedeck.swipes`) for saved and hidden ideas until accounts arrive in sprint 3                                              |
+| Testing         | Vitest and React Testing Library (PocketBase is mocked)                                                                                      |
+| Code quality    | ESLint and Prettier                                                                                                                          |
+| Hosting         | Netlify (frontend) and AWS (PocketBase)                                                                                                      |
+| Project tools   | GitHub (code, pull requests to a protected `main`), Trello (sprint board), Discord (team chat)                                               |
 
 ```
 datedeck/
@@ -133,14 +132,12 @@ The full stories with acceptance criteria are in [`docs/PLAN.md`](docs/PLAN.md).
 
 ### Stretch goals
 
-**Sprint 3: Accounts and AI (Nov 2 – Nov 13)**
+**Sprint 3: Accounts (Nov 2 – Nov 13)**
 
 - [ ] DD-10b Put PocketBase on AWS and go live
 - [ ] DD-10 Sign up and sign in
 - [ ] DD-18 Keep saved and hidden ideas in your account
-- [ ] DD-19 Ask the AI for a date idea
 - [ ] DD-20 "Pick one for us" from saved ideas
-- [ ] DD-21 Let the AI help write a new idea
 - [ ] DD-22 Edit and remove my own ideas
 - [ ] DD-23 Approve new ideas before they go live
 - [ ] DD-24 Accessibility and polish pass

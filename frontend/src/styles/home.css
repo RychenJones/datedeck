@@ -6,8 +6,19 @@
   padding: var(--space-8) 0 var(--space-10);
 }
 
-.home--deck {
+.home__workspace {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.home__content {
+  min-width: 0;
+}
+
+.home--deck .home__content {
+  width: 100%;
   max-width: var(--deck-width);
+  margin-inline: auto;
 }
 
 .home__header {
@@ -48,7 +59,7 @@
 /* Stop the back cards above the controls row (save button height + its top margin). */
 .deck__behind {
   position: absolute;
-  inset: 0 0 calc(var(--control-action) + var(--space-6));
+  inset: 0 0 calc(var(--control-large) + var(--space-2) + var(--space-6));
   z-index: -1;
   overflow: hidden;
   border-radius: var(--radius-card);
@@ -80,9 +91,21 @@
   border-radius: var(--radius-pill);
   color: var(--ink);
   background: var(--panel);
-  font-size: var(--icon-large);
-  line-height: 1;
   box-shadow: var(--shadow-card);
+}
+.deck__control svg {
+  width: calc(var(--icon-size) + var(--space-1));
+  height: calc(var(--icon-size) + var(--space-1));
+}
+.deck__control--hide svg {
+  stroke-width: 2.5;
+}
+.deck__control--secondary svg {
+  width: var(--icon-size);
+  height: var(--icon-size);
+}
+.deck__control--save svg {
+  fill: currentColor;
 }
 .deck__control--secondary {
   width: var(--control-small);
@@ -90,7 +113,6 @@
   border: 0;
   color: var(--muted);
   background: transparent;
-  font-size: var(--text-xl);
   box-shadow: none;
 }
 .deck__control--shuffle {
@@ -98,10 +120,10 @@
   background: var(--shuffle);
 }
 .deck__control--save {
-  width: var(--control-action);
-  height: var(--control-action);
+  width: calc(var(--control-large) + var(--space-2));
+  height: calc(var(--control-large) + var(--space-2));
   border: 0;
-  color: var(--on-action);
+  color: var(--on-accent);
   background: var(--accent);
   box-shadow: var(--shadow-save);
 }
@@ -145,6 +167,9 @@
   color: var(--on-action);
   font-weight: var(--weight-bold);
 }
+.home__empty-action + .home__empty-action {
+  margin-inline-start: var(--space-3);
+}
 .home__empty-action:hover {
   background: var(--action-hover);
 }
@@ -163,11 +188,6 @@
 
 .home :where(h1, h2, p) {
   overflow-wrap: anywhere;
-}
-
-#add-idea-panel {
-  min-width: 0;
-  scroll-margin-block: var(--space-6);
 }
 
 /* Phone layout stays in React's styles; keep existing desktop tokens intact. */
@@ -230,10 +250,6 @@
     flex-shrink: 0;
   }
 
-  .home--deck:has(#add-idea-panel:focus-within) .deck__controls {
-    visibility: hidden;
-  }
-
   .home .saved-item {
     min-width: 0;
   }
@@ -264,6 +280,22 @@
   }
   .idea-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* Filters sit beside the deck or grid from here; below this they open as a sheet. */
+@media (min-width: 800px) {
+  .home__workspace {
+    grid-template-columns: minmax(0, var(--filter-width)) minmax(0, 1fr);
+    gap: var(--space-6);
+    align-items: start;
+  }
+}
+
+/* Beside the filter panel the grid is too narrow for two readable columns until here. */
+@media (min-width: 800px) and (max-width: 1099px) {
+  .home__workspace .idea-grid {
+    grid-template-columns: minmax(0, 1fr);
   }
 }
 

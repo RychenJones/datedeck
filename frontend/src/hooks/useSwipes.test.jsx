@@ -122,6 +122,21 @@ describe('useSwipes', () => {
     expect(result.current.canUndo).toBe(false);
   });
 
+  it('brings back every hidden idea and forgets those hides in the undo history', () => {
+    const { result } = renderSwipes();
+    act(() => result.current.save('idea-1'));
+    act(() => result.current.hide('idea-2'));
+    act(() => result.current.hide('idea-3'));
+
+    act(() => result.current.unhideAll());
+
+    expect(result.current.hidden).toEqual([]);
+    expect(result.current.saved).toEqual(['idea-1']);
+    act(() => result.current.undo());
+    expect(result.current.saved).toEqual([]);
+    expect(result.current.canUndo).toBe(false);
+  });
+
   it('forgets a choice in the undo history once you take it back by hand', () => {
     const { result } = renderSwipes();
     act(() => result.current.save('idea-1'));

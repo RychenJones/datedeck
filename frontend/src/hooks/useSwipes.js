@@ -100,6 +100,15 @@ export function useSwipesState() {
     }));
   }
 
+  /** Returns every hidden idea to the deck. Saved ideas stay saved. */
+  function unhideAll() {
+    setState((current) => ({
+      ...current,
+      swipes: { ...current.swipes, hidden: [] },
+      history: current.history.filter((entry) => entry.list !== 'hidden'),
+    }));
+  }
+
   /** Takes back the last save or hide and puts that idea on top of the deck. */
   function undo() {
     setState((current) => {
@@ -128,6 +137,7 @@ export function useSwipesState() {
     hide: (id) => add('hidden', id),
     unsave: (id) => remove('saved', id),
     unhide: (id) => remove('hidden', id),
+    unhideAll,
     undo,
     shuffle,
   };

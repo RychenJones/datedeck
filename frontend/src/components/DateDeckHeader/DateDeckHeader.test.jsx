@@ -68,5 +68,39 @@ describe('DateDeckHeader', () => {
 
     expect(screen.getByRole('button', { name: 'Signed in as Gabriel' })).toBeInTheDocument();
     expect(screen.getByText('G')).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Sign out' })).not.toBeInTheDocument();
+  });
+
+  it('offers Sign out when you open the menu on your name', async () => {
+    const user = userEvent.setup();
+    const onSignOut = vi.fn();
+    render(
+      <DateDeckHeader
+        user={{ id: 'user-1', name: 'Gabriel', email: 'gabriel@example.com' }}
+        isAccountOpen
+        onSignOut={onSignOut}
+      />,
+    );
+
+    await user.click(screen.getByRole('button', { name: 'Sign out' }));
+
+    expect(onSignOut).toHaveBeenCalledOnce();
+  });
+
+  it('closes the Sign out menu with Escape', async () => {
+    const user = userEvent.setup();
+    const onAccount = vi.fn();
+    render(
+      <DateDeckHeader
+        user={{ id: 'user-1', name: 'Gabriel', email: 'gabriel@example.com' }}
+        isAccountOpen
+        onAccount={onAccount}
+      />,
+    );
+
+    screen.getByRole('button', { name: 'Sign out' }).focus();
+    await user.keyboard('{Escape}');
+
+    expect(onAccount).toHaveBeenCalledOnce();
   });
 });

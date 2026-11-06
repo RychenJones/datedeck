@@ -1,9 +1,51 @@
+.filter-panel {
+  min-width: 0;
+}
+
+.filter-panel__toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  width: 100%;
+  min-height: var(--control-small);
+  margin-bottom: var(--space-6);
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-pill);
+  color: var(--ink);
+  background: var(--panel);
+  font-size: var(--text-md);
+  font-weight: var(--weight-bold);
+}
+
+.filter-panel__toggle:hover {
+  background: var(--field);
+}
+
+.filter-panel__badge {
+  display: grid;
+  place-items: center;
+  min-width: var(--icon-size);
+  height: var(--icon-size);
+  padding-inline: var(--space-1);
+  border-radius: var(--radius-pill);
+  color: var(--on-accent);
+  background: var(--accent);
+  font-size: var(--text-sm);
+}
+
+.filter-panel__backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  background: var(--overlay);
+}
+
 .filter-bar {
   display: grid;
   gap: var(--space-6);
   width: 100%;
   min-width: 0;
-  margin-bottom: var(--space-7);
   padding: var(--space-5);
   border-radius: var(--radius-card);
   background: var(--panel);
@@ -20,6 +62,26 @@
   justify-content: space-between;
   gap: var(--space-3);
   min-width: 0;
+}
+
+.filter-bar__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.filter-bar__done {
+  min-height: var(--control-small);
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-pill);
+  color: var(--on-action);
+  background: var(--action);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-bold);
+}
+
+.filter-bar__done:hover {
+  background: var(--action-hover);
 }
 
 .filter-bar__clear {
@@ -45,11 +107,27 @@
   font-weight: var(--weight-bold);
 }
 
+.filter-bar__field {
+  position: relative;
+  display: block;
+  min-width: 0;
+}
+
+.filter-bar__search-icon {
+  position: absolute;
+  top: 50%;
+  left: var(--space-4);
+  width: var(--icon-size);
+  height: var(--icon-size);
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+
 .filter-bar__search input {
   width: 100%;
   min-width: 0;
   min-height: var(--control-small);
-  padding: var(--space-2) var(--space-4);
+  padding: var(--space-2) var(--space-4) var(--space-2) var(--space-10);
   border: var(--border-width) solid transparent;
   border-radius: var(--radius-pill);
   color: var(--ink);
@@ -147,20 +225,47 @@
   border-color: var(--focus);
 }
 
-@media (min-width: 800px) {
+/* Phones and small tablets: hidden behind the Filters button, then a sheet from the bottom. */
+@media (max-width: 799px) {
   .filter-bar {
-    grid-template-columns: minmax(0, 0.7fr) minmax(0, 1fr);
-    align-items: start;
+    display: none;
   }
 
-  .filter-bar__heading {
-    grid-column: 1 / -1;
+  .filter-bar--open {
+    position: fixed;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 11;
+    display: grid;
+    max-height: 85vh;
+    max-height: 85dvh;
+    overflow-y: auto;
+    padding-bottom: calc(var(--space-5) + env(safe-area-inset-bottom, 0px));
+    border-radius: var(--radius-card) var(--radius-card) 0 0;
+    box-shadow: var(--shadow-dialog);
+  }
+
+  body:has(.filter-bar--open) {
+    overflow: hidden;
   }
 }
 
-@media (min-width: 1280px) {
-  .filter-bar {
-    grid-template-columns: minmax(0, 1fr);
+/* Laptops: stays in view beside the deck or grid while the page scrolls. */
+@media (min-width: 800px) {
+  .filter-panel {
+    position: sticky;
+    top: var(--space-4);
+    max-height: calc(100vh - var(--space-8));
+    max-height: calc(100dvh - var(--space-8));
+    overflow-y: auto;
+    border-radius: var(--radius-card);
+  }
+
+  .filter-panel__toggle,
+  .filter-panel__backdrop,
+  .filter-bar__done {
+    display: none;
   }
 }
 
@@ -170,11 +275,6 @@
   }
 
   .filter-bar__heading {
-    align-items: flex-start;
     flex-wrap: wrap;
-  }
-
-  .filter-bar__clear {
-    margin-left: auto;
   }
 }
