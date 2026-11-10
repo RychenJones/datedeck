@@ -1,8 +1,29 @@
 import { createContext, useContext, useEffect, useState } from 'react';
 
 const SWIPES_KEY = 'datedeck.swipes';
+const NO_DONE = Object.freeze({});
 
 export const SwipesContext = createContext(null);
+
+// `done` (DD-27) maps a saved idea's id to the ISO date-time it was marked as a date you went on.
+function isDoneMap(done) {
+  return (
+    typeof done === 'object' &&
+    done !== null &&
+    !Array.isArray(done) &&
+    Object.values(done).every((date) => typeof date === 'string' && !Number.isNaN(Date.parse(date)))
+  );
+}
+
+// Drops an idea's done mark, and the whole `done` field once nothing is left in it.
+function withoutDone(swipes, id) {
+  if (!swipes.done || !(id in swipes.done)) return swipes;
+  const done = { ...swipes.done };
+  delete done[id];
+  const result = { ...swipes, done };
+  if (Object.keys(done).length === 0) delete result.done;
+  return result;
+}
 
 // Keeps any other fields already in datedeck.swipes, so later stories can add their own.
 function readSwipes() {
@@ -14,7 +35,8 @@ function readSwipes() {
       (stored.saved !== undefined && !Array.isArray(stored.saved)) ||
       (stored.hidden !== undefined && !Array.isArray(stored.hidden)) ||
       (Array.isArray(stored.saved) && stored.saved.some((id) => typeof id !== 'string')) ||
-      (Array.isArray(stored.hidden) && stored.hidden.some((id) => typeof id !== 'string'))
+      (Array.isArray(stored.hidden) && stored.hidden.some((id) => typeof id !== 'string')) ||
+      (stored.done !== undefined && !isDoneMap(stored.done))
     ) {
       throw new Error('Invalid swipe data');
     }
@@ -121,27 +143,54 @@ export function useSwipesState() {
   }
 
   // Taking a choice back by hand also drops it from the history, so undo can't repeat it.
+  // Done marks belong to saved ideas, so unsaving an idea forgets its done mark too.
   function remove(list, id) {
-    setState((current) => ({
-      ...current,
-      swipes: { ...current.swipes, [list]: without(current.swipes[list], id) },
-      history: current.history.filter((entry) => entry.list !== list || entry.id !== id),
-    }));
+    setState((current) => {
+      const swipes = { ...current.swipes, [list]: without(current.swipes[list], id) };
+      return {
+        ...current,
+        swipes: list === 'saved' ? withoutDone(swipes, id) : swipes,
+        history: current.history.filter((entry) => entry.list !== list || entry.id !== id),
+      };
+    });
   }
 
   function toggleSave(id) {
     setState((current) => {
       const isSaved = current.swipes.saved.includes(id);
+      const swipes = {
+        ...current.swipes,
+        saved: isSaved ? without(current.swipes.saved, id) : [...current.swipes.saved, id],
+      };
       return {
         ...current,
-        swipes: {
-          ...current.swipes,
-          saved: isSaved ? without(current.swipes.saved, id) : [...current.swipes.saved, id],
-        },
+        swipes: isSaved ? withoutDone(swipes, id) : swipes,
         history: isSaved
           ? current.history.filter((entry) => entry.list !== 'saved' || entry.id !== id)
           : [...current.history, { list: 'saved', id }],
       };
+    });
+  }
+
+  /** Marks a saved idea as a date you went on, dated now (DD-27). It stays saved. */
+  function markDone(id) {
+    setState((current) => {
+      if (!current.swipes.saved.includes(id) || current.swipes.done?.[id]) return current;
+      return {
+        ...current,
+        swipes: {
+          ...current.swipes,
+          done: { ...current.swipes.done, [id]: new Date().toISOString() },
+        },
+      };
+    });
+  }
+
+  /** Takes back a done mark, so the idea is back in Liked with the ideas left to try. */
+  function undoDone(id) {
+    setState((current) => {
+      const swipes = withoutDone(current.swipes, id);
+      return swipes === current.swipes ? current : { ...current, swipes };
     });
   }
 
@@ -159,9 +208,13 @@ export function useSwipesState() {
     setState((current) => {
       const last = current.history.at(-1);
       if (!last) return current;
+      const swipes = {
+        ...current.swipes,
+        [last.list]: without(current.swipes[last.list], last.id),
+      };
       return {
         ...current,
-        swipes: { ...current.swipes, [last.list]: without(current.swipes[last.list], last.id) },
+        swipes: last.list === 'saved' ? withoutDone(swipes, last.id) : swipes,
         history: current.history.slice(0, -1),
         deckOrder: [last.id, ...without(current.deckOrder, last.id)],
       };
@@ -177,6 +230,7 @@ export function useSwipesState() {
   return {
     saved: swipes.saved,
     hidden: swipes.hidden,
+    done: swipes.done ?? NO_DONE,
     canUndo: history.length > 0,
     deckOrder,
     save: (id) => add('saved', id),
@@ -187,6 +241,8 @@ export function useSwipesState() {
     undo,
     shuffle,
     toggleSave,
+    markDone,
+    undoDone,
     storageError: storageError || writeError,
   };
 }

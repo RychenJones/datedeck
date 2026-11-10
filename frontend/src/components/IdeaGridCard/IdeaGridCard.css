@@ -41,6 +41,11 @@
   background: var(--field);
 }
 
+/* We did this (DD-27): the completion action, outlined in the accent so it stands apart from Remove. */
+.idea-grid-card__choice--done {
+  border-color: var(--accent);
+}
+
 .idea-grid-card__choice--save[aria-pressed='true'],
 .idea-grid-card__choice--save[aria-pressed='true']:hover {
   border-color: var(--accent);

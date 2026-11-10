@@ -6,10 +6,12 @@ import './IdeaGridCard.css';
 
 /**
  * A card for the idea grids: all the details, with nothing to open. All ideas saves an idea, and
- * Liked removes one, passing `onRemove` to move focus once the card is gone. Hiding is for the deck.
+ * Liked removes one, passing `onRemove` to move focus once the card is gone. Liked also passes
+ * `onDone` to show We did this, which moves the idea to the Done section (DD-27). Hiding is for
+ * the deck.
  */
-export default function IdeaGridCard({ idea, onRemove }) {
-  const { saved, toggleSave, unsave } = useSwipes();
+export default function IdeaGridCard({ idea, onRemove, onDone }) {
+  const { saved, toggleSave, unsave, markDone } = useSwipes();
   const { id, title, address } = idea;
   const isSaved = saved.includes(id);
 
@@ -19,6 +21,19 @@ export default function IdeaGridCard({ idea, onRemove }) {
       showAddress
       actions={
         <div className="idea-grid-card__actions" aria-label={`Actions for ${title}`}>
+          {onDone && (
+            <button
+              type="button"
+              className="idea-grid-card__choice idea-grid-card__choice--done"
+              aria-label={`We did ${title}`}
+              onClick={() => {
+                markDone(id);
+                onDone();
+              }}
+            >
+              We did this
+            </button>
+          )}
           {address && (
             <a
               className="idea-grid-card__maps"

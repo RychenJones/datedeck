@@ -266,6 +266,90 @@ describe('useSwipes', () => {
     expect(result.current.canUndo).toBe(true);
   });
 
+  describe('done marks (DD-27)', () => {
+    it('marks a saved idea as done with the date and keeps it saved', () => {
+      const { result } = renderSwipes();
+      act(() => result.current.save('idea-1'));
+
+      act(() => result.current.markDone('idea-1'));
+
+      expect(result.current.saved).toEqual(['idea-1']);
+      expect(Date.parse(result.current.done['idea-1'])).not.toBeNaN();
+      expect(stored().done).toEqual({ 'idea-1': result.current.done['idea-1'] });
+    });
+
+    it('keeps the first date when an idea is marked done twice', () => {
+      const { result } = renderSwipes();
+      act(() => result.current.save('idea-1'));
+      act(() => result.current.markDone('idea-1'));
+      const first = result.current.done['idea-1'];
+
+      act(() => result.current.markDone('idea-1'));
+
+      expect(result.current.done['idea-1']).toBe(first);
+    });
+
+    it('only marks saved ideas as done', () => {
+      const { result } = renderSwipes();
+
+      act(() => result.current.markDone('idea-1'));
+
+      expect(result.current.done).toEqual({});
+      expect(stored()).toEqual({ saved: [], hidden: [] });
+    });
+
+    it('takes back a done mark and keeps the idea saved', () => {
+      const { result } = renderSwipes();
+      act(() => result.current.save('idea-1'));
+      act(() => result.current.markDone('idea-1'));
+
+      act(() => result.current.undoDone('idea-1'));
+
+      expect(result.current.done).toEqual({});
+      expect(stored()).toEqual({ saved: ['idea-1'], hidden: [] });
+    });
+
+    it('forgets the done mark when the idea is unsaved, unliked or undone', () => {
+      const { result } = renderSwipes();
+      act(() => result.current.save('a'));
+      act(() => result.current.save('b'));
+      act(() => result.current.save('c'));
+      ['a', 'b', 'c'].forEach((id) => act(() => result.current.markDone(id)));
+
+      act(() => result.current.unsave('a'));
+      act(() => result.current.toggleSave('b'));
+      act(() => result.current.undo());
+
+      expect(result.current.saved).toEqual([]);
+      expect(result.current.done).toEqual({});
+    });
+
+    it('remembers done marks from an earlier visit', () => {
+      const done = { 'idea-1': '2026-11-02T18:00:00.000Z' };
+      window.localStorage.setItem(
+        'datedeck.swipes',
+        JSON.stringify({ saved: ['idea-1'], hidden: [], done }),
+      );
+
+      const { result } = renderSwipes();
+
+      expect(result.current.done).toEqual(done);
+      expect(result.current.storageError).toBeNull();
+    });
+
+    it('explains broken done data instead of using it', () => {
+      window.localStorage.setItem(
+        'datedeck.swipes',
+        JSON.stringify({ saved: ['idea-1'], hidden: [], done: { 'idea-1': 'not a date' } }),
+      );
+
+      const { result } = renderSwipes();
+
+      expect(result.current.done).toEqual({});
+      expect(result.current.storageError).toMatch(/could not read/i);
+    });
+  });
+
   it('explains the mistake when used outside SwipesProvider', () => {
     expect(() => renderHook(() => useSwipes())).toThrow(
       'useSwipes must be used inside <SwipesProvider>.',
