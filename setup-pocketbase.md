@@ -1,6 +1,6 @@
-# DateBase — Developer Setup
+# DateDeck — Developer Setup
 
-This guide explains how to set up the local PocketBase backend for DateBase.
+This guide explains how to set up the local PocketBase backend for DateDeck.
 
 Each developer runs their own local PocketBase instance and has their own local database. The database schema is shared through GitHub using PocketBase migrations.
 
@@ -20,7 +20,7 @@ Do **not** commit `pb_data/` or the PocketBase executable to GitHub.
 
 ## 1. Clone the repository
 
-Clone the DateBase repository:
+Clone the DateDeck repository:
 
 ```bash
 git clone <REPOSITORY-URL>
@@ -29,7 +29,7 @@ git clone <REPOSITORY-URL>
 Then enter the project:
 
 ```bash
-cd DateBase
+cd DateDeck
 ```
 
 If you already have the repository, simply pull the latest changes:
@@ -70,7 +70,7 @@ uname -m
 After downloading and extracting PocketBase, place the executable inside:
 
 ```text
-DateBase/
+DateDeck/
 └── backend/
     └── pocketbase
 ```
@@ -166,7 +166,7 @@ This account only applies to your local PocketBase instance.
 
 ## 8. Database migrations
 
-The DateBase database schema is managed through PocketBase migrations.
+The DateDeck database schema is managed through PocketBase migrations.
 
 The `pb_migrations/` directory is shared through GitHub.
 
@@ -291,25 +291,25 @@ http://127.0.0.1:8090
 
 Each developer's frontend therefore communicates with their own local database.
 
-Later, when DateBase is hosted, the frontend will be configured to communicate with the shared hosted PocketBase server instead.
+Later, when DateDeck is hosted, the frontend will be configured to communicate with the shared hosted PocketBase server instead.
 
 ---
 
 ## Quick Start
 
-After the initial setup, starting DateBase should generally be:
+After the initial setup, starting DateDeck should generally be:
 
 ### Terminal 1 — PocketBase
 
 ```bash
-cd DateBase/backend
+cd DateDeck/backend
 ./pocketbase serve
 ```
 
 ### Terminal 2 — Frontend
 
 ```bash
-cd DateBase/frontend
+cd DateDeck/frontend
 npm install
 npm run dev
 ```

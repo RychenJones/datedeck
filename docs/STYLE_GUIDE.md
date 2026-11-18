@@ -1,6 +1,6 @@
 # DateDeck style guide · DD-07
 
-DateDeck uses a dark charcoal canvas, rounded panels, coral accents, and friendly rounded type. The supplied Deck and All ideas references define the layout. `frontend/src/styles/index.css` is the shared source of design tokens; `Home.jsx` owns the React header and layout. Both `index.html` and `datedeck.html` mount the same React app.
+DateDeck uses a dark charcoal canvas, rounded panels, coral accents, and friendly rounded type. The supplied Deck and All ideas references define the layout. `frontend/src/styles/index.css` is the shared source of design tokens; `Home.jsx` owns the React header and layout. `index.html` mounts the React app.
 
 | Token family                                           | Use                                                                 |
 | ------------------------------------------------------ | ------------------------------------------------------------------- |
