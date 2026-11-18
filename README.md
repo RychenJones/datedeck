@@ -15,21 +15,36 @@ DateDeck shows date ideas one at a time, like a deck of cards: swipe right to **
 
 You need [Node.js](https://nodejs.org/) and the PocketBase binary (see [`setup-pocketbase.md`](setup-pocketbase.md)).
 
-1. Start PocketBase in one terminal:
+1. The frontend uses the shared cloud PocketBase by default. Copy the environment file once:
 
    ```bash
-   cd backend
-   ./pocketbase serve   # API at http://127.0.0.1:8090, dashboard at http://127.0.0.1:8090/_/
+   cd frontend
+   cp .env.example .env
    ```
 
-2. Start the React app in a second terminal:
+   The cloud API is configured at `https://api-datedeck.duckdns.org`. Do not add the `/_/` dashboard path.
+
+2. Start the React app:
 
    ```bash
    cd frontend
    npm install
-   cp .env.example .env   # sets VITE_POCKETBASE_URL
    npm run dev            # http://localhost:5173
    ```
+
+To test against your own local PocketBase instead, start PocketBase in another terminal:
+
+```bash
+cd backend
+./pocketbase serve   # API at http://127.0.0.1:8090
+```
+
+Then start the frontend with the local override:
+
+```bash
+cd frontend
+npm run dev:local
+```
 
 Other commands (from `frontend/`): `npm run lint`, `npm test`, `npm run build`, `npm run format`.
 

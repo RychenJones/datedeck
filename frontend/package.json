@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "dev:local": "VITE_POCKETBASE_URL=http://127.0.0.1:8090 vite",
     "build": "vite build",
     "preview": "vite preview",
     "lint": "eslint .",

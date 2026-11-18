@@ -4,6 +4,9 @@ Vite + React app for DateDeck.
 
 ## Run it
 
+The frontend uses the cloud PocketBase by default. The API URL is stored in `.env` as
+`https://api-datedeck.duckdns.org`.
+
 ```bash
 cd frontend
 npm install
@@ -11,7 +14,11 @@ cp .env.example .env
 npm run dev
 ```
 
-Start PocketBase first (see `../setup-pocketbase.md`) so the app can reach it at `VITE_POCKETBASE_URL`.
+To test with a local PocketBase, start it first (see `../setup-pocketbase.md`), then run:
+
+```bash
+npm run dev:local
+```
 
 ## Folders
 
@@ -25,6 +32,7 @@ Start PocketBase first (see `../setup-pocketbase.md`) so the app can reach it at
 ## Scripts
 
 - `npm run dev` – start the dev server
+- `npm run dev:local` – start the dev server using `http://127.0.0.1:8090`
 - `npm run build` – build for production
 - `npm run lint` – check code with ESLint
 - `npm run format` – format code with Prettier
