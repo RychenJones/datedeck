@@ -1,0 +1,35 @@
+/* DD-28: Try again sits first, with any other actions (like Undo) wrapping beside it. */
+.connection-error__actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-3);
+  margin-top: var(--space-6);
+}
+
+.connection-error__actions .home__empty-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  margin: 0;
+}
+
+.connection-error__actions .home__empty-action svg {
+  width: var(--icon-size);
+  height: var(--icon-size);
+}
+
+/* Phones: full-width actions, like the other empty states (DD-16). */
+@media (max-width: 479px) {
+  .connection-error__actions .home__empty-action {
+    width: 100%;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .connection-error__actions .home__empty-action:hover svg {
+    transform: rotate(90deg);
+    transition: transform var(--duration);
+  }
+}

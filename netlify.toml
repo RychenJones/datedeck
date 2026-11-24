@@ -7,3 +7,10 @@
 
 [build.environment]
   NODE_VERSION = "22"
+
+# DD-28: a link to a page that does not exist still loads the app, which shows its Not found
+# screen. Real files (like /assets/*) are served first; 404 keeps the right status for browsers.
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 404

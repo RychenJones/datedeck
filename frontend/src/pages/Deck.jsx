@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef } from 'react';
 import { Shuffle, Undo2, X } from 'lucide-react';
+import ConnectionError from '../components/ConnectionError/ConnectionError.jsx';
 import IdeaCard from '../components/IdeaCard/IdeaCard.jsx';
 import SwipeCard from '../components/SwipeCard/SwipeCard.jsx';
 import { useIdeas } from '../hooks/useIdeas.js';
@@ -39,7 +40,7 @@ function DeckMessage({ title, action, children }) {
 function DeckContent({ filters }) {
   const heading = useRef(null);
   // Database ideas when there are some; the sample ideas until the database has any.
-  const { ideas, status, totalItems, hasMore, loadMore } = useIdeas(filters, {
+  const { ideas, status, error, totalItems, hasMore, loadMore, retry } = useIdeas(filters, {
     samplesWhenEmpty: true,
   });
   const { saved, hidden, canUndo, deckOrder, save, hide, undo, unhideAll, shuffle } = useSwipes();
@@ -80,6 +81,28 @@ function DeckContent({ filters }) {
     refocusUndo.current = false;
   });
 
+  // When the browser says the connection is back, try again without waiting for a click.
+  useEffect(() => {
+    if (status !== 'error') return undefined;
+    window.addEventListener('online', retry);
+    return () => window.removeEventListener('online', retry);
+  }, [status, retry]);
+
+  // Try again swaps the error for a loading message, so put focus back once it settles:
+  // on Try again if it failed again, or on the deck if the ideas came back.
+  const retryButton = useRef(null);
+  const refocusRetry = useRef(false);
+  useEffect(() => {
+    if (!refocusRetry.current || status === 'loading' || status === 'loading-more') return;
+    refocusRetry.current = false;
+    (retryButton.current ?? deck.current)?.focus();
+  });
+
+  function tryAgain() {
+    refocusRetry.current = true;
+    retry();
+  }
+
   const undoAction = canUndo && (
     <button
       type="button"
@@ -99,9 +122,9 @@ function DeckContent({ filters }) {
     content = <DeckMessage title="Loading ideas">Finding date ideas in Rexburg…</DeckMessage>;
   } else if (status === 'error' && !currentIdea) {
     content = (
-      <DeckMessage title="Could not load ideas" action={undoAction}>
-        Check your connection and reload the page to try again.
-      </DeckMessage>
+      <ConnectionError error={error} onRetry={tryAgain} retryRef={retryButton}>
+        {undoAction}
+      </ConnectionError>
     );
   } else if (currentIdea) {
     content = (
