@@ -167,6 +167,34 @@
   color: var(--on-action);
   font-weight: var(--weight-bold);
 }
+/* DD-28: Not found screen for unknown links, centered in the page width the deck uses. */
+.not-found {
+  max-width: var(--deck-width);
+  padding-top: var(--space-12);
+}
+.not-found h1 {
+  font-size: var(--text-heading);
+  line-height: var(--leading-heading);
+}
+.not-found__link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+}
+.not-found__link svg {
+  width: var(--icon-size);
+  height: var(--icon-size);
+}
+@media (max-width: 479px) {
+  .not-found {
+    padding-top: var(--space-6);
+  }
+  .not-found__link {
+    width: 100%;
+  }
+}
+
 .home__empty-action + .home__empty-action {
   margin-inline-start: var(--space-3);
 }

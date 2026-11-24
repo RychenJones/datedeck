@@ -74,6 +74,50 @@ describe('useIdeas', () => {
     expect(result.current.error).toBe(error);
   });
 
+  it('loads the ideas again when you retry after a failure', async () => {
+    collection.getList.mockRejectedValueOnce(new Error('PocketBase is unavailable'));
+    serve(makeIdeas(2));
+
+    const { result } = renderHook(() => useIdeas());
+    await waitFor(() => expect(result.current.status).toBe('error'));
+
+    act(() => result.current.retry());
+
+    expect(result.current.status).toBe('loading');
+    await waitFor(() => expect(result.current.status).toBe('ready'));
+    expect(result.current.ideas.map((idea) => idea.title)).toEqual(['Idea 1', 'Idea 2']);
+    expect(result.current.error).toBeNull();
+  });
+
+  it('retries only the page that failed and keeps the ideas it already has', async () => {
+    const ideas = makeIdeas(PAGE_SIZE + 5);
+    serve(ideas);
+    const { result } = renderHook(() => useIdeas());
+    await waitFor(() => expect(result.current.status).toBe('ready'));
+
+    collection.getList.mockRejectedValueOnce(new Error('PocketBase is unavailable'));
+    act(() => result.current.loadMore());
+    await waitFor(() => expect(result.current.status).toBe('error'));
+    expect(result.current.ideas).toHaveLength(PAGE_SIZE);
+
+    act(() => result.current.retry());
+
+    await waitFor(() => expect(result.current.ideas).toHaveLength(PAGE_SIZE + 5));
+    expect(result.current.status).toBe('ready');
+    expect(collection.getList).toHaveBeenLastCalledWith(2, PAGE_SIZE, expect.any(Object));
+  });
+
+  it('does nothing when you retry while nothing has failed', async () => {
+    serve(makeIdeas(2));
+    const { result } = renderHook(() => useIdeas());
+    await waitFor(() => expect(result.current.status).toBe('ready'));
+
+    act(() => result.current.retry());
+
+    expect(result.current.status).toBe('ready');
+    expect(collection.getList).toHaveBeenCalledTimes(1);
+  });
+
   it('ignores a cancelled request', async () => {
     collection.getList.mockRejectedValue(
       Object.assign(new Error('autocancelled'), { isAbort: true }),

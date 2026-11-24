@@ -132,7 +132,8 @@ function mergeIdeas(primaryIdeas, additionalIdeas) {
 
 /**
  * Loads ideas from the PocketBase dates collection that match the filters,
- * PAGE_SIZE at a time. Call loadMore() to add the next page.
+ * PAGE_SIZE at a time. Call loadMore() to add the next page, and retry() to ask again after
+ * a request fails.
  *
  * includeSamples always mixes in the sample ideas (and uses them if PocketBase fails);
  * samplesWhenEmpty uses them only while the database has no ideas at all.
@@ -231,6 +232,13 @@ export function useIdeas(
     setRequest((current) => ({ ...current, page: current.page + 1 }));
   }, [canLoadMore]);
 
+  // Asks again for the page that failed; a new request object re-runs the effect above.
+  const failed = isDone && Boolean(result.error);
+  const retry = useCallback(() => {
+    if (!failed) return;
+    setRequest((current) => ({ ...current }));
+  }, [failed]);
+
   let status = 'ready';
   if (isDone && result.error) status = 'error';
   else if (!isDone) status = request.page === 1 ? 'loading' : 'loading-more';
@@ -242,6 +250,7 @@ export function useIdeas(
     totalItems: result.totalItems,
     hasMore: result.hasMore,
     loadMore,
+    retry,
   };
 }
 

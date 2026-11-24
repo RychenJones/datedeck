@@ -1,5 +1,6 @@
 import { fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { ClientResponseError } from 'pocketbase';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import App from '../App.jsx';
 import sampleIdeas from '../data/sample-ideas.json';
@@ -787,6 +788,99 @@ describe('Home deck', () => {
     expect(
       await screen.findByRole('heading', { name: 'Picnic at Porter Park' }),
     ).toBeInTheDocument();
+  });
+
+  it('shows a friendly screen with Try again when PocketBase cannot be reached', async () => {
+    // The SDK reports a failed connection as status 0.
+    collection.getList.mockRejectedValue(new ClientResponseError({ status: 0 }));
+    const user = userEvent.setup();
+    render(<App />);
+
+    expect(
+      await screen.findByRole('heading', { name: 'We can’t reach DateDeck right now' }),
+    ).toBeInTheDocument();
+    expect(screen.getByText(/Check your internet connection/)).toBeInTheDocument();
+
+    serve(sampleIdeas);
+    await user.click(screen.getByRole('button', { name: 'Try again' }));
+
+    expect(await topIdeaTitle()).toBe('Picnic at Porter Park');
+    expect(screen.queryByRole('button', { name: 'Try again' })).not.toBeInTheDocument();
+  });
+
+  it('keeps the friendly screen when Try again still cannot reach PocketBase', async () => {
+    collection.getList.mockRejectedValue(new ClientResponseError({ status: 0 }));
+    const user = userEvent.setup();
+    render(<App />);
+
+    await user.click(await screen.findByRole('button', { name: 'Try again' }));
+
+    expect(
+      await screen.findByRole('heading', { name: 'We can’t reach DateDeck right now' }),
+    ).toBeInTheDocument();
+    await waitFor(() => expect(collection.getList).toHaveBeenCalledTimes(2));
+    expect(screen.getByRole('button', { name: 'Try again' })).toHaveFocus();
+  });
+
+  it('offers Try again when the ideas cannot load for another reason', async () => {
+    collection.getList.mockRejectedValueOnce(new ClientResponseError({ status: 500 }));
+    const user = userEvent.setup();
+    render(<App />);
+
+    expect(
+      await screen.findByRole('heading', { name: 'Could not load ideas' }),
+    ).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: 'Try again' }));
+
+    expect(await topIdeaTitle()).toBe('Picnic at Porter Park');
+  });
+
+  it('tries again by itself when the connection comes back', async () => {
+    collection.getList.mockRejectedValueOnce(new ClientResponseError({ status: 0 }));
+    render(<App />);
+
+    expect(
+      await screen.findByRole('heading', { name: 'We can’t reach DateDeck right now' }),
+    ).toBeInTheDocument();
+    fireEvent(window, new Event('online'));
+
+    expect(await topIdeaTitle()).toBe('Picnic at Porter Park');
+  });
+
+  it('loads the next page again when you press Try again after it failed', async () => {
+    const manyIdeas = Array.from({ length: PAGE_SIZE + 2 }, (_, index) => ({
+      ...sampleIdeas[0],
+      id: `idea-${index + 1}`,
+      title: `Idea ${index + 1}`,
+    }));
+    let reachable = false;
+    collection.getList.mockImplementation(async (page, perPage) => {
+      if (page > 1 && !reachable) throw new ClientResponseError({ status: 0 });
+      return {
+        page,
+        perPage,
+        totalItems: manyIdeas.length,
+        totalPages: 2,
+        items: manyIdeas.slice((page - 1) * perPage, page * perPage),
+      };
+    });
+    window.localStorage.setItem(
+      'datedeck.swipes',
+      JSON.stringify({ saved: [], hidden: manyIdeas.slice(0, PAGE_SIZE).map((idea) => idea.id) }),
+    );
+    const user = userEvent.setup();
+    render(<App />);
+
+    await user.click(await screen.findByRole('button', { name: 'Try again' }));
+    // Still offline: the same screen comes back.
+    expect(
+      await screen.findByRole('heading', { name: 'We can’t reach DateDeck right now' }),
+    ).toBeInTheDocument();
+
+    reachable = true;
+    await user.click(screen.getByRole('button', { name: 'Try again' }));
+
+    expect(await topIdeaTitle()).toBe(`Idea ${PAGE_SIZE + 1}`);
   });
 
   it('opens the account panel from the header and from the add idea form', async () => {
